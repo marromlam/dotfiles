@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 THEME=$1
-KITTYTHEMES=$HOME/.config/kitty/kitty-themes/themes
+KITTYTHEMES=$HOME/.config/kitty/kitty-themes
 
 # clone all kitty themes if needed
 if [ ! -d $KITTYTHEMES ]; then
@@ -9,9 +9,9 @@ if [ ! -d $KITTYTHEMES ]; then
 fi
 
 # show all themes
-ls $KITTYTHEMES
+ls $KITTYTHEMES/themes
 
 # Change kitty theme
-kitty @ set-colors -a "$KITTYTHEMES/$THEME.conf"
+kitty @ set-colors -a "$KITTYTHEMES/themes/$THEME.conf"
 rm -rf $HOME/.config/kitty/theme.conf
-ln -s $KITTYTHEMES/$THEME.conf $HOME/.config/kitty/theme.conf 
+ln -s $KITTYTHEMES/themes/$THEME.conf $HOME/.config/kitty/theme.conf 

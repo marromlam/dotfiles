@@ -2,13 +2,13 @@
 
 
 
-FC=${HOME}/.fictional-couscous
+FC=${HOME}/fictional-couscous
 TMUX_SHARE=${HOME}/.config/tmux
 
 all: brew neovim vim tmux fzf-marks
 
 install:
-	stow --restow --ignore ".DS_Store" --target="$(HOME)" --dir="$(FC)" files
+	stow --ignore ".DS_Store" --target="$(HOME)" --dir="$(FC)" files
 
 brew:
 	brew bundle --file="$(FC)/homebrew/Brewfile"
