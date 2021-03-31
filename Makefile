@@ -13,6 +13,14 @@ install:
 brew:
 	brew bundle --file="$(FC)/homebrew/Brewfile"
 
+tmux:
+	if [ ! -d "$(TMUX_SHARE)/plugins/tpm" ]; then
+	  git clone https://github.com/tmux-plugins/tpm "$(TMUX_SHARE)/plugins/tpm";
+	fi
+	tmux start-server
+	tmux new-session -d
+	#${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
+	tmux kill-server
 neovim:
 	python3 -m pip install --upgrade pynvim
 	nvim +PlugInstall +qall
