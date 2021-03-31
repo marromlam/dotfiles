@@ -1,4 +1,5 @@
 # This file install all shit
+#${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 
 
 
@@ -8,19 +9,20 @@ TMUX_SHARE=${HOME}/.config/tmux
 all: brew kitty neovim vim tmux fzf-marks
 
 install:
-	stow --ignore ".DS_Store" --target="$(HOME)" --dir="$(FC)" files
+	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
 
 brew:
-	brew bundle --file="$(FC)/homebrew/Brewfile"
+	brew bundle --file="${FC}/homebrew/Brewfile"
 
 tmux:
-	if [ ! -d "$(TMUX_SHARE)/plugins/tpm" ]; then
-	  git clone https://github.com/tmux-plugins/tpm "$(TMUX_SHARE)/plugins/tpm";
+	if [ ! -d "${TMUX_SHARE}/plugins/tpm" ]; then \
+	  git clone https://github.com/tmux-plugins/tpm "${TMUX_SHARE}/plugins/tpm"; \
 	fi
 	tmux start-server
 	tmux new-session -d
-	#${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
+	${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 	tmux kill-server
+
 neovim:
 	python3 -m pip install --upgrade pynvim
 	nvim +PlugInstall +qall
@@ -37,4 +39,4 @@ fzf-marks:
 	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks;
 	fi
 
-.PHONY: all install brew kitty neovim vim tmux
+.PHONY: all install brew kitty neovim vim tmux fzf-marks
