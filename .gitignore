@@ -1,0 +1,10 @@
+# Ignore config files -- downloaded automatically with make
+files/.config/kitty/appdirs/
+files/.config/kitty/keyring.patch
+files/.config/kitty/keyring/
+files/.config/kitty/kitty-themes/
+files/.config/kitty/pylib2kitty/
+files/.config/kitty/six.py
+files/.config/kitty/theme.conf
+files/.config/kitty/wcwidth/
+files/.config/tmux/
