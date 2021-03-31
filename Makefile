@@ -18,7 +18,7 @@ neovim:
 	nvim +PlugInstall +qall
 
 kitty:
-	cp ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.8/
+	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.8/
 
 vim:
 	ln -s ${FC}/files/.config/nvim ~/.vim
