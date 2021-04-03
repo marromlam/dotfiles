@@ -6,7 +6,10 @@
 FC=${HOME}/fictional-couscous
 TMUX_SHARE=${HOME}/.config/tmux
 
-all: brew kitty neovim vim tmux fzf-marks
+all: brew macos kitty neovim vim tmux fzf-marks
+
+macos:
+	${FC}/extra/macos_settings.sh
 
 install:
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
@@ -31,12 +34,12 @@ kitty:
 	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.8/
 
 vim:
-	ln -s ${FC}/files/.config/nvim ~/.vim
-	ln -s ${FC}/files/.config/nvim/init.vim ~/.vimrc
+	ln -sf ${FC}/files/.config/nvim ~/.vim
+	ln -sf ${FC}/files/.config/nvim/init.vim ~/.vimrc
 
 fzf-marks:
 	if [ ! -d ~/fzf-marks ]; then
 	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks;
 	fi
 
-.PHONY: all install brew kitty neovim vim tmux fzf-marks
+.PHONY: all install brew macos kitty neovim vim tmux fzf-marks
