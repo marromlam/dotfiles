@@ -10,4 +10,10 @@ files/.config/kitty/wcwidth/
 files/.config/tmux/
 files/.config/coc/
 files/.config/kitty/themes/
+.DS_Store
+*.un~
+files/.config/nvim/.netrwhist
+files/.config/nvim/autoload/
+files/.config/nvim/nvim
+files/.config/nvim/sessions/
 
