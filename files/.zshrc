@@ -1,10 +1,12 @@
 # Get machine operative system
 export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
+
 # Set homebrew path
-if [ MACHINEOS=='Mac' ]; then
-  export HOMEBREW='/usr/local'
+if [[ "$MACHINEOS" == "Mac" ]]; then
+  export HOMEBREW="/usr/local"
 else
-  export HOMEBREW='$HOME/.masterbrew'
+  export HOMEBREW="$HOME/.masterbrew"
+  eval $($HOMEBREW/bin/brew shellenv)
 fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -71,13 +73,12 @@ fi
 # common denominator (bash/zsh) profile
 source $HOME/.sh_profile
 
-if [ MACHINEOS=='Mac' ]; then
+if [[ "$MACHINEOS" == "Mac" ]]; then
   export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
   export CLICOLOR=1; export LSCOLORS=GxFxCxDxBxegedabagaced
 else
   export CLICOLOR=1; export LSCOLORS=GxFxCxDxBxegedabagaced
-  eval $(/home3/marcos.romero/.linuxbrew/bin/brew shellenv)
-  export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
+  #export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 fi
 
 if [ -n "$TMUX" ]; then                                                                               
