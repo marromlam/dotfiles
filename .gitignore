@@ -8,3 +8,6 @@ files/.config/kitty/six.py
 files/.config/kitty/theme.conf
 files/.config/kitty/wcwidth/
 files/.config/tmux/
+files/.config/coc/
+files/.config/kitty/themes/
+
