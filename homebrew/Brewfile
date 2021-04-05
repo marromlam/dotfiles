@@ -72,6 +72,7 @@ cask "kitty"
 cask "mactex-no-gui"
 cask "transmission"
 cask "inkscape"
+cask "brave-browser"
 
 # Fonts
 cask "font-fira-code"
