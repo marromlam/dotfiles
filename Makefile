@@ -38,8 +38,8 @@ vim:
 	ln -sf ${FC}/files/.config/nvim/init.vim ~/.vimrc
 
 fzf-marks:
-	if [ ! -d ~/fzf-marks ]; then
-	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks;
+	if [ ! -d ~/fzf-marks ]; then \
+	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks; \
 	fi
 
 .PHONY: all install brew macos kitty neovim vim tmux fzf-marks
