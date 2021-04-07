@@ -48,6 +48,7 @@ to plot images inline, plus it allows me to run the code in any of the machines
 I have access to on the fly. 
 
 |             | local python kernel | remote python kernel |
+|-------------|---------------------|----------------------|
 | local code  | yes                 | yes                  |
 | remote code | yes                 | yes                  |
 
