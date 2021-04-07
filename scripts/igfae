@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+echo "              _          _              _          _                   _        " 
+echo "             /\ \       /\ \           /\ \       / /\                /\ \      " 
+echo "             \ \ \     /  \ \         /  \ \     / /  \              /  \ \     " 
+echo "             /\ \_\   / /\ \_\       / /\ \ \   / / /\ \            / /\ \ \    " 
+echo "            / /\/_/  / / /\/_/      / / /\ \_\ / / /\ \ \          / / /\ \_\   " 
+echo "           / / /    / / / ______   / /_/_ \/_// / /  \ \ \        / /_/_ \/_/   " 
+echo "          / / /    / / / /\_____\ / /____/\  / / /___/ /\ \      / /____/\      " 
+echo "         / / /    / / /  \/____ // /\____\/ / / /_____/ /\ \    / /\____\/      " 
+echo "     ___/ / /__  / / /_____/ / // / /      / /_________/\ \ \  / / /______      " 
+echo "    /\__\/_/___\/ / /______\/ // / /      / / /_       __\ \_\/ / /_______\     " 
+echo "    \/_________/\/___________/ \/_/       \_\___\     /____/_/\/__________/     " 
+echo "                                                                                " 
+
+echo "================================================================================"
+
+# Check whether lemonade is running
+ps cax | grep lemonade> /dev/null
+if [ $? -eq 0 ]; then
+  echo "=  lemonade is running.                                                        ="
+else
+  echo "=  lemonade was not running... lemonade was launched.                          ="
+  nohup lemonade server -allow 127.0.0.1 &
+fi
+
+# Set display variable
+export DISPLAY=:0.0
+echo "=  export display variable.                                                    ="
+
+# Command to attach tmux session
+cmnd="/home3/marcos.romero/.masterbrew/bin/tmux attach -t IGFAE"
+
+# Connect and attach
+echo "Connection to diskpool1.igfae.usc.es is opened."
+ssh -R 2489:127.0.0.1:2489 -t gpu109 $cmnd
+
+echo "================================================================================"
