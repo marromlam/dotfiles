@@ -41,7 +41,7 @@ Kitty lacks a good macOS icon. I made one for me, with my favourite cat, Gin.
 
 #### juKitty
 I develop a lot of python code, so you might recommend me to use Jupiter
-notebooks. I argue that. In 2021 Easter, encouraded by my mate Saul, I developed
+notebooks. I argue that. In 2021 Easter, encouraded by my mate [Saul](https://github.com/saulsolino), I developed
 juKitty. It is (we think) a very close approach to that the VSCode Python
 extension does with line-by-line evaluation. It leverages kitty's image support
 to plot images inline, plus it allows me to run the code in any of the machines
