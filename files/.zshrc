@@ -12,7 +12,7 @@ fi
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-#export XDG_DATA_DIRS="/home3/marcos.romero/.linuxbrew/share:$XDG_DATA_DIRS"
+export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -47,6 +47,14 @@ export FZF_DEFAULT_OPTS='--height 40% --border --preview="cat {}" --preview-wind
 
 
 # zsh completions -------------------------------------------------------------
+
+# save history
+export HISTFILE=$HOME/.zsh_history
+export HISTSIZE=999999999
+export SAVEHIST=999999999
+setopt SHARE_HISTORY
+setopt APPEND_HISTORY
+
 # zsh suggestions
 source $HOMEBREW/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 # syntax highlighting                                                       
@@ -73,12 +81,13 @@ fi
 # common denominator (bash/zsh) profile
 source $HOME/.sh_profile
 
+# colorize everything
 if [[ "$MACHINEOS" == "Mac" ]]; then
-  export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
-  export CLICOLOR=1; export LSCOLORS=GxFxCxDxBxegedabagaced
+  export CLICOLOR=1
+  export LSCOLORS=GxFxCxDxBxegedabagaced
 else
-  export CLICOLOR=1; export LSCOLORS=GxFxCxDxBxegedabagaced
-  #export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
 fi
 
 if [ -n "$TMUX" ]; then                                                                               
@@ -87,5 +96,5 @@ else
   export IS_TMUX=0
 fi
 
-#eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 #POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
