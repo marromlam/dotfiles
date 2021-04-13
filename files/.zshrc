@@ -85,6 +85,7 @@ source $HOME/.sh_profile
 if [[ "$MACHINEOS" == "Mac" ]]; then
   export CLICOLOR=1
   export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
 else
   export LSCOLORS=GxFxCxDxBxegedabagaced
   alias ls="ls --color='auto'"
@@ -98,3 +99,19 @@ fi
 
 eval "$(starship init zsh)"
 #POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/marcos/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/marcos/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/marcos/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/marcos/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
