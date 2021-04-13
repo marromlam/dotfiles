@@ -29,7 +29,7 @@ set splitright                          " Vertical splits will automatically be 
 " Always display the status line
 set laststatus=2
 " Line numbers
-set number
+set number relativenumber
 " Enable highlighting of the current line
 set cursorline
 " We don't need to see things like -- INSERT -- anymore
