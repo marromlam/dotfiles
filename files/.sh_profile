@@ -80,28 +80,28 @@ export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
 
 # Alternative to lemonade -----------------------------------------------------
 
-_dt_term_socket_ssh() {
-    ssh -oControlPath=$1 -O exit DUMMY_HOST
-}
-function sshx {
-  #local t=$(mktemp -u --tmpdir=$HOME ssh.sock.XXXXXXXXXX)
-  local t=$(mktemp -u -d "/Users/marcos/ssh.sock.XXXXXXXXXX")
-  local f="~/clip"
-  ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null || return 1
-  ssh -S$t DUMMY_HOST "bash -c 'if ! [ -p $f ]; then mkfifo $f; fi'" \
-      || { _dt_term_socket_ssh $t; return 1; }
-  (
-  set -e
-  set -o pipefail
-  while [ 1 ]; do
-      ssh -S$t DUMMY_HOST "cat $f" | xclip -selection clipboard
-  done &
-  )
-  ssh -S$t DUMMY_HOST \
-      || { _dt_term_socket_ssh $t; return 1; }
-  ssh -S$t DUMMY_HOST "rm $f"
-  _dt_term_socket_ssh $t
-}
+#_dt_term_socket_ssh() {
+#    ssh -oControlPath=$1 -O exit DUMMY_HOST
+#}
+#function sshx {
+#  #local t=$(mktemp -u --tmpdir=$HOME ssh.sock.XXXXXXXXXX)
+#  local t=$(mktemp -u -d "/Users/marcos/ssh.sock.XXXXXXXXXX")
+#  local f="~/clip"
+#  ssh -f -oControlMaster=yes -oControlPath=$t $@ tail\ -f\ /dev/null || return 1
+#  ssh -S$t DUMMY_HOST "bash -c 'if ! [ -p $f ]; then mkfifo $f; fi'" \
+#      || { _dt_term_socket_ssh $t; return 1; }
+#  (
+#  set -e
+#  set -o pipefail
+#  while [ 1 ]; do
+#      ssh -S$t DUMMY_HOST "cat $f" | xclip -selection clipboard
+#  done &
+#  )
+#  ssh -S$t DUMMY_HOST \
+#      || { _dt_term_socket_ssh $t; return 1; }
+#  ssh -S$t DUMMY_HOST "rm $f"
+#  _dt_term_socket_ssh $t
+#}
 
 
 
@@ -171,4 +171,7 @@ USER_PATHS=(
 export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")
 
 
-
+# Custom functions
+function sshx (){
+  ssh -t $1 "export IS_TMUX=${IS_TMUX}; zsh"
+}
