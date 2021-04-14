@@ -1,5 +1,7 @@
+echo $IS_TMUX
 # Get machine operative system
 export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
+function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 # Set homebrew path
 if [[ "$MACHINEOS" == "Mac" ]]; then
@@ -8,27 +10,32 @@ else
   export HOMEBREW="$HOME/.masterbrew"
   eval $($HOMEBREW/bin/brew shellenv)
 fi
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
-source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+
+# Use Powerlevel10k if zsh is new enough, else use starship
+MIN_ZSH_VERSION=5.1.0
+THE_ZSH_VERSION=`echo $ZSH_VERSION`
+if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
+  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+  # Initialization code that may require console input (password prompts, [y/n]
+  # confirmations, etc.) must go above this block; everything else may go below.
+  source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  fi
+  # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+else
+  eval "$(starship init zsh)"
 fi
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # export languages
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-
 # navigate words with arrows
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
-
 
 
 
@@ -93,8 +100,8 @@ fi
 if [ -n "$TMUX" ]; then                                                                               
   export IS_TMUX=1
 else                                                                                                  
-  export IS_TMUX=0
+  if [ -z ${IS_TMUX+x} ]; then
+    export IS_TMUX=0
+  fi
 fi
-
-eval "$(starship init zsh)"
-#POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
+echo "is tmux = " $IS_TMUX
