@@ -8,6 +8,7 @@ let g:coc_global_extensions = [
   \ 'coc-emmet',
   \ 'coc-tasks',
   \ 'coc-tsserver',
+  \ 'coc-tabnine',
   \ 'coc-floaterm',
   \ 'coc-fzf-preview', 
   \ 'coc-css',
@@ -24,7 +25,6 @@ let g:coc_global_extensions = [
   \ 'coc-python',
   \ 'coc-marketplace',
   \ ]
-  " \ 'coc-tabnine',
   " \ 'coc-highlight',
   " \ 'coc-bookmark',
 
