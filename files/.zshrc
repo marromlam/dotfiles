@@ -3,12 +3,26 @@ echo $IS_TMUX
 export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
-# Set homebrew path
+# Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
-  export HOMEBREW="/usr/local"
+  # homebrew path
+  if [[ "$(uname -m)" == "x86_64" ]]; then
+    # intel / rosseta
+    export HOMEBREW="/usr/local"
+  else
+    # running on Apple Sillicon
+    export HOMEBREW="/opt/ask/asier"
+  fi
+  # colorize
+  export CLICOLOR=1
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
 else
+  # linuxbrew path
   export HOMEBREW="$HOME/.masterbrew"
-  eval $($HOMEBREW/bin/brew shellenv)
+  # colorize
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
 fi
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 
@@ -87,16 +101,10 @@ fi
 # finishing -------------------------------------------------------------------
 # common denominator (bash/zsh) profile
 source $HOME/.sh_profile
+# source local config file, if exists
+[[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
-# colorize everything
-if [[ "$MACHINEOS" == "Mac" ]]; then
-  export CLICOLOR=1
-  export LSCOLORS=GxFxCxDxBxegedabagaced
-else
-  export LSCOLORS=GxFxCxDxBxegedabagaced
-  alias ls="ls --color='auto'"
-fi
-
+# check whether tmux is running or not, and export variable
 if [ -n "$TMUX" ]; then                                                                               
   export IS_TMUX=1
 else                                                                                                  
@@ -104,22 +112,3 @@ else
     export IS_TMUX=0
   fi
 fi
-
-eval "$(starship init zsh)"
-#POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/marcos/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/marcos/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/marcos/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/marcos/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
