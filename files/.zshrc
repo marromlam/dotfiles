@@ -11,7 +11,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
     export HOMEBREW="/usr/local"
   else
     # running on Apple Sillicon
-    export HOMEBREW="/opt/ask/asier"
+    export HOMEBREW="/opt/homebrew"
   fi
 else
   # linuxbrew path
