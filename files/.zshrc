@@ -13,16 +13,9 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
     # running on Apple Sillicon
     export HOMEBREW="/opt/ask/asier"
   fi
-  # colorize
-  export CLICOLOR=1
-  export LSCOLORS=GxFxCxDxBxegedabagaced
-  alias ls="ls --color='auto'"
 else
   # linuxbrew path
   export HOMEBREW="$HOME/.masterbrew"
-  # colorize
-  export LSCOLORS=GxFxCxDxBxegedabagaced
-  alias ls="ls --color='auto'"
 fi
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 
@@ -84,28 +77,40 @@ source $HOMEBREW/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 CASE_SENSITIVE="false"
 setopt MENU_COMPLETE
 setopt no_list_ambiguous
-
 #zstyle -e ':completion:*:default' list-colors 'reply=("${PREFIX:+=(#bi)($PREFIX:t)(?)*==34=34}:${(s.:.)LS_COLORS}")';
 ls_colors="di=1;34:ln=36:so=35:pi=33:ex=32:bd=40;33:cd=40;33:su=37;41:sg=30;43:tw=30;42:ow=34;42"
 zstyle ':completion:*:default' list-colors "${(s.:.)ls_colors}"
 zstyle ':completion:*' menu yes select
 autoload -Uz compinit
 compinit
-# jukitty to have same completion as vim
-compdef jukitty=nvim
-
-# Completion for kitty
-kitty + complete setup zsh | source /dev/stdin
 
 if [[ -n $ZSH_INIT_COMMAND ]]; then
-    echo "Running: $ZSH_INIT_COMMAND"
-    eval "$ZSH_INIT_COMMAND"
+  echo "Running: $ZSH_INIT_COMMAND"
+  eval "$ZSH_INIT_COMMAND"
+fi
+
+
+
+# OS-dependent stuff ----------------------------------------------------------
+if [[ "$MACHINEOS" == "Mac" ]]; then
+  # colorize
+  export CLICOLOR=1
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
+  # jukitty to have same completion as vim
+  compdef jukitty=nvim
+  # Completion for kitty
+  kitty + complete setup zsh | source /dev/stdin
+else
+  # colorize
+  export LSCOLORS=GxFxCxDxBxegedabagaced
+  alias ls="ls --color='auto'"
 fi
 
 
 
 # finishing -------------------------------------------------------------------
-# common denominator (bash/zsh) profile
+# common settings for bash and zsh
 source $HOME/.sh_profile
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
