@@ -20,6 +20,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
 else
   # linuxbrew path
   export HOMEBREW="$HOME/.masterbrew"
+  eval $($HOMEBREW/bin/brew shellenv)
   # colorize
   export LSCOLORS=GxFxCxDxBxegedabagaced
   alias ls="ls --color='auto'"
