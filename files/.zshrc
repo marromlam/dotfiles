@@ -85,12 +85,15 @@ CASE_SENSITIVE="false"
 setopt MENU_COMPLETE
 setopt no_list_ambiguous
 
-autoload -Uz compinit
-compinit
 #zstyle -e ':completion:*:default' list-colors 'reply=("${PREFIX:+=(#bi)($PREFIX:t)(?)*==34=34}:${(s.:.)LS_COLORS}")';
 ls_colors="di=1;34:ln=36:so=35:pi=33:ex=32:bd=40;33:cd=40;33:su=37;41:sg=30;43:tw=30;42:ow=34;42"
-zstyle ':completion:*' menu yes select
 zstyle ':completion:*:default' list-colors "${(s.:.)ls_colors}"
+zstyle ':completion:*' menu yes select
+autoload -Uz compinit
+compinit
+# jukitty to have same completion as vim
+compdef jukitty=nvim
+
 # Completion for kitty
 kitty + complete setup zsh | source /dev/stdin
 
