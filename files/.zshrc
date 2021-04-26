@@ -16,6 +16,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
 else
   # linuxbrew path
   export HOMEBREW="$HOME/.masterbrew"
+  eval $($HOMEBREW/bin/brew shellenv)
 fi
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 
