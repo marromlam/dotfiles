@@ -97,6 +97,7 @@ let g:indent_guides_color_change_percent = 1
 let g:indent_guides_exclude_filetypes = ['help',
                                         \'fzf',
                                         \'openterm',
+                                        \'coc-explorer',
                                         \'neoterm',
                                         \'startify',
                                         \'calendar']
