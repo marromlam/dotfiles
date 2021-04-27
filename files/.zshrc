@@ -99,6 +99,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   alias ls="ls --color='auto'"
   # jukitty to have same completion as vim
   compdef jukitty=nvim
+  compdef texkitty=nvim
   # Completion for kitty
   kitty + complete setup zsh | source /dev/stdin
 else
