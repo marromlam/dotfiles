@@ -41,18 +41,18 @@ _jukitty(){
   KK_ID=`kitty @ launch -m title:$EDITOR_ID --title $KERNEL_ID --keep-focus`
   
   # 5 -put juKitty as window name
-  kitty @ set-tab-title --match title:$EDITOR_ID "texKitty"
+  kitty @ set-tab-title --match title:$EDITOR_ID "texKitty - nvim"
   
   echo "keditor" $KE_ID
   echo "kkernel" $KK_ID
   
   # export KITTY_WINDOW_ID to be the one in the KKERNEL_ID window
-  kitty @ send-text --match title:$EDITOR_ID "export KITTY_WINDOW_ID=${KK_ID}\n"
   # open nvim in first window
   if [[ $the_server == "local" ]]; then
     kitty @ send-text --match title:$EDITOR_ID "nvim $the_file\n"
   else
     kitty @ send-text --match title:$EDITOR_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
+    kitty @ send-text --match title:$EDITOR_ID "export KITTY_WINDOW_ID=${KK_ID}\n"
     kitty @ send-text --match title:$EDITOR_ID "nvim $the_file\n"
     kitty @ send-text --match title:$KERNEL_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
   fi
