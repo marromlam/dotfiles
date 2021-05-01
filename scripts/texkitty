@@ -53,7 +53,7 @@ _jukitty(){
   else
     kitty @ send-text --match title:$EDITOR_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
     kitty @ send-text --match title:$EDITOR_ID "export KITTY_WINDOW_ID=${KK_ID}\n"
-    kitty @ send-text --match title:$EDITOR_ID "nvim $the_file\n"
+    kitty @ send-text --match title:$EDITOR_ID "vim $the_file\n"
     kitty @ send-text --match title:$KERNEL_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
   fi
   
