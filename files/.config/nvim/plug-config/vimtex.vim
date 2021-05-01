@@ -6,6 +6,7 @@ let g:vimtex_view_automatic = 0
 let g:termpdf_lastcalled = 0
 
 
+
 " This function is called if document was properly compiled. It calls 
 function! VimtexCallback(status) abort
   "call system('kitty @ kitten termpdf.py ' . b:vimtex.out())
@@ -14,6 +15,8 @@ function! VimtexCallback(status) abort
     call TermPDF(b:vimtex.out())
   endif
 endfunction
+
+
 
 function! OpenPDFCitekey()
    let kcmd = 'kitty --single-instance --instance-group=1 '
@@ -35,6 +38,8 @@ function! OpenPDFCitekey()
    call system(kcmd . b:vimtex.out())
 endfunction
 
+
+
 function! CompileMarkdown() abort
   :only
   let md_file = expand('%:p')
@@ -49,8 +54,15 @@ function! TermPDF(file) abort
   " Implement some basic throttling
   let time = str2float(reltimestr(reltime())) * 1000.0
   if time - g:termpdf_lastcalled > 1000
-    call system('kitty @ set-background-opacity 1.0')
-    call system('kitty @ kitten termpdf.py ' . a:file)
+    if $MACHINEOS == "Linux"
+      let kcmd = 'kitty @ send-text --match id:'
+      let kcmd = kcmd . $KITTY_WINDOW_ID . ' termpdf.py '
+      " echo "termpdf " . kcmd
+      call system(kcmd . a:file . "\r")
+    else
+      call system('kitty @ set-background-opacity 1.0')
+      call system('kitty @ kitten termpdf.py ' . a:file)
+    endif
     let g:termpdf_lastcalled = time
   endif
 endfunction

@@ -21,6 +21,7 @@ if sys.flags.interactive:
     interactive(True)
 
 
+
 class FigureManagerICat(FigureManagerBase):
 
     @classmethod
@@ -40,8 +41,9 @@ class FigureManagerICat(FigureManagerBase):
 
         # gather terminal dimensions
         rows = int(tput('lines'))
-        px = "400x300"#cat('--print-window-size')
+        px = icat('--print-window-size')
         px = list(map(int, px.split('x')))
+        px = [min(px[0],640), min(px[1],480)]
 
         # account for post-display prompt scrolling
         # 3 line shift for [\n, <matplotlib.axes…, >>>] after the figure
@@ -54,6 +56,8 @@ class FigureManagerICat(FigureManagerBase):
         with BytesIO() as buf:
             self.canvas.figure.savefig(buf, format='png', facecolor='#ffffff')
             icat('--align', 'left', output=False, input=buf.getbuffer())
+
+
 
 @_Backend.export
 class _BackendICatAgg(_Backend):
