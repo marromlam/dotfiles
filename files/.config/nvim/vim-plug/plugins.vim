@@ -46,14 +46,14 @@ Plug 'wincent/terminus'
 Plug 'tpope/vim-projectionist' | " Navigation of related files
 Plug 'tpope/vim-vinegar'
 if ($IS_TMUX==1)
-  echo "is tmux =" $IS_TMUX
+  " echo "is tmux = true"
   " Seamlessly navigation between vim and tmux                          [MUST]
   Plug 'christoomey/vim-tmux-navigator'
   let g:tmux_navigator_save_on_switch = 1
   " Vimux - tmux pannels runing files from vim
   "Plug 'benmills/vimux'
 else
-  echo "is tmux =" $IS_TMUX
+  " echo "is tmux = false"
   Plug 'knubie/vim-kitty-navigator'
   set title
   let &titlestring='%t - nvim'
