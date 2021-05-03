@@ -8,6 +8,7 @@ files/.config/kitty/six.py
 files/.config/kitty/theme.conf
 files/.config/kitty/wcwidth/
 files/.config/tmux/
+files/.config/htop/
 files/.config/coc/
 files/.config/kitty/themes/
 files/.config/kitty/mplbackend/kitty/__pycache__/

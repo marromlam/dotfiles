@@ -1,4 +1,4 @@
-echo "start zshrc :: is_tmux=" $IS_TMUX
+# echo "start zshrc :: is_tmux=" $IS_TMUX
 # Get machine operative system
 export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
@@ -100,6 +100,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   alias ls="ls --color='auto'"
   # jukitty to have same completion as vim
   compdef jukitty=nvim
+  compdef texkitty=nvim
   # Completion for kitty
   kitty + complete setup zsh | source /dev/stdin
 else

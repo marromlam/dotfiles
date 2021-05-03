@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+HOST=$1
+
+# make sure IS_TMUX has a value
+if [ -z ${IS_TMUX+x} ]; then
+  export IS_TMUX=0
+fi
+
+# Check whether lemonade is running
+ps cax | grep lemonade> /dev/null
+if [ $? -eq 0 ]; then
+  echo "=  lemonade is running.                                                        ="
+else
+  echo "=  lemonade was not running... lemonade was launched.                          ="
+  nohup lemonade server -allow 127.0.0.1 &
+fi
+
+# set display variable
+export DISPLAY=:0.0
+
+# Command to attach tmux session
+cmnd="export IS_TMUX=$IS_TMUX"
+
+# ssh to host 
+echo "Connection to diskpool1.igfae.usc.es is opened."
+ssh -R 2489:127.0.0.1:2489 -t $HOST $cmnd 

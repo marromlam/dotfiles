@@ -1,0 +1,15 @@
+#!/bin/sh
+ 
+arch_name="$(uname -m)"
+ 
+if [ "${arch_name}" = "x86_64" ]; then
+  if [ "$(sysctl -in sysctl.proc_translated)" = "1" ]; then
+    echo "rosseta"
+  else
+    echo "intel"
+  fi 
+elif [ "${arch_name}" = "arm64" ]; then
+  echo "arm"
+else
+  echo "Unknown architecture: ${arch_name}"
+fi
