@@ -10,6 +10,9 @@ files/.config/kitty/wcwidth/
 files/.config/tmux/
 files/.config/coc/
 files/.config/kitty/themes/
+files/.config/kitty/mplbackend/kitty/__pycache__/
+files/.config/TabNine/
+files/.config/htop/
 .DS_Store
 *.un~
 files/.config/nvim/.netrwhist
