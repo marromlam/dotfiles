@@ -37,6 +37,7 @@ set noshowmode
 
 " Enable undo persistence
 set undofile 
+set undodir=.undo/,~/.undo/
 " }}}
 
 " Tabs and indentation {{{
@@ -146,4 +147,9 @@ autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 cmap w!! w !sudo tee %
 
 
+" These are for linters... {{{
+" Python
+let g:pymode_lint_checkers = ['mccabe', 'pyflakes', 'pylint', 'pep8', 'pep257']
+let g:pymode_lint_ignore = 'E111,W0311'
+" }}}
 
