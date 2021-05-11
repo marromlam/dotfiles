@@ -24,8 +24,8 @@ let g:coc_global_extensions = [
   \ 'coc-ccls',
   \ 'coc-python',
   \ 'coc-marketplace',
+  \ 'coc-highlight',
   \ ]
-  " \ 'coc-highlight',
   " \ 'coc-bookmark',
 
 

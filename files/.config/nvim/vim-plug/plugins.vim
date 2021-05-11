@@ -206,6 +206,7 @@ Plug 'reedes/vim-pencil'             | " Auto hard breaks for text files
 Plug 'samoshkin/vim-mergetool'       | " Merge tool for git
 Plug 'sedm0784/vim-you-autocorrect'  | " Automatic autocorrect
 Plug 'tpope/vim-obsession'           | " Save sessions automatically
+Plug 'cdelledonne/vim-cmake'
 "Plug 'tpope/vim-unimpaired'          | " Common mappings for many needs
 "Plug 'vim-vdebug/vdebug'             | " Debugging, loaded manually
 "Plug 'cedarbaum/fugitive-azure-devops.vim'
