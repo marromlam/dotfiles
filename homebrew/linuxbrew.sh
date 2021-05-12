@@ -19,29 +19,13 @@ echo " "
 echo " "
 
 # name for the homebrew environment
-export HOMEBREW=$HOME/.linuxbrew2
+export HOMEBREW=$HOME/.linuxbrew
 
 # since cURL and git are too old, let's ignore them
 export HOMEBREW_NO_ENV_FILTERING=1
 
 # speed up a bit
 export HOMEBREW_MAKE_JOBS=8
-
-
-
-pkginstall () {
-  echo " "
-  echo " "
-  echo " "
-  echo " "
-  echo " "
-  echo "-------------------------------------" $1 "-------------------------------------"
-
-  # [[ !-d "$HOMEBREW/Cellar/$1" ]] && brew install $1 
-  # [[ !-d "$HOMEBREW/Cellar/$1" ]] && exit 
-}
-
-
 
 # first start by cloning linuxbrew
 if [[ -d "$HOMEBREW" ]]; then
@@ -71,8 +55,8 @@ ln -s $HOMEBREW/Cellar/gcc@9/9.3.0_2/lib/gcc/9/libgcc_s.so.1  $HOMEBREW/lib/
 #    we link syste,m libraries to gcc@5
 rm $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib/libstdc++.so.6
 rm $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib/libgcc_s.so.1
-ln -s /usr/lib64/libstdc++.so.6 $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib
-ln -s /usr/lib64/libgcc_s.so.1 $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib
+# ln -s /usr/lib64/libstdc++.so.6 $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib
+# ln -s /usr/lib64/libgcc_s.so.1 $HOMEBREW/Cellar/gcc@5/5.5.0_6/lib
 # WARNING: When gcc@9 updates, those linked paths will be wrong!
 
 
