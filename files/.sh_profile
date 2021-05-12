@@ -43,6 +43,7 @@ export EDITOR='nvim'
 alias clc="clear && printf '\e[3J'"   # clear terminal window and clean history
 alias ll="ls -lrth"                                    # show list of directory
 #alias tree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
+alias icat="kitty kitten icat"
 
 
 
