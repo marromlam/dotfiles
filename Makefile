@@ -31,10 +31,11 @@ neovim:
 	nvim +PlugInstall +qall
 
 kitty:
-	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.8/ \
-  cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/ \
-  mv /Applications/kitty.app/Contents/Resources/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns
-	
+	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.9/; \
+	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/python3.9/; \
+	rm /Applications/kitty.app/Contents/Resources/kitty.icns; \
+  cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns;
+
 vim:
 	ln -sf ${FC}/files/.config/nvim ~/.vim
 	ln -sf ${FC}/files/.config/nvim/init.vim ~/.vimrc
