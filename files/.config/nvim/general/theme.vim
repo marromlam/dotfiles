@@ -20,6 +20,7 @@ set conceallevel=0                      " So that I can see `` in markdown files
 " Color scheme {{{
 colorscheme gruvbox
 let g:airline_theme='gruvbox'
+highlight Comment cterm=italic gui=italic
 " }}}
 
 " Dim Inactive {{{

@@ -43,6 +43,7 @@ export EDITOR='nvim'
 alias clc="clear && printf '\e[3J'"   # clear terminal window and clean history
 alias ll="ls -lrth"                                    # show list of directory
 #alias tree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
+alias icat="kitty kitten icat"
 
 
 
@@ -174,4 +175,9 @@ export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")
 # Custom functions
 function sshx (){
   ssh -t $1 "export IS_TMUX=${IS_TMUX}; zsh"
+}
+
+function blindworm() {
+  source $HOME/conda3/bin/activate
+  conda activate $1
 }
