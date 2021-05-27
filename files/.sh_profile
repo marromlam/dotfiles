@@ -175,3 +175,8 @@ export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")
 function sshx (){
   ssh -t $1 "export IS_TMUX=${IS_TMUX}; zsh"
 }
+
+function blindworm() {
+  source $HOME/conda3/bin/activate
+  conda activate $1
+}
