@@ -291,3 +291,6 @@ call plug#end()
 
 " let g:kitty_navigator_listening_on_address='unix:/tmp/mykitty'
 
+
+
+" vim: foldmethod=marker
