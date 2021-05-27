@@ -265,6 +265,7 @@ Plug 'sheerun/vim-polyglot'
 " Add snakemake language
 Plug 'ibab/vim-snakemake'
 Plug 'chrisbra/csv.vim'
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 " Translator                                                            [DNIINI]
 " Plug 'voldikss/vim-translator'
 " }}}

@@ -116,4 +116,6 @@ nnoremap <silent> <F5> :call StartVdebug()<CR>
 " Last fix and patches {{{
 " Some plugin sets this to 2, or at least thats what it seems to be
 set cmdheight=1
+" Some plugin overrides this setting too
+highlight Comment cterm=italic gui=italic
 " }}}
