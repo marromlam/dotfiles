@@ -3,20 +3,20 @@
 ##############################################
 
 # Windows: Alt + [DIR]
-shift + alt - h : yabai -m window --focus west
-shift + alt - j : yabai -m window --focus south
-shift + alt - k : yabai -m window --focus north
-shift + alt - l : yabai -m window --focus east
+cmd - h : yabai -m window --focus west
+cmd - j : yabai -m window --focus south
+cmd - k : yabai -m window --focus north
+cmd - l : yabai -m window --focus east
 
 # Spaces:  Alt + [NUM]
-lalt - 1 : yabai -m space --focus 1
-lalt - 2 : yabai -m space --focus 2
-lalt - 3 : yabai -m space --focus 3
-lalt - 4 : yabai -m space --focus 4
-lalt - 5 : yabai -m space --focus 5
-lalt - 6 : yabai -m space --focus 6
-lalt - 7 : yabai -m space --focus 7
-lalt - 8 : yabai -m space --focus 8
+# lalt - 1 : yabai -m space --focus 1
+# lalt - 2 : yabai -m space --focus 2
+# lalt - 3 : yabai -m space --focus 3
+# lalt - 4 : yabai -m space --focus 4
+# lalt - 5 : yabai -m space --focus 5
+# lalt - 6 : yabai -m space --focus 6
+# lalt - 7 : yabai -m space --focus 7
+# lalt - 8 : yabai -m space --focus 8
 
 # Monitors: Ctrl + Alt + [NUM]
 ctrl + alt - 1  : yabai -m display --focus 1
