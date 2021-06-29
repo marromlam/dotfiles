@@ -1,4 +1,24 @@
-# echo "start zshrc :: is_tmux=" $IS_TMUX
+#                                                        
+#                         ,dPYb,                         
+#                         IP'`Yb                         
+#                         I8  8I                         
+#                         I8  8'                         
+#       ,gggg,    ,g,     I8 dPgg,    ,gggggg,    ,gggg, 
+#      d8"  Yb   ,8'8,    I8dP" "8I   dP""""8I   dP"  "Yb
+#     dP    dP  ,8'  Yb   I8P    I8  ,8'    8I  i8'      
+#   ,dP  ,adP' ,8'_   8) ,d8     I8,,dP     Y8,,d8,_    _
+#   8"   ""Y8d8P' "YY8P8P88P     `Y88P      `Y8P""Y8888PP
+#         ,d8I'                                          
+#       ,dP'8I                                           
+#      ,8"  8I     zsh configuration file                                  
+#      I8   8I                                           
+#      `8, ,8I                                           
+#       `Y8P"      Marcos Romero Lamas                                   
+#   
+
+
+# Eval Homebrew {{{
+
 # Get machine operative system
 export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
@@ -20,7 +40,14 @@ else
 fi
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 
-# Use Powerlevel10k if zsh is new enough, else use starship
+# export languages
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# }}}
+
+
+# Use Powerlevel10k if zsh is new enough, else use starship {{{
 MIN_ZSH_VERSION=5.1.0
 THE_ZSH_VERSION=`echo $ZSH_VERSION`
 if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
@@ -36,32 +63,28 @@ if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
 else
   # eval "$(starship init zsh)"
 fi
-
-# export languages
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-# navigate words with arrows
-bindkey "^[[1;3C" forward-word
-bindkey "^[[1;3D" backward-word
+# }}}
 
 
+# fuzzy finder configuration {{{
 
-# fuzzy finder configuration --------------------------------------------------
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_OPTS='--height 40% --border --preview="cat {}" --preview-window=right:60%:wrap'
 
+# }}}
 
 
-# pyenv stuff -----------------------------------------------------------------
+# pyenv stuff {{{
+
 #   eval "$(pyenv init -)"
 #   if which pyenv-virtualenv-init > /dev/null; then 
 #     eval "$(pyenv virtualenv-init -)"
 #   fi
 
+# }}}
 
 
-# zsh completions -------------------------------------------------------------
+# zsh completions {{{
 
 # save history
 export HISTFILE=$HOME/.zsh_history
@@ -90,9 +113,11 @@ if [[ -n $ZSH_INIT_COMMAND ]]; then
   eval "$ZSH_INIT_COMMAND"
 fi
 
+# }}}
 
 
-# OS-dependent stuff ----------------------------------------------------------
+# OS-dependent stuff {{{
+
 if [[ "$MACHINEOS" == "Mac" ]]; then
   # colorize
   export CLICOLOR=1
@@ -109,9 +134,11 @@ else
   alias ls="ls --color='auto'"
 fi
 
+# }}}
 
 
-# finishing -------------------------------------------------------------------
+# finishing {{{
+
 # common settings for bash and zsh
 source $HOME/.sh_profile
 # source local config file, if exists
@@ -125,3 +152,8 @@ else
     export IS_TMUX=0
   fi
 fi
+
+# }}}
+
+
+# vim:foldmethod=marker
