@@ -15,7 +15,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   fi
 else
   # linuxbrew path
-  export HOMEBREW="$HOME/.masterbrew"
+  export HOMEBREW="$HOME/.linuxbrew"
   eval $($HOMEBREW/bin/brew shellenv)
 fi
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
@@ -34,7 +34,7 @@ if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
   # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 else
-  eval "$(starship init zsh)"
+  # eval "$(starship init zsh)"
 fi
 
 # export languages
