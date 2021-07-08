@@ -48,6 +48,7 @@ export LANG=en_US.UTF-8
 
 
 # Use Powerlevel10k if zsh is new enough, else use starship {{{
+
 MIN_ZSH_VERSION=5.1.0
 THE_ZSH_VERSION=`echo $ZSH_VERSION`
 if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
@@ -61,8 +62,24 @@ if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
   # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 else
-  # eval "$(starship init zsh)"
+  function whoismyhost (){
+    a="$(ip route get 1 | awk '{print $NF;exit}')"
+    b=`echo "$a" | sed 's/^.*\.\([^.]*\)$/\1/'`
+    #echo $a
+    #echo $b
+    if [[ $a == 172.16.57.* ]]; then
+      echo "gpu"$b
+    elif [[ $a == 172.16.58.1 ]]; then
+      echo "master"
+    elif [[ $a == 193.144.80.1 ]]; then
+      echo "pool"
+    else
+      echo "nodo0"$b
+    fi
+  }
+  export CURRENT_HOST="$(whoismyhost)"
 fi
+
 # }}}
 
 
