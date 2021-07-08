@@ -32,7 +32,7 @@ export DISPLAY=:0.0
 echo "=  export display variable.                                                    ="
 
 # Command to attach tmux session
-cmnd="/home3/marcos.romero/.masterbrew/bin/tmux attach -t IGFAE"
+cmnd="/home3/marcos.romero/.linuxbrew/bin/tmux attach -t IGFAE"
 
 # Connect and attach
 echo "Connection to diskpool1.igfae.usc.es is opened."
