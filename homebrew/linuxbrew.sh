@@ -23,6 +23,7 @@ echo " "
 
 # Name for the homebrew environment
 export HOMEBREW=$HOME/.linuxbrew
+# export HOMEBREW="/afs/cern.ch/work/m/mromerol/.linuxbrew"
 
 # Since cURL and git are too old, let's ignore them
 export HOMEBREW_NO_ENV_FILTERING=1
@@ -49,7 +50,7 @@ fi
 
 # To install gcc@5 we first need to fix the formula for linux.
 sed -i "19s/.*/    sha256 cellar: :any, x86_64_linux: \"cd94b6bc2189df7861c2c32c480f777984865dbab4107f493188feda5a05b80d\"/" $HOMEBREW/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/gcc@5.rb
-brew install 
+brew install gcc@5 git
 
 # Install zsh plugins
 brew install zsh-syntax-highlighting zsh-autosuggestions
