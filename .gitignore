@@ -15,6 +15,7 @@ files/.config/kitty/themes/
 files/.config/kitty/mplbackend/kitty/__pycache__/
 files/.config/TabNine/
 files/.config/htop/
+files/.config/nvim
 .DS_Store
 *.un~
 files/.config/nvim/.netrwhist

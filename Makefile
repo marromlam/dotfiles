@@ -6,7 +6,7 @@
 FC=${HOME}/fictional-couscous
 TMUX_SHARE=${HOME}/.config/tmux
 
-all: brew macos kitty neovim vim tmux fzf-marks
+all: brew macos kitty nvim vim tmux fzf-marks
 
 macos:
 	${FC}/extra/macos_settings.sh
@@ -26,7 +26,10 @@ tmux:
 	${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 	tmux kill-server
 
-neovim:
+nvim:
+	if [ ! -d "${FC}/files/.config/nvim" ]; then \
+	  git clone git@github.com:marromlam/nvim-config.git "${FC}/files/.config/nvim"; \
+	fi
 	python3 -m pip install --upgrade pynvim
 	nvim +PlugInstall +qall
 
@@ -45,4 +48,4 @@ fzf-marks:
 	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks; \
 	fi
 
-.PHONY: all install brew macos kitty neovim vim tmux fzf-marks
+.PHONY: all install brew macos kitty nvim vim tmux fzf-marks
