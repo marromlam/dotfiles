@@ -28,8 +28,12 @@ tmux:
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
-	  git clone git@github.com:marromlam/nvim-config.git "${FC}/files/.config/nvim"; \
+	  git clone git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
+	else \
+	  rm -rf ${FC}/files/.config/nvim/autoload; \
+	  rm -rf ${FC}/files/.config/coc; \
 	fi
+	bash ${FC}/extra/ccls_patch.sh; cd ${FC};
 	python3 -m pip install --upgrade pynvim
 	nvim +PlugInstall +qall
 
