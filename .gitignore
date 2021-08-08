@@ -23,3 +23,5 @@ files/.config/nvim/autoload/
 files/.config/nvim/nvim
 files/.config/nvim/sessions/
 
+
+.nvimlog
