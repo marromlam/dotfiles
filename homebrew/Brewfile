@@ -15,7 +15,7 @@ tap "rlue/utils"
 tap "epk/epk"
 
 # Homebrew essentials
-brew "bat"
+brew "bat" # alternative to cat
 brew "calcurse"
 brew "composer"
 brew "coreutils"
@@ -33,7 +33,7 @@ brew "gnu-sed"
 brew "ifstat"
 brew "jq"
 brew "lazydocker"
-brew "lazygit"
+brew "lazygit" # awesome git util
 brew "mkcert"
 brew "mosh"
 brew "mycli"
@@ -59,24 +59,26 @@ brew "tmuxinator"
 brew "tmuxinator-fzf-start"
 brew "tree"
 brew "vifm"
-brew "vim"
-brew "wget"
+brew "vim" # best editor on Earth
+brew "wget" # like curl
 brew "yabai"
 brew "yarn"
-brew "sshfs"
+brew "sshfs" # mount ssh volumes
 brew "mupdf-tools"
 
 
 # App essentials
-cask "kitty"
-cask "mactex-no-gui"
-cask "transmission"
-cask "inkscape"
-cask "brave-browser"
+cask "kitty" # best terminal on Earth
+cask "mactex-no-gui" # mactex without crap
+cask "transmission" # torrent client
+cask "inkscape" # draw
+cask "brave-browser" # chromium based browser
+cask "adobe-acrobat-reader" # allows to digitally sign pdfs 
 
 # Fonts
 cask "font-fira-code"
 cask "font-hasklug-nerd-font"
 cask "font-jetbrains-mono"
 cask "font-victor-mono"
+cask "font-iosevka"
 cask "font-sf-mono-nerd-font"
