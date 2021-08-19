@@ -145,6 +145,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   compdef texkitty=nvim
   # Completion for kitty
   kitty + complete setup zsh | source /dev/stdin
+  if test -e "/Applications/kitty.app/Contents/Resources/kitty/shell-integration/kitty.zsh"; then source "/Applications/kitty.app/Contents/Resources/kitty/shell-integration/kitty.zsh"; fi
 else
   # colorize
   export LSCOLORS=GxFxCxDxBxegedabagaced
