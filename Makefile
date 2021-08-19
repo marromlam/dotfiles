@@ -28,14 +28,16 @@ tmux:
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
-	  git clone git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
+	  git clone -b main git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
 	else \
 	  rm -rf ${FC}/files/.config/nvim/autoload; \
 	  rm -rf ${FC}/files/.config/coc; \
+		rm -rf $HOME/.local/share/nvim; \
 	fi
-	bash ${FC}/extra/ccls_patch.sh; cd ${FC};
+	#bash ${FC}/extra/ccls_patch.sh; cd ${FC};
 	python3 -m pip install --upgrade pynvim
-	nvim +PlugInstall +qall
+	#nvim +PlugInstall +qall
+	nvim +PackerSync
 
 kitty:
 	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.9/; \
