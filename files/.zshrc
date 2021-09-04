@@ -36,8 +36,8 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
 else
   # linuxbrew path
   export HOMEBREW="$HOME/.linuxbrew"
-  eval $($HOMEBREW/bin/brew shellenv)
 fi
+eval $($HOMEBREW/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW/share:$XDG_DATA_DIRS"
 
 # export languages
@@ -139,7 +139,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   # colorize
   export CLICOLOR=1
   export LSCOLORS=GxFxCxDxBxegedabagaced
-  alias ls="ls --color='auto'"
+  # alias ls="ls --color='auto'"
   # jukitty to have same completion as vim
   compdef jukitty=nvim
   compdef texkitty=nvim
