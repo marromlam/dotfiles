@@ -6,7 +6,7 @@
 FC=${HOME}/fictional-couscous
 TMUX_SHARE=${HOME}/.config/tmux
 
-all: brew macos kitty nvim vim tmux fzf-marks
+all: brew macos kitty nvim vim tmux fzf-marks private
 
 macos:
 	${FC}/extra/macos_settings.sh
@@ -28,7 +28,7 @@ tmux:
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
-	  git clone -b main git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
+	  git clone -b luavim git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
 	else \
 	  rm -rf ${FC}/files/.config/nvim/autoload; \
 	  rm -rf ${FC}/files/.config/coc; \
@@ -54,4 +54,16 @@ fzf-marks:
 	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks; \
 	fi
 
-.PHONY: all install brew macos kitty nvim vim tmux fzf-marks
+private:
+	# this uses a private repository where I store somoe other snippets
+	if [ ! -d "${FC}/files/private" ]; then \
+	  git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
+	else \
+    cd  "${FC}/files/private"; \
+	  git pull; \
+		cd "${FC}"; \
+	fi
+	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" private
+
+
+.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private
