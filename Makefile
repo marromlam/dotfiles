@@ -2,7 +2,6 @@
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 
 
-
 FC=${HOME}/fictional-couscous
 TMUX_SHARE=${HOME}/.config/tmux
 
@@ -28,11 +27,12 @@ tmux:
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
-	  git clone -b main git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
+	  git clone -b luavim git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
 	else \
 	  rm -rf ${FC}/files/.config/nvim/autoload; \
+	  rm -rf ${FC}/files/.config/nvim/plugin; \
 	  rm -rf ${FC}/files/.config/coc; \
-		rm -rf $HOME/.local/share/nvim; \
+	  rm -rf ${HOME}/.local/share/nvim; \
 	fi
 	#bash ${FC}/extra/ccls_patch.sh; cd ${FC};
 	python3 -m pip install --upgrade pynvim
