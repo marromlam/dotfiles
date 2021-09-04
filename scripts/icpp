@@ -1,0 +1,9 @@
+pyPath=$(realpath `which python`)
+pyVersion=$($pyPath --version)
+pyVersion=${pyVersion:7:3}
+
+
+
+# CPATH="$HOME/.config/kitty/mplbackend" MPLBACKEND="module://kitty" cling -I/home3/marcos.romero/conda3/envs/clingLab/include/python3.9 -L/home3/marcos.romero/conda3/envs/clingLab/lib/python3.9/config-3.9-x86_64-linux-gnu -L/home3/marcos.romero/conda3/envs/clingLab/lib -I/home3/marcos.romero/conda3/envs/clingLab/lib/python3.9/site-packages/numpy/core/include -lpython3.9 -w
+
+CPATH="$HOME/.config/kitty/mplbackend" MPLBACKEND="module://kitty" cling -I$CONDA_PREFIX/include/python$pyVersion -L$CONDA_PREFIX/lib -I$CONDA_PREFIX/lib/python$pyVersion/site-packages/numpy/core/include -lpython$pyVersion -w
