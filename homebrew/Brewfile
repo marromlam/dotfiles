@@ -17,68 +17,71 @@ tap "epk/epk"
 # Homebrew essentials
 brew "bat" # alternative to cat
 brew "calcurse"
-brew "composer"
-brew "coreutils"
-brew "dbus"
-brew "editorconfig"
-brew "fnm"
-brew "fontconfig"
-brew "fontforge"
-brew "fpp"
-brew "fzf"
-brew "gawk"
+#brew "composer"
+#brew "coreutils"
+#brew "dbus"
+#brew "editorconfig"
+#brew "fnm"
+#brew "fontconfig"
+#brew "fontforge"
+brew "fpp"     # facebook path picker 
+brew "fzf"     # fuzzy finder
+#brew "gawk"
 brew "git"
-brew "gitlab-gem"
+#brew "gitlab-gem"
 brew "gnu-sed"
-brew "ifstat"
-brew "jq"
-brew "lazydocker"
-brew "lazygit" # awesome git util
-brew "mkcert"
-brew "mosh"
-brew "mycli"
+#brew "ifstat"
+#brew "jq"
+#brew "lazydocker"
+brew "lazygit"                   # awesome git util
+#brew "mkcert"
+#brew "mosh"
+#brew "mycli"
 brew "ncurses"
 brew "neovim"
 brew "node"
-brew "php"
+#brew "php"
 brew "pkg-config"
-brew "portaudio"
+#brew "portaudio"
 brew "python"
-brew "rbenv"
+#brew "rbenv"
 brew "readline"
-brew "readydocker"
-brew "ripgrep"
+#brew "readydocker"
+brew "ripgrep"                  # like grep, but faster
 brew "rlue/utils/timer"
-brew "ruby"
-brew "skhd"
-brew "spotify-tui"
-brew "starship"
+#brew "ruby"
+brew "skhd"                     # control 
+#brew "spotify-tui"
+#brew "starship"
 brew "stow"
-brew "tmux"
-brew "tmuxinator"
-brew "tmuxinator-fzf-start"
+brew "tmux"                     # terminal multiplexer
+#brew "tmuxinator"
+#brew "tmuxinator-fzf-start"
 brew "tree"
 brew "vifm"
-brew "vim" # best editor on Earth
-brew "wget" # like curl
+brew "vim"                      # best editor on Earth
+brew "wget"                     # like curl
 brew "yabai"
 brew "yarn"
-brew "sshfs" # mount ssh volumes
+brew "sshfs"                    # mount ssh volumes
 brew "mupdf-tools"
-
+# TODO: add p10k, zsh-syntax-highligting, zsh-autosuggestions
 
 # App essentials
-cask "kitty" # best terminal on Earth
-cask "mactex-no-gui" # mactex without crap
-cask "transmission" # torrent client
-cask "inkscape" # draw
-cask "brave-browser" # chromium based browser
-cask "adobe-acrobat-reader" # allows to digitally sign pdfs 
+cask "kitty"                    # best terminal on Earth
+cask "mactex-no-gui"            # mactex without crap
+cask "transmission"             # torrent client
+cask "inkscape"                 # draw
+cask "brave-browser"            # chromium based browser
+cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
+cask "zoom"
+cask "tidal"
+cask "Mattermost"
 
 # Fonts
 cask "font-fira-code"
-cask "font-hasklug-nerd-font"
+cask "font-hasklug-nerd-font"   # I use this font as the nerd one
 cask "font-jetbrains-mono"
-cask "font-victor-mono"
+cask "font-victor-mono"         # main font
 cask "font-iosevka"
 cask "font-sf-mono-nerd-font"

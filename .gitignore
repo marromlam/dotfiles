@@ -25,3 +25,5 @@ files/.config/nvim/sessions/
 
 
 .nvimlog
+homebrew/Brewfile.lock.json
+private/

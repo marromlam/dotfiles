@@ -2,11 +2,10 @@
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 
 
+FC=${HOME}/.dotfiles
+TMUX_SHARE=${FC}/.config/tmux
 
-FC=${HOME}/fictional-couscous
-TMUX_SHARE=${HOME}/.config/tmux
-
-all: brew macos kitty nvim vim tmux fzf-marks
+all: brew macos kitty nvim vim tmux fzf-marks private
 
 macos:
 	${FC}/extra/macos_settings.sh
@@ -32,14 +31,17 @@ tmux:
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
-	  git clone git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
+	  git clone -b luavim git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
 	else \
 	  rm -rf ${FC}/files/.config/nvim/autoload; \
+	  rm -rf ${FC}/files/.config/nvim/plugin; \
 	  rm -rf ${FC}/files/.config/coc; \
+	  rm -rf ${HOME}/.local/share/nvim; \
 	fi
-	bash ${FC}/extra/ccls_patch.sh; cd ${FC};
+	#bash ${FC}/extra/ccls_patch.sh; cd ${FC};
 	python3 -m pip install --upgrade pynvim
-	nvim +PlugInstall +qall
+	#nvim +PlugInstall +qall
+	nvim +PackerSync
 
 kitty:
 	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.9/; \
@@ -56,4 +58,16 @@ fzf-marks:
 	  git clone https://github.com/urbainvaes/fzf-marks.git ~/fzf-marks; \
 	fi
 
-.PHONY: all install brew macos kitty nvim vim tmux fzf-marks
+private:
+	# this uses a private repository where I store somoe other snippets
+	if [ ! -d "${FC}/files/private" ]; then \
+	  git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
+	else \
+    cd  "${FC}/private"; \
+	  git pull; \
+		cd "${FC}"; \
+	fi
+	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" private
+
+
+.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private
