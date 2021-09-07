@@ -14,6 +14,10 @@ macos:
 install:
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
 
+projects:
+	mkdir -p "${HOME}/Projects/icloud"
+	stow --ignore ".DS_Store" --target="${HOME}/Projects/icloud" --dir="/Users/marcos/Library/Mobile Documents/com~apple~CloudDocs/" Projects
+
 brew:
 	brew bundle --file="${FC}/homebrew/Brewfile"
 
