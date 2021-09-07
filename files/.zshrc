@@ -20,7 +20,7 @@
 # Eval Homebrew {{{
 
 # Get machine operative system
-export MACHINEOS=`$HOME/fictional-couscous/scripts/machine.sh`
+export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 # Set OS-dependent stuff

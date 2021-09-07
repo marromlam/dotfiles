@@ -2,8 +2,8 @@
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 
 
-FC=${HOME}/fictional-couscous
-TMUX_SHARE=${HOME}/.config/tmux
+FC=${HOME}/.dotfiles
+TMUX_SHARE=${FC}/.config/tmux
 
 all: brew macos kitty nvim vim tmux fzf-marks private
 
@@ -59,7 +59,7 @@ private:
 	if [ ! -d "${FC}/files/private" ]; then \
 	  git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
 	else \
-    cd  "${FC}/files/private"; \
+    cd  "${FC}/private"; \
 	  git pull; \
 		cd "${FC}"; \
 	fi

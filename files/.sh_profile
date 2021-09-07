@@ -162,7 +162,7 @@ SYS_PATHS=(
 # User paths
 USER_PATHS=(
   "/usr/local/opt/fzf/bin" # Fzf
-  "$HOME/fictional-couscous/scripts" # Personal scripts
+  "$HOME/.dotfiles/scripts" # Personal scripts
 )
 
 #echo $SYS_PATHS
