@@ -74,6 +74,9 @@ cask "transmission"             # torrent client
 cask "inkscape"                 # draw
 cask "brave-browser"            # chromium based browser
 cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
+cask "zoom"
+cask "tidal"
+cask "Mattermost"
 
 # Fonts
 cask "font-fira-code"
