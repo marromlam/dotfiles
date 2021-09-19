@@ -60,14 +60,14 @@ fzf-marks:
 
 private:
 	# this uses a private repository where I store somoe other snippets
-	if [ ! -d "${FC}/files/private" ]; then \
+	if [ ! -d "${FC}/private" ]; then \
 	  git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
 	else \
     cd  "${FC}/private"; \
 	  git pull; \
 		cd "${FC}"; \
 	fi
-	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" private
+	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
 
 
 .PHONY: all install brew macos kitty nvim vim tmux fzf-marks private
