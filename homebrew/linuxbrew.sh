@@ -49,8 +49,10 @@ fi
 # Homebrew package installation {{{
 
 # To install gcc@5 we first need to fix the formula for linux.
-# sed -i "19s/.*/    sha256 cellar: :any, x86_64_linux: \"cd94b6bc2189df7861c2c32c480f777984865dbab4107f493188feda5a05b80d\"/" $HOMEBREW/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/gcc@5.rb
-brew install gcc@5 git
+sed -i "16s/.*/    sha256 cellar: :any, x86_64_linux: \"cd94b6bc2189df7861c2c32c480f777984865dbab4107f493188feda5a05b80d\"/" $HOMEBREW/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/gcc@5.rb
+brew install gcc@5
+brew install stow
+brew install git lazygit ydiff
 brew install gcc@11 --force-bottle
 
 # Install zsh plugins
