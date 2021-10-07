@@ -43,7 +43,7 @@ class FigureManagerICat(FigureManagerBase):
         rows = int(tput('lines'))
         px = icat('--print-window-size')
         px = list(map(int, px.split('x')))
-        #px = [min(px[0],640), min(px[1],480)]
+        px = [min(px[0],2*640), min(px[1],2*480)]
 
         # account for post-display prompt scrolling
         # 3 line shift for [\n, <matplotlib.axes…, >>>] after the figure
