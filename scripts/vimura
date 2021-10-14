@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ $1 == "neovim" ]; then
+    synctex_command="nvr --remote +%{line} %{input}"
+else
+    synctex_command="vim --servername vimd --remote +%{line} %{input}" 
+fi
+zathura -x "$synctex_command" ${@:2}
