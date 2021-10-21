@@ -35,3 +35,5 @@ stow
 chmod
 chown
 make
+kinit
+krb5
