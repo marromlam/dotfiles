@@ -139,7 +139,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   # colorize
   export CLICOLOR=1
   export LSCOLORS=GxFxCxDxBxegedabagaced
-  # alias ls="ls --color='auto'"
+  alias ls="ls --color='auto'"
   # jukitty to have same completion as vim
   compdef jukitty=nvim
   compdef texkitty=nvim
