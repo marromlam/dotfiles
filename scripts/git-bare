@@ -1,0 +1,6 @@
+repo=$1
+folder=$2
+branch=main
+
+mkdir $folder
+cd $folder && git clone --bare $repo .bare && echo "gitdir: ./.bare" > .git && git worktree add $branch && cd ..
