@@ -50,8 +50,19 @@ kitty:
   cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns;
 
 vim:
-	ln -sf ${FC}/files/.config/nvim ~/.vim
-	ln -sf ${FC}/files/.config/nvim/init.vim ~/.vimrc
+	if [ ! -d "${FC}/files/.config/vim" ]; then \
+	  git clone -b main git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/vim"; \
+	else \
+	  rm -rf ${FC}/files/.config/vim/autoload; \
+	  rm -rf ${FC}/files/.config/vim/plugin; \
+	  rm -rf ${FC}/files/.config/coc; \
+	  rm -rf ${HOME}/.local/share/vim; \
+	fi
+	bash ${FC}/extra/ccls_patch.sh; cd ${FC};
+	python3 -m pip install --upgrade pynvim
+	vim +PlugInstall +qall
+	ln -sf ${FC}/files/.config/vim ~/.vim
+	ln -sf ${FC}/files/.config/vim/init.vim ~/.vimrc
 
 fzf-marks:
 	if [ ! -d ~/fzf-marks ]; then \

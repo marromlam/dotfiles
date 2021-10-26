@@ -1,0 +1,1 @@
+ps -ax | fzf -m --layout=reverse | xargs | python -c "import sys; print('\n'.join([el.split(' ')[-1] for el in sys.stdin.read().replace('tty','?? ').split(' ??')][:-1]))" | xargs 
