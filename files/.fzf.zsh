@@ -1,6 +1,6 @@
 # Setup fzf
 # ---------
-if [[ ! "$PATH" == */home3/marcos.romero/.masterbrew/opt/fzf/bin* ]]; then
+if [[ ! "$PATH" == *$HOMEBREW/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}$HOMEBREW/opt/fzf/bin"
 fi
 
