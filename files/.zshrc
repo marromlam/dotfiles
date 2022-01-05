@@ -83,6 +83,7 @@ fi
 # }}}
 
 
+
 # fuzzy finder configuration {{{
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
