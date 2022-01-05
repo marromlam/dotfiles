@@ -47,7 +47,9 @@ kitty:
 	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.9/; \
 	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/python3.9/; \
 	rm /Applications/kitty.app/Contents/Resources/kitty.icns; \
-  cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns;
+  cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns; \
+	# link some files from vim plugin \
+  # ln -s ~/.local/share/tmux/plugins/ ~/.config/kitty/
 
 vim:
 	if [ ! -d "${FC}/files/.config/vim" ]; then \
@@ -79,6 +81,7 @@ private:
 		cd "${FC}"; \
 	fi
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
+	chmod 600 ${HOME}/.ssh/*
 
 
 .PHONY: all install brew macos kitty nvim vim tmux fzf-marks private
