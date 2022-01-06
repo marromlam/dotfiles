@@ -24,8 +24,8 @@ brew "calcurse"
 #brew "fnm"
 #brew "fontconfig"
 #brew "fontforge"
-brew "fpp"     # facebook path picker 
-brew "fzf"     # fuzzy finder
+brew "fpp"                      # facebook path picker 
+brew "fzf"                      # fuzzy finder
 #brew "gawk"
 brew "git"
 #brew "gitlab-gem"
@@ -33,7 +33,7 @@ brew "gnu-sed"
 #brew "ifstat"
 #brew "jq"
 #brew "lazydocker"
-brew "lazygit"                   # awesome git util
+brew "lazygit"                  # awesome git util
 #brew "mkcert"
 #brew "mosh"
 #brew "mycli"
@@ -41,6 +41,7 @@ brew "ncurses"
 brew "neovim"
 brew "node"
 #brew "php"
+brew "pandoc"
 brew "pkg-config"
 #brew "portaudio"
 brew "python"
@@ -65,6 +66,7 @@ brew "yabai"
 brew "yarn"
 brew "sshfs"                    # mount ssh volumes
 brew "mupdf-tools"
+brew "ffmpeg"                   # video converter
 # TODO: add p10k, zsh-syntax-highligting, zsh-autosuggestions
 
 # App essentials
@@ -77,6 +79,7 @@ cask "adobe-acrobat-reader"     # allows to digitally sign pdfs
 cask "zoom"
 cask "tidal"
 cask "Mattermost"
+cask "keycastr"
 
 # Fonts
 cask "font-fira-code"
