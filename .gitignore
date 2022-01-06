@@ -30,3 +30,5 @@ private/
 
 .config/tmux/plugins/tpm
 files/.config/github-copilot
+files/.config/vifm/vifm-help.txt
+files/.config/vifm/vifminfo.json
