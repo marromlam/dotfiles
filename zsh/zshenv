@@ -1,0 +1,67 @@
+#!/usr/bin/zsh
+
+#       ENV VARIABLES
+
+export DOTFILES=$HOME/.dotfiles
+export PROJECTS_DIR=$HOME/projects
+export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
+
+# @see: https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#configuration-file
+if which rg >/dev/null; then
+  export RIPGREP_CONFIG_PATH=$HOME/.config/rg/.ripgreprc
+fi
+
+
+export MANPATH="/usr/local/man:$MANPATH"
+if which nvim >/dev/null; then
+  export MANPAGER='nvim +Man!'
+fi
+
+# you may need to manually set your language environment
+export LC_ALL=en_GB.UTF-8
+export LANG=en_GB.UTF-8
+
+# preferred editor for local and remote sessions
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+else
+    export VISUAL="nvim"
+    export EDITOR="nvim"
+fi
+
+export USE_EDITOR=$EDITOR
+
+if [ -f "$HOME/.environment.secret.sh" ]; then
+  source $HOME/.environment.secret.sh
+fi
+
+if [ -f "$HOME/.environment.local.sh" ]; then
+  source $HOME/.environment.local.sh
+fi
+
+# ssh
+export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+# export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
+
+if ! type "$bat" > /dev/null; then
+  export BAT_THEME="TwoDark"
+fi
+
+# Setting ag as the default source for fzf
+
+# --files: List files that would be searched but do not search
+# --no-ignore: Do not respect .gitignore, etc...
+# --hidden: Search hidden files and folders
+# --follow: Follow symlinks
+# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+# Need to escape the "!" and "*" characters using /
+# --no-ignore = this flag shows node modules etc
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+export FZF_DEFAULT_OPTS="--history=$HOME/.fzf_history"
+
+# To apply to the command to CTRL-T as well
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# Don't open FZF in a separate split in tmux
+export FZF_TMUX=0
