@@ -28,7 +28,29 @@ export LANG=en_US.UTF-8
 
 # source basuc functions
 source $DOTFILES/zsh/ufunctions.sh
+#
+# set prompt-stuyle for zsh {{{
 
+CONDA_AUTO_ACTIVATE_BASE=false
+CONDA_ALWAYS_YES=true
+
+export VIRTUAL_ENV_DISABLE_PROMPT=0
+#conda config --set changeps1 False
+
+# get virtualenv
+function get_env {
+ if [ $VIRTUAL_ENV ]; then
+   echo "via ('`basename $VIRTUAL_ENV`') "
+ elif [ $CONDA_DEFAULT_ENV ]; then
+   echo "via ${CONDA_DEFAULT_ENV}"
+ else
+   echo "syst"
+ fi
+}
+
+
+# disables prompt mangling in virtual_env/bin/activate
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 # }}}
 
 
@@ -290,8 +312,9 @@ function set-prompt() {
   local dots_prompt_failure_icon="%F{red}✘ %f"
   local execution_time="%F{yellow}%{$__DOTS[ITALIC_ON]%}${cmd_exec_time}%{$__DOTS[ITALIC_OFF]%}%f "
 
+  local current_eviron="%F{red}% -<$(get_env)>-"
   local placeholder="(%F{blue}%{$__DOTS[ITALIC_ON]%}…%{$__DOTS[ITALIC_OFF]%}%f)"
-  local top_left="%B%F{10}%1~%f%b${_git_status_prompt:-$placeholder}"
+  local top_left="%B%F{10}%1~%f%b${current_eviron}${_git_status_prompt:-$placeholder}"
   local top_right="${vim_mode}${execution_time}%F{240}%*%f"
   local bottom_left="%(1j.%F{cyan}%j✦%f .)%(?.${dots_prompt_icon}.${dots_prompt_failure_icon})"
 

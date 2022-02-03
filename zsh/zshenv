@@ -6,10 +6,6 @@ export DOTFILES=$HOME/.dotfiles
 export PROJECTS_DIR=$HOME/projects
 export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
 
-# @see: https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md#configuration-file
-if which rg >/dev/null; then
-  export RIPGREP_CONFIG_PATH=$HOME/.config/rg/.ripgreprc
-fi
 
 
 export MANPATH="/usr/local/man:$MANPATH"
