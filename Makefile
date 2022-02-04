@@ -36,9 +36,10 @@ nvim:
 	  rm -rf ${HOME}/.local/share/nvim; \
 	fi
 	#bash ${FC}/extra/ccls_patch.sh; cd ${FC};
-	python3 -m pip install --upgrade pynvim
+	python3 -m pip install --upgrade pynvim \
+  python3 -m pip install --upgrade neovim-remote \
 	#nvim +PlugInstall +qall
-	nvim +PackerSync
+	nvim +PackerSync \
 
 
 kitty:
