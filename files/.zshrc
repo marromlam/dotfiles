@@ -27,7 +27,7 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 # source basuc functions
-source $DOTFILES/zsh/ufunctions.sh
+source $HOME/.dotfiles/zsh/ufunctions.sh
 #
 # set prompt-stuyle for zsh {{{
 
@@ -280,7 +280,7 @@ function +vi-git-stash() {
 }
 
 # Add the zsh directory to the autoload dirs
-fpath+=$DOTFILES/zsh/zshfunctions
+fpath+=$HOME/.dotfiles/zsh/zshfunctions
 
 autoload -Uz _fill_line && _fill_line
 
@@ -491,13 +491,6 @@ add-zsh-hook chpwd () {
 add-zsh-hook preexec () {
   __timings_preexec
 }
-#-------------------------------------------------------------------------------
-#   LOCAL SCRIPTS
-#-------------------------------------------------------------------------------
-# source all zsh and sh files
-for script in $DOTFILES/zsh/scripts/*; do
-  source $script
-done
 
 # }}}
 
@@ -505,17 +498,17 @@ done
 
 case `uname` in
   Darwin)
-    source "$DOTFILES/zsh/macos.sh"
+    source "$HOME/.dotfiles/zsh/macos.sh"
     ;;
   Linux)
-    source "$DOTFILES/zsh/linux.sh"
+    source "$HOME/.dotfiles/zsh/linux.sh"
     ;;
 esac
 
 # }}}
 
 # source my aliases
-source $DOTFILES/zsh/aliases.sh
+source $HOME/.dotfiles/zsh/aliases.sh
 
 
 
@@ -591,7 +584,7 @@ bindkey '^U' autosuggest-accept
 # finishing {{{
 
 # common settings for bash and zsh
-source $DOTFILES/zsh/common.sh
+source $HOME/.dotfiles/zsh/common.sh
 
 # Set editor
 # export EDITOR='nvim'
