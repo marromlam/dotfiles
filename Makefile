@@ -33,9 +33,6 @@ nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \
 	  git clone -b luavim git@github.com:marromlam/vim-gasm.git "${FC}/files/.config/nvim"; \
 	else \
-	  rm -rf ${FC}/files/.config/nvim/autoload; \
-	  rm -rf ${FC}/files/.config/nvim/plugin; \
-	  rm -rf ${FC}/files/.config/coc; \
 	  rm -rf ${HOME}/.local/share/nvim; \
 	fi
 	#bash ${FC}/extra/ccls_patch.sh; cd ${FC};
@@ -43,13 +40,15 @@ nvim:
 	#nvim +PlugInstall +qall
 	nvim +PackerSync
 
+
 kitty:
-	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/Python/lib/python3.9/; \
-	cp -r ${FC}/extra/pylib2kitty/* /Applications/kitty.app/Contents/Resources/python3.9/; \
 	rm /Applications/kitty.app/Contents/Resources/kitty.icns; \
   cp ${FC}/assets/Gin.icns /Applications/kitty.app/Contents/Resources/kitty.icns; \
-	# link some files from vim plugin \
-  # ln -s ~/.local/share/tmux/plugins/ ~/.config/kitty/
+	if [ ! -f "${HOME}/Library/Keychains/kitty.keychain-db" ]; then \
+	  security create-keychain -P kitty.keychain; \
+	fi; \
+  mkdir -p "${HOME}/.config/kitty/kittens"; \
+  wget -O ~/.config/kitty/kittens/password.py https://github.com/marromlam/kitty-password/raw/main/password.py
 
 vim:
 	if [ ! -d "${FC}/files/.config/vim" ]; then \
@@ -72,7 +71,7 @@ fzf-marks:
 	fi
 
 private:
-	# this uses a private repository where I store somoe other snippets
+	# this uses a private repository where I store some other snippets
 	if [ ! -d "${FC}/private" ]; then \
 	  git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
 	else \
