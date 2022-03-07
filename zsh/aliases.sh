@@ -26,6 +26,9 @@ alias lp="lsp"
 #alias tree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
 alias digls="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
 
+# fzf for images
+# ls *jpg | fzf --preview="kitty icat --clear --place 200x40@0x0 --transfer-mode file {}"
+
 # vi, vim, nvim aliases {{{
 
 alias mvim="nvim -u NONE"
