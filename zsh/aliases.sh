@@ -55,7 +55,9 @@ alias md="mkdir -p"
 
 # ssh aliases {{{
 
-alias ssh='ssh -R 50000:${KITTY_LISTEN_ON#*:}'
+if ! [ $SSH_TTY ]; then
+  alias ssh='ssh -R 50000:${KITTY_LISTEN_ON#*:}'
+fi
 
 # }}}
 
@@ -85,8 +87,8 @@ alias localip="ipconfig getifaddr en0"
 
 # }}}
 
-alias serve='python -m SimpleHTTPServer'
-alias fuckit='export THEFUCK_REQUIRE_CONFIRMATION=False; fuck; export THEFUCK_REQUIRE_CONFIRMATION=True'
+# alias serve='python -m SimpleHTTPServer'
+# alias fuckit='export THEFUCK_REQUIRE_CONFIRMATION=False; fuck; export THEFUCK_REQUIRE_CONFIRMATION=True'
 
 # if use kitty, simplify the image cat command
 if which kitty >/dev/null; then
