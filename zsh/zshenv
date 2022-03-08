@@ -1,21 +1,15 @@
-#!/usr/bin/zsh
-
-#       ENV VARIABLES
-
 export DOTFILES=$HOME/.dotfiles
 export PROJECTS_DIR=$HOME/projects
 export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
-
-
 
 export MANPATH="/usr/local/man:$MANPATH"
 if which nvim >/dev/null; then
   export MANPAGER='nvim +Man!'
 fi
 
-# you may need to manually set your language environment
-export LC_ALL=en_GB.UTF-8
-export LANG=en_GB.UTF-8
+# export languages
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # preferred editor for local and remote sessions
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
@@ -28,18 +22,13 @@ fi
 
 export USE_EDITOR=$EDITOR
 
-if [ -f "$HOME/.environment.secret.sh" ]; then
-  source $HOME/.environment.secret.sh
-fi
-
-if [ -f "$HOME/.environment.local.sh" ]; then
-  source $HOME/.environment.local.sh
-fi
-
-# ssh
-export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
+# if [ -f "$HOME/.environment.secret.sh" ]; then
+#   source $HOME/.environment.secret.sh
+# fi
+#
+# if [ -f "$HOME/.environment.local.sh" ]; then
+#   source $HOME/.environment.local.sh
+# fi
 
 if ! type "$bat" > /dev/null; then
   export BAT_THEME="TwoDark"
@@ -61,3 +50,6 @@ export FZF_DEFAULT_OPTS="--history=$HOME/.fzf_history"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # Don't open FZF in a separate split in tmux
 export FZF_TMUX=0
+
+# # Ripgrep configuration file
+# export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
