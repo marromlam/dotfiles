@@ -17,8 +17,6 @@ export TEXINPUTS=".:~/beamer-compostela:"
 
 # System paths
 SYS_PATHS=(
-  "/usr/local/opt/coreutils/libexec/gnubin" # Prefer coreutils
-  "/usr/local/opt/gnu-sed/libexec/gnubin" # Custom sed
   "/usr/local/sbin" # Brew scripts
   "/usr/local/bin" # Brew scripts
 )
