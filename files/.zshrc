@@ -1,3 +1,7 @@
+# zsh shell config file
+#
+#
+
 
 # Eval Homebrew {{{
 
@@ -22,17 +26,18 @@ fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
-# export languages
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
+# }}}
+
 
 # source basuc functions
 source $HOME/.dotfiles/zsh/ufunctions.sh
-#
-# set prompt-stuyle for zsh {{{
+source $HOME/.dotfiles/zsh/zshenv
 
-CONDA_AUTO_ACTIVATE_BASE=false
-CONDA_ALWAYS_YES=true
+
+# get current environment name {{{
+
+export CONDA_AUTO_ACTIVATE_BASE=false
+export CONDA_ALWAYS_YES=true
 
 export VIRTUAL_ENV_DISABLE_PROMPT=0
 #conda config --set changeps1 False
@@ -40,14 +45,13 @@ export VIRTUAL_ENV_DISABLE_PROMPT=0
 # get virtualenv
 function get_env {
  if [ $VIRTUAL_ENV ]; then
-   echo "via ('`basename $VIRTUAL_ENV`') "
+   echo "('`basename $VIRTUAL_ENV`') "
  elif [ $CONDA_DEFAULT_ENV ]; then
-   echo "via ${CONDA_DEFAULT_ENV}"
+   echo "${CONDA_DEFAULT_ENV}"
  else
    echo "syst"
  fi
 }
-
 
 # disables prompt mangling in virtual_env/bin/activate
 export VIRTUAL_ENV_DISABLE_PROMPT=1
@@ -55,7 +59,7 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 # }}}
 
 
-# Use Powerlevel10k if zsh is new enough, else use starship {{{
+# Use Powerlevel10k if zsh is new enough, else starship -- DEPRECATED -- {{{
 
 # MIN_ZSH_VERSION=5.1.0
 # THE_ZSH_VERSION=`echo $ZSH_VERSION`
@@ -91,6 +95,8 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 # }}}
 
 
+# Plugins {{{
+
 zmodload zsh/datetime
 
 # Create a hash table for globally stashing variables without polluting main
@@ -107,12 +113,12 @@ PLUGIN_DIR=$DOTFILES/zsh/plugins
 autoload -Uz compinit
 compinit
 
-# Plugins {{{
+
 # These should be source *BEFORE* setting up hooks
 
 # zsh suggestions
 source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 CASE_SENSITIVE="false"
 setopt MENU_COMPLETE
@@ -132,6 +138,7 @@ source $HOMEBREW_PREFIX/share/zsh-alias-tips/alias-tips.plugin.zsh
 autoload zmv # builtin zsh rename command
 
 # }}}
+
 
 # zsh completions {{{
 
@@ -176,6 +183,7 @@ zstyle ':completion:*' matcher-list '' '+m:{[:lower:]}={[:upper:]}' '+m:{[:upper
 
 # }}}
 
+
 # set some history options {{{
 
 setopt EXTENDED_HISTORY
@@ -219,8 +227,6 @@ esac
 # source my aliases
 source $HOME/.dotfiles/zsh/aliases.sh
 
-
-
 # fuzzy finder configuration {{{
 
 # export FZF_DEFAULT_OPTS='--height 40% --border --preview="cat {}" --preview-window=right:60%:wrap'
@@ -237,8 +243,6 @@ source $HOME/.dotfiles/zsh/aliases.sh
 #source "/usr/local/opt/fzf/shell/key-bindings.bash"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Ripgrep configuration file
-export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
 
 # }}}
 
@@ -252,6 +256,7 @@ export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
 
 # }}}
 
+
 # autoinit {{{
 
 # if [[ -n $ZSH_INIT_COMMAND ]]; then
@@ -261,47 +266,30 @@ export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
 
 # }}}
 
-if exists hub; then
-  eval "$(hub alias -s)" # Aliases 'hub' to git
-fi
-
-if [[ ! "$(exists nvr)" && "$(exists pip3)" ]]; then
-  pip3 install neovim-remote
-fi
-
-if exists thefuck; then
-  eval $(thefuck --alias)
-fi
-
-if exists zoxide; then
-  eval "$(zoxide init zsh)"
-fi
-
 
 # zsh keybindings {{{
 
-bindkey -v # enables vi mode, using -e = emacs
-
-export KEYTIMEOUT=1
-bindkey ‘^R’ history-incremental-search-backward
-bindkey '^P' up-history
-bindkey '^N' down-history
-bindkey '^U' autosuggest-accept
+# bindkey -v # enables vi mode, using -e = emacs
+#
+# export KEYTIMEOUT=1
+# bindkey ‘^R’ history-incremental-search-backward
+# bindkey '^P' up-history
+# bindkey '^N' down-history
+# bindkey '^U' autosuggest-accept
 
 # }}}
 
+
 # finishing {{{
+
+# source my aliases
+source $DOTFILES/zsh/aliases.sh
 
 # common settings for bash and zsh
 source $HOME/.dotfiles/zsh/common.sh
 
-# Set editor
-# export EDITOR='nvim'
-
-# source $HOME/.sh_profile
-
 # source local config file, if exists
-[[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
+# [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
 # check whether tmux is running or not, and export variable
 if [ -n "$TMUX" ]; then
@@ -310,6 +298,12 @@ else
   if [ -z ${IS_TMUX+x} ]; then
     export IS_TMUX=0
   fi
+fi
+
+# Set KITTY_PORT env variable
+if [ $SSH_TTY ] && ! [ -n "$TMUX" ]; then
+# if [ $SSH_TTY ]; then
+  export KITTY_PORT=`kitty @ ls 2>/dev/null | grep "[0-9]:/tmp/mykitty" | head -n 1 | cut -d : -f 1 | cut -d \" -f 2`
 fi
 
 # }}}
