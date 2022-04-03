@@ -270,6 +270,7 @@ source $HOME/.dotfiles/zsh/aliases.sh
 # zsh keybindings {{{
 
 # bindkey -v # enables vi mode, using -e = emacs
+bindkey -e # enables vi mode, using -e = emacs
 #
 # export KEYTIMEOUT=1
 # bindkey ‘^R’ history-incremental-search-backward

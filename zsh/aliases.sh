@@ -156,7 +156,7 @@ function grename() {
 function gdnolock() {
   git diff "$@" ":(exclude)package-lock.json" ":(exclude)*.lock"
 }
-compdef _git gdnolock=git-diff
+# compdef _git gdnolock=git-diff
 
 # Check if main exists and use instead of master
 function git_main_branch() {
