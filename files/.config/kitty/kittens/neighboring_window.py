@@ -1,0 +1,1 @@
+/Users/marcos/.local/share/nvim/site/pack/packer/opt/sailor.vim/neighboring_window.py
