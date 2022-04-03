@@ -34,9 +34,9 @@ def handle_result(args, result, target_window_id, boss):
     if w is None:
         return
 
-    if w.screen.is_main_linebuf():
-        getattr(tab, args[1])(args[2])
-        return
+    # if w.screen.is_main_linebuf():
+    #     getattr(tab, args[1])(args[2])
+    #     return
 
     mods, key, is_text = ku.parse_kittens_shortcut(args[3])
     if is_text:
