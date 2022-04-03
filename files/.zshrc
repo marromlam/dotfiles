@@ -211,7 +211,7 @@ setopt AUTOPARAMSLASH # tab completing directory appends a slash
 
 # os-dependent config {{{
 
-# source "$HOME/.dotfiles/zsh/prompt.sh"
+source "$HOME/.dotfiles/zsh/prompt2.sh"
 
 case `uname` in
   Darwin)
