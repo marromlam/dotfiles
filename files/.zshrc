@@ -211,14 +211,18 @@ setopt AUTOPARAMSLASH # tab completing directory appends a slash
 
 # os-dependent config {{{
 
-source "$HOME/.dotfiles/zsh/prompt2.sh"
+# source "$HOME/.dotfiles/zsh/prompt.sh"
+# source "$HOME/.dotfiles/zsh/prompt2.sh"
+# source "$HOME/.dotfiles/zsh/prompt3.sh"
 
 case `uname` in
   Darwin)
     source "$HOME/.dotfiles/zsh/macos.sh"
+    source "$HOME/.dotfiles/zsh/prompt.sh"
     ;;
   Linux)
     source "$HOME/.dotfiles/zsh/linux.sh"
+    source "$HOME/.dotfiles/zsh/prompt2.sh"
     ;;
 esac
 
