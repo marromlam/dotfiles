@@ -1,1 +1,0 @@
-/Users/marcos/.local/share/nvim/site/pack/packer/opt/sailor.vim/pass_keys.py
