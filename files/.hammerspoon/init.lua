@@ -52,7 +52,8 @@ hs.hotkey.bind(hyper, "C", show_clock)
 -- Wallpaper {{{
 
 local function update_wallpaper()
-  spoon.SpoonInstall:andUse("BingDaily", { })
+  spoon.SpoonInstall:andUse("BingDaily", {screen=hs.screen.allScreens(), runAt="11:41"})
+  spoon.BingDaily:start()
   hs.alert.show("Wallpaper updated")
 end
 
