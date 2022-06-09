@@ -14,7 +14,9 @@ def handle_result(args, result, target_window_id, boss):
 
     # Runs a command in the window
     def run_cmd(window):
-        boss.child_monitor.needs_write(window.id, cmd + "\x0d")
+        _cmd = cmd + "\x0d"
+        _cmd = _cmd.encode('utf-8')
+        boss.child_monitor.needs_write(window.id, _cmd )
 
     # Try to find an existing pdf window
     for window in boss.match_windows("title:" + window_title):
