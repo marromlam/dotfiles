@@ -35,6 +35,7 @@ brew "gnu-sed"
 #brew "lazydocker"
 brew "lazygit"                  # awesome git util
 #brew "mkcert"
+brew "git-delta"
 #brew "mosh"
 #brew "mycli"
 brew "ncurses"
@@ -80,6 +81,7 @@ cask "zoom"
 cask "tidal"
 cask "Mattermost"
 cask "keycastr"
+cask "nteract"
 
 # Fonts
 cask "font-fira-code"
