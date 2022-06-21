@@ -1,4 +1,5 @@
---theme="Nord"
+--theme="gruvbox-dark"
 --style="changes,numbers"
 --color=always
+--italic-text=always
 
