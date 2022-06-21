@@ -9,3 +9,6 @@ js:*.{ts,tsx}
 
 --type-add
 ts:*.{ts,tsx}
+
+--hidden
+--smart-case
