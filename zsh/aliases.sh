@@ -53,6 +53,19 @@ alias dnd='do-not-disturb toggle'
 
 alias md="mkdir -p"
 
+alias cat='bat --paging=never --style=plain'
+
+batdiff() {
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+}
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+alias bathelp='bat --plain --language=help'
+help() {
+    "$@" --help 2>&1 | bathelp
+}
+export BAT_PAGER="less -RF"
+
 # ssh aliases {{{
 
 if ! [ $SSH_TTY ]; then
