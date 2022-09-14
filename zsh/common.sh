@@ -17,14 +17,15 @@ export TEXINPUTS=".:~/beamer-compostela:"
 
 # System paths
 SYS_PATHS=(
-  "/usr/local/sbin" # Brew scripts
-  "/usr/local/bin" # Brew scripts
+  "$HOMEBREW_PREFIX/sbin" # Brew scripts
+  "$HOMEBREW_PREFIX/bin" # Brew scripts
 )
 
 # User paths
 USER_PATHS=(
   # "/usr/local/opt/fzf/bin" # Fzf
   "$HOME/.dotfiles/scripts" # Personal scripts
+  "$HOME/.cargo" # Personal scripts
 )
 
 #echo $SYS_PATHS

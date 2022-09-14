@@ -1,5 +1,8 @@
 # bashrc
 
+# skip loading
+[[ -f "$HOME/.skip" ]] && source $HOME/.skip
+
 
 # Eval homebrew {{{
 # Get machine operative system
@@ -19,7 +22,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   fi
 else
   # linuxbrew path
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew"
+  export HOMEBREW_PREFIX="$HOME/.linuxbrew-nodo"
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
@@ -40,13 +43,11 @@ echo "Connected to $(whoismyhost) with bash"
 
 # . ~/.sh_profile
 
-export HOMEBREW_PREFIX="/home3/marcos.romero/.linuxbrew"
-eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 
 
-bind 'set show-all-if-ambiguous on'
-bind 'set completion-ignore-case on'
-bind 'TAB: menu-complete'
+# bind 'set show-all-if-ambiguous on'
+# bind 'set completion-ignore-case on'
+# bind 'TAB: menu-complete'
 
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
     alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'

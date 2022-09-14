@@ -272,5 +272,5 @@ function TRAPUSR1() {
     ASYNC_PROC=0
 
     # redisplay
-    zle && zle reset-prompt
+    # zle && zle reset-prompt
 }

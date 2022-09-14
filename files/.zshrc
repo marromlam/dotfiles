@@ -21,7 +21,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   fi
 else
   # linuxbrew path
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew"
+  export HOMEBREW_PREFIX="$HOME/.linuxbrew-nodo"
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
@@ -222,14 +222,13 @@ case `uname` in
     ;;
   Linux)
     source "$HOME/.dotfiles/zsh/linux.sh"
-    source "$HOME/.dotfiles/zsh/prompt2.sh"
+    source "$HOME/.dotfiles/zsh/prompt-basic.sh"
+    # source "$HOME/.dotfiles/zsh/prompt2.sh"
     ;;
 esac
 
 # }}}
 
-# source my aliases
-source $HOME/.dotfiles/zsh/aliases.sh
 
 # fuzzy finder configuration {{{
 
@@ -273,14 +272,21 @@ source $HOME/.dotfiles/zsh/aliases.sh
 
 # zsh keybindings {{{
 
-# bindkey -v # enables vi mode, using -e = emacs
-bindkey -e # enables vi mode, using -e = emacs
+# bindkey -v # enables vi mode
+bindkey -e # emacs
 #
 # export KEYTIMEOUT=1
 # bindkey ‘^R’ history-incremental-search-backward
 # bindkey '^P' up-history
 # bindkey '^N' down-history
 # bindkey '^U' autosuggest-accept
+
+
+# bindkey -s '^o' 'nvim $(fzf)^M'
+# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
+# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
+# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
+# bindkey -M '^f' fzf-history-widget
 
 # }}}
 
@@ -294,7 +300,7 @@ source $DOTFILES/zsh/aliases.sh
 source $HOME/.dotfiles/zsh/common.sh
 
 # source local config file, if exists
-# [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
+[[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
 # check whether tmux is running or not, and export variable
 if [ -n "$TMUX" ]; then
@@ -306,10 +312,7 @@ else
 fi
 
 # Set KITTY_PORT env variable
-if [ $SSH_TTY ] && ! [ -n "$TMUX" ]; then
-# if [ $SSH_TTY ]; then
-  export KITTY_PORT=`kitty @ ls 2>/dev/null | grep "[0-9]:/tmp/mykitty" | head -n 1 | cut -d : -f 1 | cut -d \" -f 2`
-fi
+source /home3/marcos.romero/.local/share/nvim/site/pack/packer/start/sailor.vim/sailor.zsh
 
 # }}}
 

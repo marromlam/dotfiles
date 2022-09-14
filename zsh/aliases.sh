@@ -64,7 +64,6 @@ alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
 }
-export BAT_PAGER="less -RF"
 
 # ssh aliases {{{
 

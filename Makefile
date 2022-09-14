@@ -5,7 +5,7 @@
 FC=${HOME}/.dotfiles
 TMUX_SHARE=${FC}/.config/tmux
 
-all: brew macos kitty nvim vim tmux fzf-marks private
+all: brew macos kitty nvim vim tmux fzf-marks private zsh-plugins
 
 macos:
 	${FC}/extra/macos_settings.sh
@@ -83,5 +83,10 @@ private:
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
 	chmod 600 ${HOME}/.ssh/*
 
+zsh-plugins:
+	git clone https://github.com/djui/alias-tips.git ${HOMEBREW_PREFIX}/Cellar/alias-tips; \
+	mkdir -p ${HOMEBREW_PREFIX}/share/zsh-alias-tips; \
+	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
+	
 
-.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private
+.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private zsh-plugins

@@ -52,6 +52,7 @@ def handle_result(args, result, target_window_id, boss):
     # Create the new window
     window = tab.new_window(override_title=window_title, location="vsplit")
     # Write the termpdf.py command
+    boss.child_monitor.needs_write(window.id, "ssh gpu219\x0d")
     run_cmd(window)
     # Switch the active window back to what it was
     boss.set_active_window(active_window)
