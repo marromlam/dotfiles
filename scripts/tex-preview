@@ -1,0 +1,34 @@
+TEXCODE=$1
+
+# %& -job-name=newfilenameialwayswanted
+
+
+mkdir -p /tmp/tex-preview
+rm -rf /tmp/tex-preview/output.tex && touch /tmp/tex-preview/output.tex
+
+echo "\documentclass[10pt]{standalone}" > /tmp/tex-preview/output.tex
+echo "\usepackage{xcolor}" >> /tmp/tex-preview/output.tex
+# echo "\usepackage[showframe]{geometry}" >> /tmp/tex-preview/output.tex
+echo "\begin{document}" >> /tmp/tex-preview/output.tex
+echo "\color{white}" >> /tmp/tex-preview/output.tex
+echo "%%%%%" >> /tmp/tex-preview/output.tex
+# echo "\centering \verb|$1|" >> /tmp/tex-preview/output.tex
+echo " " >> /tmp/tex-preview/output.tex
+/usr/bin/cat $1 >> /tmp/tex-preview/output.tex
+echo " " >> /tmp/tex-preview/output.tex
+echo "%%%%%" >> /tmp/tex-preview/output.tex
+echo "\end{document}" >> /tmp/tex-preview/output.tex
+
+
+pushd /tmp/tex-preview  > /dev/null
+# pdflatex output.tex > pdflatex.log 2>&1
+/home3/marcos.romero/.linuxbrew/bin/pdflatex -halt-on-error -interaction=nonstopmode output.tex > pdflatex.log 2>&1
+
+if which kitty >/dev/null; then
+    kitty +kitten icat /tmp/tex-preview/output.pdf
+else
+    echo "Compiled pdf at: /tmp/tex-preview/output.pdf"
+fi
+popd > popd
+
+# vim: ft=sh

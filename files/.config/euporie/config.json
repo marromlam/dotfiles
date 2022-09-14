@@ -1,0 +1,9 @@
+{
+  "notebook": {
+    "syntax_theme": "gruvbox-dark",
+    "color_scheme": "default",
+    "edit_mode": "vi",
+    "expand": true,
+    "line_numbers": true
+  }
+}

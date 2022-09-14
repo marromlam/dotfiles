@@ -1,0 +1,17 @@
+printf "Step 1/4 - pdflatex\n"
+/home3/marcos.romero/.linuxbrew/bin/pdflatex -interaction=nonstopmode $1.tex > $1.txt
+grep '^!.*' --color=always $1.txt
+
+printf "Step 2/4 - bibtex\n"
+/home3/marcos.romero/.linuxbrew/bin/bibtex $1.aux > $1.txt
+grep '^!.*' --color=always $1.txt
+
+printf "Step 3/4 - pdflatex\n"
+/home3/marcos.romero/.linuxbrew/bin/pdflatex -interaction=nonstopmode $1.tex > $1.txt
+grep '^!.*' --color=always $1.txt
+
+printf "Step 4/4 - pdflatex\n"
+/home3/marcos.romero/.linuxbrew/bin/pdflatex -interaction=nonstopmode $1.tex > $1.txt
+grep '^!.*' --color=always $1.txt
+
+rm -f $1.txt $1.aux $1.bbl $1.blg $1.log $1.out $1.toc
