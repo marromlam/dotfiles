@@ -64,6 +64,7 @@ function get_machine() {
   echo ${machine}
 }
 
+
 # Atom functions {{{
 # these functions are from old times when I was not a vimmer :')
 # I do not have Atom anymore, but just in case I will keep them

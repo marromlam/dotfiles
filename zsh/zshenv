@@ -56,3 +56,5 @@ export FZF_TMUX=0
 
 # # Ripgrep configuration file
 # export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
+source ~/.dotfiles/zsh/ufunctions.sh
+source ~/.dotfiles/zsh/common.sh

@@ -5,27 +5,25 @@ export PYTHONPATH="$HOME/.config/kitty/mplbackend":$PYTHONPATH
 
 # }}}
 
-
 # Cook TEXINPUTS {{{
 
 export TEXINPUTS=".:~/beamer-compostela:"
 
 # }}}
 
-
 # Cook system PATH {{{
 
 # System paths
 SYS_PATHS=(
-  "$HOMEBREW_PREFIX/sbin" # Brew scripts
-  "$HOMEBREW_PREFIX/bin" # Brew scripts
+	"$HOMEBREW_PREFIX/sbin" # Brew scripts
+	"$HOMEBREW_PREFIX/bin"  # Brew scripts
 )
 
 # User paths
 USER_PATHS=(
-  # "/usr/local/opt/fzf/bin" # Fzf
-  "$HOME/.dotfiles/scripts" # Personal scripts
-  "$HOME/.cargo" # Personal scripts
+	# "/usr/local/opt/fzf/bin" # Fzf
+	"$HOME/.dotfiles/scripts" # Personal scripts
+	"$HOME/.cargo"            # Personal scripts
 )
 
 #echo $SYS_PATHS
@@ -35,6 +33,5 @@ USER_PATHS=(
 export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")
 
 # }}}
-
 
 # vim: fdm=marker
