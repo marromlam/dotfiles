@@ -27,6 +27,7 @@ files/.config/nvim/sessions/
 .nvimlog
 homebrew/Brewfile.lock.json
 private/
+.bashrc_local
 
 .config/tmux/plugins/tpm
 files/.config/github-copilot
