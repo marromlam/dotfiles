@@ -5,10 +5,12 @@
 
 if [[ "$(uname)" == "Darwin" ]]; then
   # ls does not work on macos as it uses a BSD version
-  alias ls="ls -G"
+  # alias ls="ls -G"
+  alias ls='lsd'
   alias ll="ls -lrth"                                  # show list of directory
 else
-  alias ls="ls --color=auto"
+  # alias ls="ls --color=auto"
+  alias ls='lsd'
   alias l='ls -lFh'                             # size,show type,human readable
 fi
 

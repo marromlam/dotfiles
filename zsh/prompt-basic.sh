@@ -25,8 +25,8 @@ function current_environ {
 export NEWLINE=$'\n'
 # export PS1='${NEWLINE}%B[%2~ $(current_environ)@$(whoismyhost)] %(!.#.>) '
 # export PS1="\u \w \$(git branch 2>/dev/null | sed -n "s/* \(.*\)/\1 /p")$ "
-export PS1='$(whoismyhost) `echo "${PWD%/*}" | sed -e "s;\(/.\)[^/]*;\1;g"`/${PWD##*/} $(git branch 2>/dev/null | sed -n "s/* \(.*\)/(\1) /p")$ '
-# export RPROMPT="%b%*"
+export PS1='$CURRENT_HOST `echo "${PWD%/*}" | sed -e "s;\(/.\)[^/]*;\1;g"`/${PWD##*/} $(git branch 2>/dev/null | sed -n "s/* \(.*\)/(\1) /p")» '
+# export RPROMPT="%b%*
 
 
 # vim:foldmethod=marker
