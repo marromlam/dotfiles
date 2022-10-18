@@ -302,18 +302,6 @@ source $HOME/.dotfiles/zsh/common.sh
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
-# check whether tmux is running or not, and export variable
-if [ -n "$TMUX" ]; then
-  export IS_TMUX=1
-else
-  if [ -z ${IS_TMUX+x} ]; then
-    export IS_TMUX=0
-  fi
-fi
-
-# Set KITTY_PORT env variable
-source /home3/marcos.romero/.local/share/nvim/site/pack/packer/start/sailor.vim/sailor.zsh
-
 # }}}
 
 
