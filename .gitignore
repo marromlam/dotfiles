@@ -14,7 +14,9 @@ files/.config/yarn/
 files/.config/kitty/themes/
 files/.config/kitty/mplbackend/kitty/__pycache__/
 files/.config/kitty/neighboring_window.py
+files/.config/kitty/kittens/neighboring_window.py
 files/.config/kitty/pass_keys.py
+files/.config/kitty/kittens/pass_keys.py
 files/.config/TabNine/
 files/.config/htop/
 files/.config/nvim
