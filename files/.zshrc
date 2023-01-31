@@ -61,36 +61,36 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # Use Powerlevel10k if zsh is new enough, else starship -- DEPRECATED -- {{{
 
-# MIN_ZSH_VERSION=5.1.0
-# THE_ZSH_VERSION=`echo $ZSH_VERSION`
-# if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
-#   # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-#   # Initialization code that may require console input (password prompts, [y/n]
-#   # confirmations, etc.) must go above this block; everything else may go below.
-#   source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
-#   if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-#   fi
-#   # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-#   [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-# else
-#   function whoismyhost (){
-#     a="$(ip route get 1 | awk '{print $NF;exit}')"
-#     b=`echo "$a" | sed 's/^.*\.\([^.]*\)$/\1/'`
-#     #echo $a
-#     #echo $b
-#     if [[ $a == 172.16.57.* ]]; then
-#       echo "gpu"$b
-#     elif [[ $a == 172.16.58.1 ]]; then
-#       echo "master"
-#     elif [[ $a == 193.144.80.1 ]]; then
-#       echo "pool"
-#     else
-#       echo "nodo0"$b
-#     fi
-#   }
-#   export CURRENT_HOST="$(whoismyhost)"
-# fi
+MIN_ZSH_VERSION=5.1.0
+THE_ZSH_VERSION=`echo $ZSH_VERSION`
+if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
+  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+  # Initialization code that may require console input (password prompts, [y/n]
+  # confirmations, etc.) must go above this block; everything else may go below.
+  source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  fi
+  # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+else
+  function whoismyhost (){
+    a="$(ip route get 1 | awk '{print $NF;exit}')"
+    b=`echo "$a" | sed 's/^.*\.\([^.]*\)$/\1/'`
+    #echo $a
+    #echo $b
+    if [[ $a == 172.16.57.* ]]; then
+      echo "gpu"$b
+    elif [[ $a == 172.16.58.1 ]]; then
+      echo "master"
+    elif [[ $a == 193.144.80.1 ]]; then
+      echo "pool"
+    else
+      echo "nodo0"$b
+    fi
+  }
+  export CURRENT_HOST="$(whoismyhost)"
+fi
 
 # }}}
 
@@ -103,8 +103,8 @@ zmodload zsh/datetime
 # scope with a bunch of identifiers.
 typeset -A __DOTS
 
-__DOTS[ITALIC_ON]=$'\e[3m'
-__DOTS[ITALIC_OFF]=$'\e[23m'
+## __DOTS[ITALIC_ON]=$'\e[3m'
+## __DOTS[ITALIC_OFF]=$'\e[23m'
 
 
 PLUGIN_DIR=$DOTFILES/zsh/plugins
@@ -119,7 +119,7 @@ compinit
 # zsh suggestions
 source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
-ZSH_AUTOSUGGEST_USE_ASYNC=1
+# ZSH_AUTOSUGGEST_USE_ASYNC=1
 CASE_SENSITIVE="false"
 setopt MENU_COMPLETE
 setopt no_list_ambiguous
@@ -130,60 +130,60 @@ zstyle ':completion:*' menu yes select
 
 # syntax highlighting
 source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# source $HOMEBREW_PREFIX/share/zsh-completions/zsh-completions.zsh
-
-source $HOMEBREW_PREFIX/share/zsh-alias-tips/alias-tips.plugin.zsh
-
-autoload zmv # builtin zsh rename command
-
-# }}}
-
-
-# zsh completions {{{
-
-# Completion for kitty
-if [[ "$TERM" == "xterm-kitty" ]]; then
-  kitty + complete setup zsh | source /dev/stdin
-fi
-
-# Colorize completions using default `ls` colors.
-zstyle ':completion:*' list-colors ''
-
-# Enable keyboard navigation of completions in menu
-# (not just tab/shift-tab but cursor keys as well):
-zstyle ':completion:*' menu select
-
-# persistent reshahing i.e puts new executables in the $path
-# if no command is set typing in a line will cd by default
-zstyle ':completion:*' rehash true
-
-# Allow completion of ..<Tab> to ../ and beyond.
-zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
-
-# Categorize completion suggestions with headings:
-zstyle ':completion:*' group-name ''
-# Style the group names
-zstyle ':completion:*' format %F{yellow}%B%U%{$__DOTS[ITALIC_ON]%}%d%{$__DOTS[ITALIC_OFF]%}%b%u%f
-
-# Added by running `compinstall`
-zstyle ':completion:*' expand suffix
-zstyle ':completion:*' file-sort modification
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
-zstyle ':completion:*' list-suffixes true
-# End of lines added by compinstall
-
-# Make completion:
-# (stolen from Wincent)
-# - Try exact (case-sensitive) match first.
-# - Then fall back to case-insensitive.
-# - Accept abbreviations after . or _ or - (ie. f.b -> foo.bar).
-# - Substring complete (ie. bar -> foobar).
-zstyle ':completion:*' matcher-list '' '+m:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}' '+m:{_-}={-_}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-
-# }}}
-
-
+## 
+## # source $HOMEBREW_PREFIX/share/zsh-completions/zsh-completions.zsh
+## 
+## source $HOMEBREW_PREFIX/share/zsh-alias-tips/alias-tips.plugin.zsh
+## 
+## autoload zmv # builtin zsh rename command
+## 
+## # }}}
+## 
+## 
+## # zsh completions {{{
+## 
+## # Completion for kitty
+## if [[ "$TERM" == "xterm-kitty" ]]; then
+##   kitty + complete setup zsh | source /dev/stdin
+## fi
+## 
+## # Colorize completions using default `ls` colors.
+## zstyle ':completion:*' list-colors ''
+## 
+## # Enable keyboard navigation of completions in menu
+## # (not just tab/shift-tab but cursor keys as well):
+## zstyle ':completion:*' menu select
+## 
+## # persistent reshahing i.e puts new executables in the $path
+## # if no command is set typing in a line will cd by default
+## zstyle ':completion:*' rehash true
+## 
+## # Allow completion of ..<Tab> to ../ and beyond.
+## zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
+## 
+## # Categorize completion suggestions with headings:
+## zstyle ':completion:*' group-name ''
+## # Style the group names
+## zstyle ':completion:*' format %F{yellow}%B%U%{$__DOTS[ITALIC_ON]%}%d%{$__DOTS[ITALIC_OFF]%}%b%u%f
+## 
+## # Added by running `compinstall`
+## zstyle ':completion:*' expand suffix
+## zstyle ':completion:*' file-sort modification
+## zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+## zstyle ':completion:*' list-suffixes true
+## # End of lines added by compinstall
+## 
+## # Make completion:
+## # (stolen from Wincent)
+## # - Try exact (case-sensitive) match first.
+## # - Then fall back to case-insensitive.
+## # - Accept abbreviations after . or _ or - (ie. f.b -> foo.bar).
+## # - Substring complete (ie. bar -> foobar).
+## zstyle ':completion:*' matcher-list '' '+m:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}' '+m:{_-}={-_}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+## 
+## # }}}
+## 
+## 
 # set some history options {{{
 
 setopt EXTENDED_HISTORY
@@ -301,6 +301,7 @@ source $HOME/.dotfiles/zsh/common.sh
 
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
+source /home3/marcos.romero/.local/share/nvim/site/pack/packer/start/sailor.vim/sailor.zsh
 
 # }}}
 

@@ -1,14 +1,8 @@
 # bashrc
 
-<<<<<<< HEAD
 # skip loading
 [[ -f "$HOME/.skip" ]] && source $HOME/.skip
 
-
-||||||| parent of 7a6d373 (feat: updates for bashrc)
-
-=======
->>>>>>> 7a6d373 (feat: updates for bashrc)
 # Eval homebrew {{{
 # Get machine operative system
 
@@ -28,16 +22,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
 		export HOMEBREW_PREFIX="/opt/homebrew"
 	fi
 else
-<<<<<<< HEAD
-  # linuxbrew path
   export HOMEBREW_PREFIX="$HOME/.linuxbrew-nodo"
-||||||| parent of 7a6d373 (feat: updates for bashrc)
-  # linuxbrew path
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew"
-=======
-	# linuxbrew path
-	export HOMEBREW_PREFIX="$HOME/.linuxbrew"
->>>>>>> 7a6d373 (feat: updates for bashrc)
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
@@ -57,25 +42,9 @@ echo "Connected to $(whoismyhost) with bash"
 
 # . ~/.sh_profile
 
-<<<<<<< HEAD
-
-
 # bind 'set show-all-if-ambiguous on'
 # bind 'set completion-ignore-case on'
 # bind 'TAB: menu-complete'
-||||||| parent of 7a6d373 (feat: updates for bashrc)
-export HOMEBREW_PREFIX="/home3/marcos.romero/.linuxbrew"
-eval $($HOMEBREW_PREFIX/bin/brew shellenv)
-
-
-bind 'set show-all-if-ambiguous on'
-bind 'set completion-ignore-case on'
-bind 'TAB: menu-complete'
-=======
-bind 'set show-all-if-ambiguous on'
-bind 'set completion-ignore-case on'
-bind 'TAB: menu-complete'
->>>>>>> 7a6d373 (feat: updates for bashrc)
 
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
 	alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'

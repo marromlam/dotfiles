@@ -67,7 +67,8 @@ cd 20200715
 # }}}
 
 # create homebrew links {{{
-#
+# 
+brew link texlive
 #
 # }}}
 
