@@ -3,6 +3,8 @@ export PROJECTS_DIR=$HOME/projects
 export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
 export TMPDIR=$HOME/tmp
 export VIRTUAL_ENV_DISABLE_PROMPT=1
+export LG_CONFIG_FILE="/Users/marcos/.dotfiles/files/.config/lazygit/config.yml"
+
 
 export MANPATH="/usr/local/man:$MANPATH"
 if which nvim >/dev/null; then

@@ -42,4 +42,10 @@ ssh -t $HOST $CMND
 echo "================================================================================"
 
 
+
+
+mp3p () { 
+ youtube-dl --ignore-errors --sleep-interval 30 -i -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s' "$1"
+}
+
 # vim:ft=sh

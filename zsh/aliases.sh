@@ -1,21 +1,19 @@
 # ALIASES
 
-
 # the ls thing {{{
 
 if [[ "$(uname)" == "Darwin" ]]; then
-  # ls does not work on macos as it uses a BSD version
-  # alias ls="ls -G"
-  alias ls='lsd'
-  alias ll="ls -lrth"                                  # show list of directory
+	# ls does not work on macos as it uses a BSD version
+	# alias ls="ls -G"
+	alias ls='lsd'
+	alias ll="ls -lrth" # show list of directory
 else
-  # alias ls="ls --color=auto"
-  alias ls='lsd'
-  alias l='ls -lFh'                             # size,show type,human readable
+	# alias ls="ls --color=auto"
+	alias ls='lsd'
+	alias l='ls -lFh' # size,show type,human readable
 fi
 
 # }}}
-
 
 alias zshrc='${=EDITOR} ${ZDOTDIR:-$HOME}/.zshrc' # Quick access to the .zshrc file
 alias grep='grep --color'
@@ -41,13 +39,13 @@ alias vim='nvim'
 
 # This allow using neovim remote when nvim is called from inside a running vim instance
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-    alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
+	alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
 fi
 
 # }}}
 
 alias cl='clear'
-alias clc="clear && printf '\e[3J'"   # clear terminal window and clean history
+alias clc="clear && printf '\e[3J'" # clear terminal window and clean history
 
 alias restart="exec $SHELL"
 alias src='restart'
@@ -58,23 +56,22 @@ alias md="mkdir -p"
 alias cat='bat --paging=never --style=plain'
 
 batdiff() {
-    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+	git diff --name-only --relative --diff-filter=d | xargs bat --diff
 }
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 alias bathelp='bat --plain --language=help'
 help() {
-    "$@" --help 2>&1 | bathelp
+	"$@" --help 2>&1 | bathelp
 }
 
 # ssh aliases {{{
 
 if ! [ $SSH_TTY ]; then
-  alias ssh='ssh -R 50000:${KITTY_LISTEN_ON#*:}'
+	alias ssh='ssh -R 50000:${KITTY_LISTEN_ON#*:}'
 fi
 
 # }}}
-
 
 # tmux {{{
 
@@ -106,9 +103,8 @@ alias localip="ipconfig getifaddr en0"
 
 # if use kitty, simplify the image cat command
 if which kitty >/dev/null; then
-  alias icat="kitty +kitten icat"
+	alias icat="kitty +kitten icat"
 fi
-
 
 # Git aliases {{{
 # source: https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/git/git.plugin.zsh#L53
@@ -154,37 +150,36 @@ alias gstp="git stash pop"
 alias gsts="git stash show -p"
 
 function grename() {
-  if [[ -z "$1" || -z "$2" ]]; then
-    echo "Usage: $0 old_branch new_branch"
-    return 1
-  fi
+	if [[ -z "$1" || -z "$2" ]]; then
+		echo "Usage: $0 old_branch new_branch"
+		return 1
+	fi
 
-  # Rename branch locally
-  git branch -m "$1" "$2"
-  # Rename branch in origin remote
-  if git push origin :"$1"; then
-    git push --set-upstream origin "$2"
-  fi
+	# Rename branch locally
+	git branch -m "$1" "$2"
+	# Rename branch in origin remote
+	if git push origin :"$1"; then
+		git push --set-upstream origin "$2"
+	fi
 }
 
 function gdnolock() {
-  git diff "$@" ":(exclude)package-lock.json" ":(exclude)*.lock"
+	git diff "$@" ":(exclude)package-lock.json" ":(exclude)*.lock"
 }
 # compdef _git gdnolock=git-diff
 
 # Check if main exists and use instead of master
 function git_main_branch() {
-  local branch
-  for branch in main trunk; do
-    if command git show-ref -q --verify refs/heads/$branch; then
-      echo $branch
-      return
-    fi
-  done
-  echo master
+	local branch
+	for branch in main trunk; do
+		if command git show-ref -q --verify refs/heads/$branch; then
+			echo $branch
+			return
+		fi
+	done
+	echo master
 }
 
 # }}}
-
 
 # vim:foldmethod=marker
