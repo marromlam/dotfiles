@@ -33,6 +33,18 @@ cd "${FC}"
 ln -sf "${FC}/files/.ssh" "${HOME}/.ssh"
 chmod 600 ${HOME}/.ssh/*
 
+OS="`uname`"
+case $OS in
+  'Linux')
+    echo "Remove UseKeyChain keys"
+    sed '/UseKeyChain/d' ~/.ssh/config > ~/.ssh/config
+    ;;
+  'Darwin')
+    echo "KeyChain can be used to unlock ssh keys"
+    ;;
+  *) ;;
+esac
+
 touch $HTTPS_OR_SSH
 
 echo "--------------------------------------------------------------------------------";
