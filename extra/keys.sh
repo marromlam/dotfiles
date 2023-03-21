@@ -29,21 +29,22 @@ else
 fi
 
 cd "${FC}"
-# stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
-ln -sf "${FC}/files/.ssh" "${HOME}/.ssh"
-chmod 600 ${HOME}/.ssh/*
 
 OS="`uname`"
 case $OS in
   'Linux')
     echo "Remove UseKeyChain keys"
-    sed '/UseKeyChain/d' ~/.ssh/config > ~/.ssh/config
+    sed '/UseKeyChain/d' files/.ssh/config > files/.ssh/config
     ;;
   'Darwin')
     echo "KeyChain can be used to unlock ssh keys"
     ;;
   *) ;;
 esac
+
+# stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
+ln -sf "${FC}/files/.ssh" "${HOME}/.ssh"
+chmod 600 ${HOME}/.ssh/*
 
 touch $HTTPS_OR_SSH
 
