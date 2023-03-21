@@ -3,6 +3,9 @@
 Most of my machine configuration is handled with my dotfiles.
 Dotfiles, you know, fictional couscous...
 
+```
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/marromlam/dotfiles/main/install.sh)" -f -f
+```
 
 
 ## Core ideas
