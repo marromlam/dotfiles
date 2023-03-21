@@ -14,13 +14,13 @@ echo $DOTFILES
 
 if [ -d "$DOTFILES" ]; then
   echo "Dotfiles have already been cloned into the home dir"
-  git pull
 else
   echo "Cloning dotfiles"
   git clone git@github.com:marromlam/dotfiles.git $DOTFILES
 fi
 
-cd "$DOTFILES" || "Didn't cd into dotfiles this will be bad :("
+cd $DOTFILES
+git pull
 git submodule update --init --recursive
 
 exit 0
