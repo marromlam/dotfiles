@@ -29,7 +29,7 @@ bash ${HOME}/tmp/keys.sh $1
 
 # clone dotfiles
 printf " \n\n"
-bash ${HOME}/tmp/dotfiles.sh
+bash ${HOME}/tmp/dotfiles.sh $1
 
 # clone dotfiles
 printf " \n\n"
