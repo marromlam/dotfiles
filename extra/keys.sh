@@ -5,6 +5,7 @@ HTTPS_OR_SSH=${HOME}/.ssh_keys_present
 if test "$1" = "-f"; then
   rm -rf $HTTPS_OR_SSH
   rm -rf $FC
+  rm -rf ${HOME}/.ssh
 fi
 
 echo "================================================================================"
@@ -28,7 +29,8 @@ else
 fi
 
 cd "${FC}"
-stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
+# stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
+ln -sf "${FC}/files/.ssh" "${HOME}/.ssh"
 chmod 600 ${HOME}/.ssh/*
 
 touch $HTTPS_OR_SSH

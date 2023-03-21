@@ -1,0 +1,36 @@
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- create:
+    ~/.ssh:
+      mode: 0600
+    ~/.config:
+    ~/projects:
+
+- clean: ["~"]
+
+- link:
+    ~/.dotfiles: ""
+    ~/.ssh:
+      force: true
+      mode: 0600
+      path: ~/.private/files/.ssh
+    # ~/.gitignore: git/.gitignore
+    # ~/.gitconfig: git/.gitconfig
+    # ~/.gitmessage: git/.gitmessage
+    ~/.config:
+      force: true
+      path: files/.config
+    # ~/.Brewfile:
+    #   if: "[ `uname` = Darwin ]"
+    #   path: macos/Brewfile
+    # ~/Library/Application Support/lazygit/config.yml:
+    #   if: "[ `uname` = Darwin ]"
+    #   path: .config/lazygit/config.yml
+
+- shell:
+    - [git submodule update --init --recursive, Installing submodules]
+    - [bash extra/macos_settings.sh, Installing macOS config]
+    # - [cp -n ./git/config.template ~/.gitconfig.local]

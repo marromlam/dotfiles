@@ -1,4 +1,5 @@
 # Might as well ask for password up-front, right?
+set -e
 echo "Starting install script, please grant me sudo access..."
 sudo -v
 
@@ -29,4 +30,8 @@ bash ${HOME}/tmp/keys.sh -f
 # clone dotfiles
 printf " \n\n"
 bash ${HOME}/tmp/dotfiles.sh
+
+# clone dotfiles
+printf " \n\n"
+./install
 
