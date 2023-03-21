@@ -34,7 +34,7 @@ OS="`uname`"
 case $OS in
   'Linux')
     echo "Remove UseKeyChain keys"
-    sed '/UseKeyChain/d' files/.ssh/config > files/.ssh/config
+    sed -i '/UseKeyChain/d' files/.ssh/config
     ;;
   'Darwin')
     echo "KeyChain can be used to unlock ssh keys"
