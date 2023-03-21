@@ -4,13 +4,15 @@ echo "--------------------------------------------------------------------------
 
 set -e
 
-export DOTFILES="$HOME/.dotfiles"
+DOTFILES=${HOME}/.dotfiles
 
 if test "$1" = "-f"; then
   rm -rf $DOTFILES
 fi
 
-if [ -f "$DOTFILES" ]; then
+echo $DOTFILES
+
+if [ -d "$DOTFILES" ]; then
   echo "Dotfiles have already been cloned into the home dir"
   git pull
 else

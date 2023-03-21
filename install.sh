@@ -26,4 +26,7 @@ fi
 printf " \n\n"
 bash ${HOME}/tmp/keys.sh -f
 
+# clone dotfiles
+printf " \n\n"
+bash ${HOME}/tmp/dotfiles.sh
 

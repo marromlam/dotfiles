@@ -4,7 +4,6 @@ echo "--------------------------------------------------------------------------
 
 set -e
 
-
 if [[ "$(uname -m)" == "x86_64" ]]; then
   # intel / rosseta
   export HOMEBREW_PREFIX="/usr/local"
