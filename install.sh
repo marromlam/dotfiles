@@ -25,7 +25,7 @@ fi
 
 # install private dotfiles
 printf " \n\n"
-bash ${HOME}/tmp/keys.sh -f
+bash ${HOME}/tmp/keys.sh $1
 
 # clone dotfiles
 printf " \n\n"
