@@ -33,5 +33,5 @@ bash ${HOME}/tmp/dotfiles.sh $1
 
 # clone dotfiles
 printf " \n\n"
-./install
+./.dotfiles/install
 
