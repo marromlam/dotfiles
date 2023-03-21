@@ -33,11 +33,11 @@ cd "${FC}"
 OS="`uname`"
 case $OS in
   'Linux')
-    echo "Remove UseKeyChain keys"
-    sed -i '/UseKeyChain/d' files/.ssh/config
+    echo "Remove UseKeychain keys"
+    sed -i '/UseKeychain/d' files/.ssh/config
     ;;
   'Darwin')
-    echo "KeyChain can be used to unlock ssh keys"
+    echo "Keychain can be used to unlock ssh keys"
     ;;
   *) ;;
 esac
