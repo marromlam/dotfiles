@@ -7,7 +7,6 @@
 
 # Get machine operative system
 export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
-function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 # Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
@@ -21,7 +20,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   fi
 else
   # linuxbrew path
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew-nodo"
+  export HOMEBREW_PREFIX="$HOME/.linuxbrew"
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
@@ -59,42 +58,6 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 # }}}
 
 
-# Use Powerlevel10k if zsh is new enough, else starship -- DEPRECATED -- {{{
-
-MIN_ZSH_VERSION=5.1.0
-THE_ZSH_VERSION=`echo $ZSH_VERSION`
-if [ $(version $THE_ZSH_VERSION) -ge $(version $MIN_ZSH_VERSION) ]; then
-  # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-  # Initialization code that may require console input (password prompts, [y/n]
-  # confirmations, etc.) must go above this block; everything else may go below.
-  source $HOMEBREW/opt/powerlevel10k/powerlevel10k.zsh-theme
-  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-  fi
-  # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-  [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-else
-  function whoismyhost (){
-    a="$(ip route get 1 | awk '{print $NF;exit}')"
-    b=`echo "$a" | sed 's/^.*\.\([^.]*\)$/\1/'`
-    #echo $a
-    #echo $b
-    if [[ $a == 172.16.57.* ]]; then
-      echo "gpu"$b
-    elif [[ $a == 172.16.58.1 ]]; then
-      echo "master"
-    elif [[ $a == 193.144.80.1 ]]; then
-      echo "pool"
-    else
-      echo "nodo0"$b
-    fi
-  }
-  export CURRENT_HOST="$(whoismyhost)"
-fi
-
-# }}}
-
-
 # Plugins {{{
 
 zmodload zsh/datetime
@@ -117,7 +80,7 @@ compinit
 # These should be source *BEFORE* setting up hooks
 
 # zsh suggestions
-source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
 # ZSH_AUTOSUGGEST_USE_ASYNC=1
 CASE_SENSITIVE="false"
@@ -129,7 +92,7 @@ zstyle ':completion:*:default' list-colors "${(s.:.)ls_colors}"
 zstyle ':completion:*' menu yes select
 
 # syntax highlighting
-source $HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.dotfiles/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ## 
 ## # source $HOMEBREW_PREFIX/share/zsh-completions/zsh-completions.zsh
 ## 
@@ -301,7 +264,6 @@ source $HOME/.dotfiles/zsh/common.sh
 
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
-source /home3/marcos.romero/.local/share/nvim/site/pack/packer/start/sailor.vim/sailor.zsh
 
 # }}}
 
