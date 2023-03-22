@@ -139,8 +139,20 @@ defaults write com.apple.dock show-recents -bool false
 
 # Doc autohide delay off
 defaults write com.apple.dock autohide -bool true
-defaults write com.apple.dock autohide-time-modifier -int 0;killall Dock
-defaults write com.apple.Dock autohide-delay -float 0 && killall Dock
+defaults write com.apple.dock autohide-time-modifier -int 0
+defaults write com.apple.Dock autohide-delay -float 0
+
+# Dock size
+defaults write com.apple.dock tilesize -int 32
+defaults write com.apple.dock size-immutable -bool yes
+
+# Dock position
+# defaults write com.apple.dock pinning start
+defaults write com.apple.dock orientation left
+
+# Effects
+defaults write com.apple.dock mineffect suck; killall Dock
+
 
 # Save screenshots to the desktop
 defaults write com.apple.screencapture location -string "$HOME/Desktop"
