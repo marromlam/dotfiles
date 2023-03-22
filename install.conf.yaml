@@ -41,7 +41,7 @@
     - [git submodule update --init --recursive, Installing submodules]
     - [bash extra/macos_settings.sh, Installing macOS config]
     - [bash extra/keyboard.sh, Installing keyboard config]
-    - [pip install -r requirements.txt, Installing python packages]
+    - [python -m pip install -r requirements.txt, Installing python packages]
     - [tmux start-server && tmux new-session -d && ~/.config/tmux/plugins/tpm/scripts/install_plugins.sh && tmux kill-server, Installing python packages]
     # - [source ~/.zshrc, Install fzf marks]
     # -
