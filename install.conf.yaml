@@ -42,13 +42,15 @@
     - [bash extra/macos_settings.sh, Installing macOS config]
     - [bash extra/keyboard.sh, Installing keyboard config]
     - [python3 -m pip install -r requirements.txt, Installing python packages]
-    - [tmux start-server && tmux new-session -d && ~/.config/tmux/plugins/tpm/scripts/install_plugins.sh && tmux kill-server, Installing python packages]
+    - [
+        tmux start-server && tmux new-session -d && ~/.config/tmux/plugins/tpm/scripts/install_plugins.sh && tmux kill-server,
+        Installing python packages,
+      ]
     # - [source ~/.zshrc, Install fzf marks]
-    # -
-    #   command: bash extra/nvim.sh #&> /dev/null
-    #   stdin: true
-    #   stdout: true
-    #   stderr: true
-    #   description: Installing neovim config
-    #   quiet: true
+    - command: bash extra/nvim.sh #&> /dev/null
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing neovim config
+      quiet: true
     # - [cp -n ./git/config.template ~/.gitconfig.local]
