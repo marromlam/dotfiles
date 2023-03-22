@@ -53,7 +53,7 @@ brew "ripgrep"                  # like grep, but faster
 brew "rlue/utils/timer"
 #brew "ruby"
 brew "skhd"                     # control 
-#brew "spotify-tui"
+brew "spotify-tui"
 #brew "starship"
 brew "stow"
 brew "tmux"                     # terminal multiplexer
@@ -65,12 +65,12 @@ brew "vim"                      # best editor on Earth
 brew "wget"                     # like curl
 brew "yabai"
 brew "yarn"
-brew "sshfs"                    # mount ssh volumes
+# brew "sshfs"                    # mount ssh volumes
 brew "mupdf-tools"
 brew "ffmpeg"                   # video converter
 # TODO: add p10k, zsh-syntax-highligting, zsh-autosuggestions
 
-brew install shfmt
+brew "shfmt"
 # npm install fixjson 
 # brew install clang-format
 
