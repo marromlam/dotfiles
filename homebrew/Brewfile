@@ -68,9 +68,10 @@ brew "yarn"
 # brew "sshfs"                    # mount ssh volumes
 brew "mupdf-tools"
 brew "ffmpeg"                   # video converter
-# TODO: add p10k, zsh-syntax-highligting, zsh-autosuggestions
 
 brew "shfmt"
+brew "lsd"
+brew "gcc"
 # npm install fixjson 
 # brew install clang-format
 
