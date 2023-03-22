@@ -1,0 +1,11 @@
+#/bin/bash
+
+# song=$(playerctl metadata --format "Title: ({ title }}\nArtist: {{ artist }} \nAlbum: {{ album }])
+song="mera"
+
+# notify-send "Spotify" "$song" --icon=~/.config/spotifyd/spotify.png
+printf '\x1b]99;i=1:d=0;Spotify\x1b\\'
+printf '\x1b]99;i=1:d=1:p=body;${song}\x1b\\'
+
+
+# vim: ft=bash
