@@ -40,7 +40,7 @@
     #   path: .config/lazygit/config.yml
 
 - shell:
-    - [scripts/reload_shell, Reload shell]
+    - [source scripts/reload_shell, Reload shell]
     - [brew bundle --file=~/.Brewfile, Install homebrew dependencies]
     - [git submodule update --init --recursive, Installing submodules]
     - [bash extra/macos_settings.sh, Installing macOS config]
