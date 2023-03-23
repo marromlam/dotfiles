@@ -20,7 +20,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
   fi
 else
   # linuxbrew path
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew"
+  export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
@@ -185,7 +185,7 @@ case `uname` in
     ;;
   Linux)
     source "$HOME/.dotfiles/zsh/linux.sh"
-    source "$HOME/.dotfiles/zsh/prompt-basic.sh"
+    # source "$HOME/.dotfiles/zsh/prompt-basic.sh"
     # source "$HOME/.dotfiles/zsh/prompt2.sh"
     ;;
 esac
