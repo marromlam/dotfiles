@@ -22,7 +22,7 @@ if [[ "$MACHINEOS" == "Mac" ]]; then
 		export HOMEBREW_PREFIX="/opt/homebrew"
 	fi
 else
-  export HOMEBREW_PREFIX="$HOME/.linuxbrew-nodo"
+  export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
