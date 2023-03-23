@@ -32,6 +32,9 @@
     ~/.Brewfile:
       if: "[ `uname` = Darwin ]"
       path: homebrew/Brewfile
+    ~/.Brewfile:
+      if: "[ `uname` = Linux ]"
+      path: homebrew/BrewfileLinux
     # ~/Library/Application Support/lazygit/config.yml:
     #   if: "[ `uname` = Darwin ]"
     #   path: .config/lazygit/config.yml
