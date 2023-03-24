@@ -29,7 +29,9 @@ bash ${HOME}/tmp/keys.sh $1
 
 # clone dotfiles
 printf " \n\n"
+source ${HOME}/.dotfiles/scripts/reload_shell
 bash ${HOME}/tmp/dotfiles.sh $1
+chsh -s `which zsh`
 
 # clone dotfiles
 printf " \n\n"
