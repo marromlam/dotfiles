@@ -15,9 +15,9 @@ fi
 if test "$1" = "-f"; then
   # rm -rf $HOMEBREW_PREFIX
   echo "Forcing homebrew install"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
-  echo "Not forcing homebrew install"
-  exit 0
+  echo "Not forcing homebrew install..."
 fi
 
 if [[ -d "$HOMEBREW_PREFIX" ]]; then
