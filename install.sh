@@ -17,11 +17,11 @@ curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.co
 
 if [[ "$MACHINEOS" == "Mac" ]]; then
   # rm -rf ${HOME}/tmp/homebrew.sh
-  bash ${HOME}/tmp/homebrew.sh
+  bash ${HOME}/tmp/homebrew.sh $0
 else
   # linuxbrew path
   export HOMEBREW_PREFIX="$HOME/.linuxbrew"
-  bash ${HOME}/tmp/linuxbrew.sh
+  bash ${HOME}/tmp/linuxbrew.sh $0
 fi
 
 # install private dotfiles
