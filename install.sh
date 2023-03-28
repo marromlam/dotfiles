@@ -15,6 +15,7 @@ curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.co
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/extra/keys.sh
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/extra/dotfiles.sh
 
+echo "Force homebrew" $0
 if [[ "$MACHINEOS" == "Mac" ]]; then
   # rm -rf ${HOME}/tmp/homebrew.sh
   bash ${HOME}/tmp/homebrew.sh $0
