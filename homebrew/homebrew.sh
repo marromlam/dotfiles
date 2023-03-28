@@ -20,7 +20,7 @@ else
 fi
 
 if [[ ! -d "$HOMEBREW_PREFIX" ]]; then
-  [ ! -x git ] xcode-select --install
+  [[ ! -x git ]] && xcode-select --install || echo "cmd-line tools installed"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
   echo "Homebrew already installed. Skipping."
