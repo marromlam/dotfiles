@@ -19,7 +19,7 @@ else
   echo "Not forcing homebrew install..."
 fi
 
-if [[ -d "$HOMEBREW_PREFIX" ]]; then
+if [[ ! -d "$HOMEBREW_PREFIX" ]]; then
   [ ! -x git ] xcode-select --install
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
