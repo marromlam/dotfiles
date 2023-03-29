@@ -7,8 +7,7 @@ tap "homebrew/cask-versions"
 tap "homebrew/bundle"
 tap "homebrew/services"
 
-# Custom taps
-tap "koekeishiya/formulae"
+# Custom taps tap "koekeishiya/formulae"
 tap "Rigellute/tap"
 tap "Schniz/tap"
 tap "rlue/utils"
@@ -36,6 +35,8 @@ brew "gnu-sed"
 brew "lazygit"                  # awesome git util
 #brew "mkcert"
 brew "git-delta"
+brew "gd"
+brew "btop"
 #brew "mosh"
 #brew "mycli"
 brew "ncurses"
