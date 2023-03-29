@@ -39,7 +39,7 @@ brew "git-delta"
 #brew "mosh"
 #brew "mycli"
 brew "ncurses"
-brew "neovim"
+brew "neovim", args: ["HEAD"]
 brew "node"
 #brew "php"
 brew "pandoc"
@@ -77,11 +77,11 @@ brew "gcc"
 
 # App essentials
 cask "kitty"                    # best terminal on Earth
-cask "mactex-no-gui"            # mactex without crap
+# cask "mactex-no-gui"            # mactex without crap
 cask "transmission"             # torrent client
 cask "inkscape"                 # draw
 cask "brave-browser"            # chromium based browser
-cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
+# cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
 cask "zoom"
 cask "tidal"
 cask "Mattermost"
