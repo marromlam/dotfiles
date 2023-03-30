@@ -10,7 +10,8 @@ export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
 
 if [[ "$MACHINEOS" == "Mac" ]]; then
   echo "Remap caps-lock to control for all Keyboards"
-  sudo cp com.ldaws.KeyMapsGeneral.plist ~/Library/LaunchAgents 
+  sudo mkdir -p ~/Library/LaunchAgents
+  sudo cp com.ldaws.KeyMapsGeneral.plist ~/Library/LaunchAgents
   sudo launchctl unload -w ~/Library/LaunchAgents/com.ldaws.KeyMapsGeneral.plist &> /dev/null
   sudo launchctl load -w ~/Library/LaunchAgents/com.ldaws.KeyMapsGeneral.plist &> /dev/null
   # ensure media keys will work
