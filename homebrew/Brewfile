@@ -27,6 +27,7 @@ brew "fpp"                      # facebook path picker
 brew "fzf"                      # fuzzy finder
 #brew "gawk"
 brew "git"
+brew "ydiff"
 #brew "gitlab-gem"
 brew "gnu-sed"
 #brew "ifstat"
@@ -55,6 +56,7 @@ brew "rlue/utils/timer"
 #brew "ruby"
 brew "skhd"                     # control 
 brew "spotify-tui"
+brew "spotifyd"
 #brew "starship"
 brew "stow"
 brew "tmux"                     # terminal multiplexer
