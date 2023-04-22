@@ -82,14 +82,15 @@ brew "gcc"
 cask "kitty"                    # best terminal on Earth
 # cask "mactex-no-gui"            # mactex without crap
 cask "transmission"             # torrent client
-cask "inkscape"                 # draw
-cask "brave-browser"            # chromium based browser
+# cask "inkscape"                 # draw
+# cask "brave-browser"            # chromium based browser
+cask "orion"
 # cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
-cask "zoom"
-cask "tidal"
-cask "Mattermost"
+# cask "zoom"
+# cask "tidal"
+# cask "Mattermost"
 cask "keycastr"
-cask "nteract"
+# cask "nteract"
 
 # Fonts
 cask "font-fira-code"

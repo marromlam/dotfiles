@@ -7,7 +7,7 @@ echo "--------------------------------------------------------------------------
 # set -e
 
 if [ ! -f "${HOME}/Library/Keychains/kitty.keychain-db" ]; then
-  security create-keychain -P kitty.keychain
+  security create-keychain -p "" kitty.keychain
 fi
 
 echo "We need your Spotify username and password to install the Spotify CLI"
@@ -23,7 +23,7 @@ echo " "
 
 echo "Creating password for Spotify"
 security delete-generic-password -a "$USER" -s spotify kitty.keychain &> /dev/null
-security add-generic-password -a "$USER" -s spotify -w $PASSWORD kitty.keychain
+security add-generic-password -a "$USER" -s spotify -w "$PASSWORD" kitty.keychain
 
 echo "Creating password for Spotify"
 
@@ -59,7 +59,7 @@ cat > $HOME/.config/spotifyd/spotifyd.conf <<EOF2
 username = "$USERNAME"
 #
 # Your Spotify account password.
-password = "$PASSWORD"
+#password = "PASSWORD"
 #
 # A command that gets executed and can be used to
 # retrieve your password.
@@ -68,7 +68,7 @@ password = "$PASSWORD"
 # This is an alternative to the "password" field. Both
 # can't be used simultaneously.
 # password_cmd = "command_that_writes_password_to_stdout"
-password_cmd = "./get_password"
+password_cmd = "$HOME/.config/spotifyd/get_password"
 #
 # If set to true, "spotifyd" tries to look up your
 # password in the system's password storage.
