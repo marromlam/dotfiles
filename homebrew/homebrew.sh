@@ -13,7 +13,7 @@ else
 fi
 
 if test "$1" = "-f"; then
-  rm -rf $HOMEBREW_PREFIX
+  sudo rm -rf $HOMEBREW_PREFIX
   echo "Forcing homebrew install"
 else
   echo "Not forcing homebrew install..."
@@ -26,6 +26,7 @@ else
   echo "Homebrew already installed. Skipping."
 fi
 
+source ${HOME}/.dotfiles/scripts/reload_shell
 brew install stow
 
 exit 0
