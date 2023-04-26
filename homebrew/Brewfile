@@ -41,7 +41,7 @@ brew "btop"
 #brew "mosh"
 #brew "mycli"
 brew "ncurses"
-brew "neovim", args: ["HEAD"]
+brew "neovim"
 brew "node"
 #brew "php"
 brew "pandoc"
