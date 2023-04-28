@@ -75,12 +75,12 @@ brew "ffmpeg"                   # video converter
 brew "shfmt"
 brew "lsd"
 brew "gcc"
-brew "wezterm"
+
 # npm install fixjson 
 # brew install clang-format
 
 # App essentials
-cask "kitty"                    # best terminal on Earth
+cask "kitty", args: ["force"]                    # best terminal on Earth
 # cask "mactex-no-gui"            # mactex without crap
 cask "transmission"             # torrent client
 # cask "inkscape"                 # draw
@@ -92,6 +92,7 @@ cask "orion"
 # cask "Mattermost"
 cask "keycastr"
 # cask "nteract"
+cask "wezterm"
 
 # Fonts
 cask "font-fira-code"
