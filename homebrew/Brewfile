@@ -93,6 +93,7 @@ cask "orion"
 cask "keycastr"
 # cask "nteract"
 cask "wezterm"
+cask "rectangle"
 
 # Fonts
 cask "font-fira-code"
