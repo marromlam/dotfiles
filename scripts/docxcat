@@ -1,0 +1,11 @@
+for var in "$@"
+do
+    echo $var "----------"
+    docx2txt $var - | cat -
+    echo " "
+    echo " "
+done
+
+
+
+# vim: ft=bash
