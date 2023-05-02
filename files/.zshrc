@@ -185,10 +185,19 @@ case `uname` in
     ;;
   Linux)
     source "$HOME/.dotfiles/zsh/linux.sh"
+    source "$HOME/.dotfiles/zsh/prompt.sh"
+    [[ ! -f /etc/resolv.conf ]] && echo nameserver 1.1.1.1 | sudo tee /etc/resolv.conf
     # source "$HOME/.dotfiles/zsh/prompt-basic.sh"
     # source "$HOME/.dotfiles/zsh/prompt2.sh"
     ;;
 esac
+
+
+# test if ~/.wsl exists and source zsh/windows.sh if it does
+if [[ -f ~/.wsl ]]; then
+  echo "WSL detected"
+  source "$HOME/.dotfiles/zsh/windows.sh"
+fi
 
 # }}}
 
