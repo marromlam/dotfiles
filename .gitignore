@@ -31,6 +31,16 @@ files/.config/nvim/nvim
 files/.config/nvim/sessions/
 files/.config/wslu
 
+files/.config/VirtualBox/VBoxSVC.log
+files/.config/VirtualBox/VBoxSVC.log.1
+files/.config/VirtualBox/VirtualBox.xml
+files/.config/VirtualBox/VirtualBox.xml-prev
+files/.config/VirtualBox/compreg.dat
+files/.config/VirtualBox/selectorwindow.log
+files/.config/VirtualBox/selectorwindow.log.1
+files/.config/VirtualBox/xpti.dat
+
+
 
 .nvimlog
 homebrew/Brewfile.lock.json
