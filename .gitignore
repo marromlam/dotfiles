@@ -29,6 +29,7 @@ files/.config/nvim/.netrwhist
 files/.config/nvim/autoload/
 files/.config/nvim/nvim
 files/.config/nvim/sessions/
+files/.config/wslu
 
 
 .nvimlog
