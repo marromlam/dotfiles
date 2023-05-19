@@ -1,0 +1,9 @@
+{
+	"extensions":
+	[
+		"jsx",
+		"js",
+    "test.js",
+    "test.jsx"
+	]
+}
