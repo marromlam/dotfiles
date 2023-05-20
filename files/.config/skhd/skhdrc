@@ -63,7 +63,8 @@ shift + ctrl - d : yabai -m window --move rel:20:0
 # Sizing: Shift + [Alt/Cmd] + [DIR] ###########################################
 
 # Auto
-rcmd + alt - 0 : yabai -m space --balance
+f1 : yabai -m space --balance
+f2 : yabai -m window --resize left:-200:0 && yabai -m window --resize right:600:0
 
 # Increase (no decrease options, just resizing the relevant windows)
 rcmd + lalt + shift - h : yabai -m window --resize left:-40:0

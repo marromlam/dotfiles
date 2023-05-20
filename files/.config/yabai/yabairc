@@ -1,52 +1,111 @@
 #!/usr/bin/env sh
+#
+# Unload the macOS WindowManager process
+launchctl unload -F /System/Library/LaunchAgents/com.apple.WindowManager.plist > /dev/null 2>&1 &
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
 
-yabai -m config external_bar all:24:0
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
+yabai -m signal --add event=display_added action="sleep 2 && $HOME/.config/yabai/create_spaces.sh"
+yabai -m signal --add event=display_removed action="sleep 1 && $HOME/.config/yabai/create_spaces.sh"
+yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
 
-# global settings
-yabai -m config mouse_follows_focus             off
-yabai -m config focus_follows_mouse             off
-yabai -m config window_placement                second_child
-yabai -m config window_topmost                  off
-yabai -m config window_shadow                   off
-yabai -m config window_border                   off
-yabai -m config window_border_placement         exterior
-yabai -m config window_border_width             0
-yabai -m config window_border_radius            0
-yabai -m config active_window_border_color      0xFFF0DFA7
-yabai -m config normal_window_border_color      0xB2282828
-yabai -m config insert_window_border_color      0xB2EBDBB2
-yabai -m config window_opacity                  off
-yabai -m config split_ratio                     0.50
-yabai -m config auto_balance                    on
-yabai -m config mouse_modifier                  fn
-yabai -m config mouse_action1                   move
-yabai -m config mouse_action2                   resize
+$HOME/.config/yabai/create_spaces.sh
 
-# general space settings
-yabai -m config layout                          bsp
-yabai -m config top_padding                     2
-yabai -m config bottom_padding                  2
-yabai -m config left_padding                    2
-yabai -m config right_padding                   2
-yabai -m config window_gap                      2
+yabai -m config external_bar               all:25:0     \
+                window_border              on           \
+                mouse_follows_focus        off          \
+                focus_follows_mouse        off          \
+                window_zoom_persist        off          \
+                window_placement           second_child \
+                window_topmost             off          \
+                window_shadow              float        \
+                window_opacity             on           \
+                window_opacity_duration    0.15         \
+                active_window_opacity      1.0          \
+                normal_window_opacity      0.95         \
+                window_border_width        2            \
+                window_border_hidpi        off          \
+                window_border_radius       11           \
+                window_animation_duration  0.22         \
+                active_window_border_color 0xffe1e3e4   \
+                normal_window_border_color 0xff879997   \
+                insert_feedback_color      0xff9dd274   \
+                split_ratio                0.50         \
+                auto_balance               off          \
+                mouse_modifier             fn           \
+                mouse_action1              move         \
+                mouse_action2              resize       \
+                mouse_drop_action          swap         \
+                top_padding                2            \
+                bottom_padding             2            \
+                left_padding               2            \
+                right_padding              2            \
+                window_gap                 2
 
-yabai -m config window_topmost                  on
-yabai -m config window_shadow                   float
+# Exclude problematic apps from being managed:
+yabai -m rule --add app="^(LuLu|Vimac|Calculator|Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Steam|Alfred|Activity Monitor)$" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
+yabai -m rule --add label="Orion" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 
-# Space labels
-yabai -m space 1 --label "Primary"
-yabai -m space 2 --label "Kitty"
 
-yabai -m space 3 --label "Browser"
-yabai -m space 4 --label "Comms"
-yabai -m space 5 --label "Tools"
-yabai -m space 6 --label "Media"
-yabai -m space 7 --label "Social"
-yabai -m space 8 --label "Float"
-yabai -m space 9 --label "Secondary"
+####     yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+####     sudo yabai --load-sa
+####     
+####     yabai -m config external_bar all:25:0
+####     
+####     # global settings
+####     yabai -m config mouse_follows_focus             off
+####     yabai -m config focus_follows_mouse             off
+####     yabai -m config window_placement                second_child
+####     yabai -m config window_topmost                  off
+####     yabai -m config window_shadow                   off
+####     yabai -m config window_border                   on
+####     yabai -m config window_border_blur              off
+####     # yabai -m config window_border_placement         exterior
+####     # yabai -m config window_border_width             0
+####     # yabai -m config window_border_radius            0
+####     yabai -m config active_window_border_color      0xff879997
+####     yabai -m config normal_window_border_color      0x00000000
+####     # yabai -m config insert_window_border_color      0xB2EBDBB2
+####     # yabai -m config window_opacity                  on
+####     yabai -m config split_ratio                     0.50
+####     yabai -m config auto_balance                    on
+####     yabai -m config mouse_modifier                  fn
+####     yabai -m config mouse_action1                   move
+####     yabai -m config mouse_action2                   resize
+####     
+####     # general space settings
+####     yabai -m config layout                          bsp
+####     yabai -m config top_padding                     2
+####     yabai -m config bottom_padding                  2
+####     yabai -m config left_padding                    2
+####     yabai -m config right_padding                   2
+####     yabai -m config window_gap                      2
+####     
+####     yabai -m config window_topmost                  on
+####     yabai -m config window_shadow                   float
+####     
+####     # Space labels
+####     yabai -m space 1 --label "Primary"
+####     yabai -m space 2 --label "Term" # --layout=float
+####     yabai -m space 3 --label "Browser"
+####     yabai -m space 4 --label "Comms"
+####     yabai -m space 5 --label "Tools"
+####     yabai -m space 6 --label "Media"
+####     yabai -m space 7 --label "Social"
+####     yabai -m space 8 --label "Float"
+####     yabai -m space 9 --label "Secondary"
+####     
+####     # Space config
+####     yabai -m config --space 1
+####     
 
-# Space config
-yabai -m config --space 1 layout float
 
 # Unmanaged
 yabai -m rule --add app="^System Preferences$"  manage=off border=off
@@ -54,35 +113,43 @@ yabai -m rule --add app="Harvest"               manage=off border=off
 yabai -m rule --add app="ScreenFlow 9"          manage=off border=off
 yabai -m rule --add app="Preview"               manage=off border=off
 
-# Primary
-yabai -m rule --add app="Brave Browser"         space=3
+# Browser
 yabai -m rule --add app="Safari"                space=3
+# yabai -m rule --add app="Orion"                 space=3 # manage=off grid=1:4:0:0:1:1 border=off
+
+# Terminal window
 yabai -m rule --add app="kitty"                 space=2 #border=off native-fullscreen=on
 yabai -m rule --add app="zathura"               space=2
+yabai -m rule --add app="WezTerm"               space=2 #manage=off grid=1:4:1:0:2:2 border=off
 
 # Communication
 yabai -m rule --add app="Mattermost"            space=4
+yabai -m rule --add app="Teams"                 space=4
 yabai -m rule --add app="Notes"                 space=4
 yabai -m rule --add app="Mail"                  space=4
-yabai -m rule --add app="Messages"              space=4
 
 # Tools
-yabai -m rule --add app="Finder"                space=1
+# yabai -m rule --add app="Finder"                space=1 manage=off
 yabai -m rule --add app="Activity Monitor"      space=5
 yabai -m rule --add app="App Store"             space=5
 yabai -m rule --add app="Transmission"          manage=off border=off
-yabai -m rule --add app="Terminal"              space=3
+yabai -m rule --add app="Terminal"              space=5
 
 # Media
 yabai -m rule --add app="Music"                 space=6
 yabai -m rule --add app="QuickTime Player"      space=6
-yabai -m rule --add app="TIDAL"                 space=6
+yabai -m rule --add app="Spotify"               space=6
 
 # Social
 yabai -m rule --add app="WhatsApp"              space=7
 yabai -m rule --add app="Telegram"              space=7
-
+yabai -m rule --add app="Messages"              space=7
+ 
 # Floating
 yabai -m rule --add app="^System Preferences$"  space=9
 yabai -m rule --add app="ScreenFlow 9"          space=9
+
+
+
+yabai -m config layout bsp
 
