@@ -1,4 +1,4 @@
-cask_args appdir: '/Applications'
+cask_args appdir: '/Applications', force: true
 
 # Add standard taps
 tap "homebrew/cask"
@@ -80,7 +80,7 @@ brew "gcc"
 # brew install clang-format
 
 # App essentials
-cask "kitty", args: ["force"]                    # best terminal on Earth
+cask "kitty"                      # best terminal on Earth
 # cask "mactex-no-gui"            # mactex without crap
 cask "transmission"             # torrent client
 # cask "inkscape"                 # draw
