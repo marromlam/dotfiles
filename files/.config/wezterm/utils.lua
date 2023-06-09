@@ -5,8 +5,13 @@ function M.basename(s)
 end
 
 function file_exists(name)
-   local f=io.open(name,"r")
-   if f~=nil then io.close(f) return true else return false end
+	local f = io.open(name, "r")
+	if f ~= nil then
+		io.close(f)
+		return true
+	else
+		return false
+	end
 end
 
 function M.merge_tables(t1, t2)
@@ -80,5 +85,14 @@ function M.split_from_url(dir)
 	return hostname, cwd
 end
 
+function M.get_current_working_dir(tab)
+	local current_dir = tab.active_pane.current_working_dir
+	local HOME_DIR = string.format("file://%s", os.getenv("HOME"))
+
+	return current_dir == HOME_DIR and "  ~"
+		or string.format("  %s", string.gsub(current_dir, "(.*[/\\])(.*)", "%2"))
+end
+
 return M
 
+-- vim: fdm=marker et ts=4 sw=4
