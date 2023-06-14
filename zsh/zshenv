@@ -36,7 +36,7 @@ export USE_EDITOR=$EDITOR
 # fi
 
 if ! type "$bat" > /dev/null; then
-  export BAT_THEME="gruvbox-dark"
+  export BAT_THEME="base16"
 fi
 
 # Setting ag as the default source for fzf
