@@ -59,3 +59,9 @@ files/.config/kitty/kittens/pass_keys.py
 files/.config/kitty/kittens/termpdf.py
 files/.config/spotifyd/rustlang.spotifyd.plist
 files/.config/lazygit/state.yml
+
+files/.config/libvirt/qemu/*
+files/.config/libvirt/storage/*
+files/.config/libvirt/storage/autostart/*
+files/.config/libvirt/storage/autostart/*
+files/.config/libvirt/storage/*

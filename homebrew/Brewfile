@@ -94,6 +94,7 @@ cask "keycastr"
 # cask "nteract"
 cask "wezterm"
 cask "rectangle"
+cask "grandperspective"
 
 # Fonts
 cask "font-fira-code"

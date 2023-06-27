@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Switch between Ripgrep launcher mode (CTRL-R) and fzf filtering mode (CTRL-F)
-RG_PREFIX="rg --column --no-ignore --line-number --no-heading --color=always --smart-case "
+RG_PREFIX="rg --no-ignore-vcs --column --line-number --no-heading --color=always --smart-case "
 INITIAL_QUERY="${*:-}"
 IFS=: read -ra selected < <(
 	FZF_DEFAULT_COMMAND="$RG_PREFIX $(printf %q "$INITIAL_QUERY")" \
@@ -18,11 +18,10 @@ IFS=: read -ra selected < <(
 		--preview-window 'up,60%,border-bottom,+{2}+3/3,~3'
 )
 
-if [[ ${selected[0]} == *.pdf ]]
-then
-  [ -n "${selected[0]}" ] && termpdf.py "${selected[0]}" "+${selected[1]}"
+if [[ ${selected[0]} == *.pdf ]]; then
+	[ -n "${selected[0]}" ] && termpdf.py "${selected[0]}" "+${selected[1]}"
 else
-  [ -n "${selected[0]}" ] && $EDITOR "${selected[0]}" "+${selected[1]}"
+	[ -n "${selected[0]}" ] && $EDITOR "${selected[0]}" "+${selected[1]}"
 fi
 
 # vim: fdm=marker
