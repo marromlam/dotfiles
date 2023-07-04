@@ -6,7 +6,7 @@ set -e
 
 if [[ "$(uname -m)" == "x86_64" ]]; then
   # intel / rosseta
-  export HOMEBREW_PREFIX="/usr/local"
+  export HOMEBREW_PREFIX="/usr/local/homebrew"
 else
   # running on Apple Silicon
   export HOMEBREW_PREFIX="/opt/homebrew"
