@@ -1,7 +1,7 @@
 cask_args appdir: '/Applications', force: true
 
 # Add standard taps
-tap "homebrew/cask"
+# tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
 tap "homebrew/bundle"
@@ -63,8 +63,6 @@ brew "tmux"                     # terminal multiplexer
 #brew "tmuxinator"
 #brew "tmuxinator-fzf-start"
 brew "tree"
-brew "vifm"
-brew "vim"                      # best editor on Earth
 brew "wget"                     # like curl
 # brew "yabai"
 brew "yarn"
@@ -73,7 +71,7 @@ brew "mupdf-tools"
 brew "ffmpeg"                   # video converter
 
 brew "shfmt"
-brew "lsd"
+brew "exa"
 brew "gcc"
 
 # npm install fixjson 
