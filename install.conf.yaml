@@ -41,12 +41,7 @@
 
 - shell:
     - [source scripts/reload_shell, Reload shell]
-    - command: ". scripts/reload_shell && brew bundle --file=~/.Brewfile"
-      stdin: true
-      stdout: true
-      stderr: true
-      description: Install homebrew dependencies
-      
+    - [zsh -c 'brew bundle --file=~/.Brewfile', Install homebrew dependencies]
     - [git submodule update --init --recursive, Installing submodules]
     - [bash extra/macos_settings.sh, Installing macOS config]
     - [bash extra/keyboard.sh, Installing keyboard config]
