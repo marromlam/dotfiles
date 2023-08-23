@@ -115,7 +115,7 @@ yabai -m rule --add app="Preview"               manage=off border=off
 
 # Browser
 yabai -m rule --add app="Safari"                space=3
-# yabai -m rule --add app="Orion"                 space=3 # manage=off grid=1:4:0:0:1:1 border=off
+yabai -m rule --add app="Orion"                 space=3 # manage=off grid=1:4:0:0:1:1 border=off
 
 # Terminal window
 yabai -m rule --add app="kitty"                 space=2 #border=off native-fullscreen=on
