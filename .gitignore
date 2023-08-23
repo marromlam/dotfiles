@@ -65,3 +65,4 @@ files/.config/libvirt/storage/*
 files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/*
+files/.config/lazygit/state.yml
