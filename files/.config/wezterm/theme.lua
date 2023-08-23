@@ -7,16 +7,17 @@ local M = {}
 CUSTOM_NIGHT = wezterm.color.get_builtin_schemes()["Gruvbox dark, hard (base16)"]
 
 -- Light themes
--- CUSTOM_DAY = wezterm.color.get_builtin_schemes()["Yousai (terminal.sexy)"]
+CUSTOM_DAY = wezterm.color.get_builtin_schemes()["Yousai (terminal.sexy)"]
 -- CUSTOM_DAY = wezterm.color.get_builtin_schemes()["Gruvbox Light"]
-CUSTOM_DAY = wezterm.color.get_builtin_schemes()["Horizon Bright (Gogh)"]
+-- CUSTOM_DAY = wezterm.color.get_builtin_schemes()["Horizon Bright (Gogh)"]
 --[[ local custom_day = wezterm.color.get_builtin_schemes()["Gruvbox (Gogh)"] ]]
 --[[ local custom_day = wezterm.color.get_builtin_schemes()['Belafonte Day'] ]]
 --[[ local custom_day = wezterm.color.get_builtin_schemes()["Everforest Light (Gogh)"] ]]
 
--- for k, v in pairs(CUSTOM_DAY) do
--- 	wezterm.log_info(k, v)
--- end
+wezterm.log_info("COLORS")
+for k, v in pairs(CUSTOM_DAY) do
+	wezterm.log_info(k, v)
+end
 
 CUSTOM_DAY.tab_bar = {
 	background = "#bbc2cf",

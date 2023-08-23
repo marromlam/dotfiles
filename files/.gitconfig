@@ -33,6 +33,7 @@
   reset-up = reset --hard $(git upstream)
   sl = log --oneline --decorate -20
   new = checkout -b
+  expunge = "!f() { git branch -d $1 && git push origin --delete $1; }; f"
 [delta]
   ; features = line-numbers
   features = zebra-dark

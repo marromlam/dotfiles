@@ -9,11 +9,11 @@
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-;SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+; SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+; AutoHotkey v2 script
 SetWorkingDir(A_ScriptDir)
 
 
-; DLL calls {{{
 
 VDA_PATH := A_ScriptDir . "\VirtualDesktopAccessor.dll"
 ; MsgBox("hola")
@@ -101,34 +101,18 @@ RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
     return ran
 }
 
-; }}}
 
-; Move window to desktop 1-9 {{{
-RCtrl::RAlt
-RAlt & 1::MoveCurrentWindowToDesktop(0)
-RAlt & 2::MoveCurrentWindowToDesktop(1)
-RAlt & 3::MoveCurrentWindowToDesktop(2)
-RAlt & 4::MoveCurrentWindowToDesktop(3)
-RAlt & 5::MoveCurrentWindowToDesktop(4)
-RAlt & 6::MoveCurrentWindowToDesktop(5)
-RAlt & 7::MoveCurrentWindowToDesktop(6)
-RAlt & 8::MoveCurrentWindowToDesktop(7)
-RAlt & 9::MoveCurrentWindowToDesktop(8)
-RAlt & 0::MoveCurrentWindowToDesktop(9)
-RCtrl & 1::MoveCurrentWindowToDesktop(0)
-RCtrl & 2::MoveCurrentWindowToDesktop(1)
-RCtrl & 3::MoveCurrentWindowToDesktop(2)
-RCtrl & 4::MoveCurrentWindowToDesktop(3)
-RCtrl & 5::MoveCurrentWindowToDesktop(4)
-RCtrl & 6::MoveCurrentWindowToDesktop(5)
-RCtrl & 7::MoveCurrentWindowToDesktop(6)
-RCtrl & 8::MoveCurrentWindowToDesktop(7)
-RCtrl & 9::MoveCurrentWindowToDesktop(8)
-RCtrl & 0::MoveCurrentWindowToDesktop(9)
+LAlt & 1::MoveCurrentWindowToDesktop(0)
+LAlt & 2::MoveCurrentWindowToDesktop(1)
+LAlt & 3::MoveCurrentWindowToDesktop(2)
+LAlt & 4::MoveCurrentWindowToDesktop(3)
+LAlt & 5::MoveCurrentWindowToDesktop(4)
+LAlt & 6::MoveCurrentWindowToDesktop(5)
+LAlt & 7::MoveCurrentWindowToDesktop(6)
+LAlt & 8::MoveCurrentWindowToDesktop(7)
+LAlt & 9::MoveCurrentWindowToDesktop(8)
+LAlt & 0::MoveCurrentWindowToDesktop(9)
 
-; }}}
-
-; switch to desktop 1-9 {{{
 RWin & 1::GoToDesktopNumber(0)
 RWin & 2::GoToDesktopNumber(1)
 RWin & 3::GoToDesktopNumber(2)
@@ -139,7 +123,27 @@ RWin & 7::GoToDesktopNumber(6)
 RWin & 8::GoToDesktopNumber(7)
 RWin & 9::GoToDesktopNumber(8)
 RWin & 0::GoToDesktopNumber(9)
-; }}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -163,42 +167,22 @@ RWin & 0::GoToDesktopNumber(9)
 ;*CapsLock Up::Send {LControl up}
 
 
-
-
-
-
-
-
-; Application and tab swiching {{{
-; LWin & Tab::AltTab
-; LWin & Shift::ShiftAltTab
-
-LWin & Tab::
-    AltTabMenu := true
-    If GetKeyState("Shift","P")
-        Send {Alt Down}{Shift Down}{Tab}
-    else
-        Send {Alt Down}{Tab}
-return
-
-#If (AltTabMenu)
-
-    ~*LWin Up::
-        Send {Shift Up}{Alt Up}
-        AltTabMenu := false
-    return
-
-#If
-
-; }}}
-
-
-
-
 ;Ctrl::CapsLock
-; #Space::!Space
+LWin::Ctrl
+#Space::LWin
 ; Disable Caps Lock key
 ;SetCapsLockState, AlwaysOff
+
+
+
+
+
+
+
+; Application and tab swiching
+LWin & Tab::AltTab
+!Tab::Send ^{Tab}
+;LWin & LCtrl::Send Win&Ctrl
 
 LCtrl & Left::SendEvent {LWin down}{LCtrl down}{Left down}{LWin up}{LCtrl up}{Left up}
 LCtrl & Right::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up}{Right up}
@@ -208,9 +192,9 @@ LCtrl & Right::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up}{
 LWin & XButton1::SendEvent {LWin down}{LCtrl down}{Left down}{LWin up}{LCtrl up}{Left up}{Esc down}{Esc up}
 LWin & XButton2::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up}{Right up}{Esc down}{Esc up}
 
+$Ctrl::CapsLock
+$CapsLock::Ctrl
 
-; <#::Ctrl
-#::!
 
 ;following section remaps alt-delete keys to mimic OSX
 ;command-delete deletes whole line
@@ -240,11 +224,9 @@ LWin & XButton2::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up
 !Left::^Left
 !Right::^Right
 
-$Ctrl::CapsLock
-$CapsLock::Ctrl
 
-; Screenshot: Windows logo key + Shift + S
-#+4::Send {LWin down}{Shift down}{s}{LWin up}{Shift up}
+
+#D::
 
 
 
@@ -275,99 +257,17 @@ $"::@
 ;+$+::Send ~
 
 
-
-F7::SendInput {Media_Prev}
-F8::SendInput {Media_Play_Pause}
-F9::SendInput {Media_Next}
-F10::SendInput {Volume_Mute}
-F11::SendInput {Volume_Down}
-F12::SendInput {Volume_Up}
-
-
-
-#IfWinActive  ; This puts subsequent remappings and hotkeys in effect for all windows.
-
-#a::Send ^a
-#b::Send ^b
-#c::Send ^c
-#d::Send ^d
-#e::Send ^e
-#f::Send ^f
-#g::Send ^g
-#h::Send ^h
-#i::Send ^i
-#j::Send ^j
-#k::Send ^k
-#l::Send ^l
-#m::Send ^m
-#n::Send ^n
-#o::Send ^o
-#p::Send ^p
-#q::Send ^q
-#r::Send ^r
-#s::Send ^s
-#t::Send ^t
-#u::Send ^u
-#v::Send ^v
-#w::Send ^w
-#x::Send ^x
-#y::Send ^y
-#z::Send ^z
-#1::Send ^1
-#2::Send ^2
-#3::Send ^3
-#4::Send ^4
-#5::Send ^5
-#6::Send ^6
-#7::Send ^7
-#8::Send ^8
-#9::Send ^9
-#0::Send ^0
-
-#+z::Send ^y
-return
-
-
-; windows space to ctrl space
-#Space::!Space
-
-
 ; CTRL-C and CTRL-V have to have special behavious in terminal window
-;#IfWinActive ahk_exe
-
+;#IfWinActive ahk_exe 
 
 ; MAPS FOR TERMINAL
 #IfWinActive ahk_exe wezterm-gui.exe
-+#d::Send ^!+d
-; shif + LWin + c :: copy
-+#c::Send ^!+c
-
-#a::Send ^!a
-#b::Send ^!b
-#c::Send ^!c
+#c::Send ^+c
+#v::Send ^+v
 #d::Send ^!d
-#e::Send ^!e
-#f::Send ^!f
-#g::Send ^!g
-#h::Send ^!h
-#i::Send ^!i
-#j::Send ^!j
-#k::Send ^!k
-#l::Send ^!l
-#m::Send ^!m
-#n::Send ^!n
-#o::Send ^!o
-#p::Send ^!p
-#q::Send ^!q
 #r::Send ^!r
-#s::Send ^!s
++#d::Send ^!+d
 #t::Send ^!t
-#u::Send ^!u
-#v::Send ^!v
-#w::Send ^!w
-#x::Send ^!x
-#y::Send ^!y
-#z::Send ^!z
 #1::Send ^!1
 #2::Send ^!2
 #3::Send ^!3
@@ -385,8 +285,33 @@ return
 
 return
 
+#IfWinActive  ; This puts subsequent remappings and hotkeys in effect for all windows.
+
+#x::Send ^x
+#c::Send ^c
+#v::Send ^v
+#s::Send ^s
+#a::Send ^a
+#z::Send ^z
+#+z::Send ^y
+#w::Send ^wCcSsAa
+#f::Send ^f
+#n::Send ^n
+#t:: Send ^t
 
 
 
+; Windows + Number
+#1::Send ^1
+#2::Send ^2
+#3::Send ^3
+#4::Send ^4
+#5::Send ^5
+#6::Send ^6
+#7::Send ^7
+#8::Send ^8
+#9::Send ^9
+#0::Send ^0
 
-; vim: fdm=marker
+
+return

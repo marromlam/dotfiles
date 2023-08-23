@@ -1,0 +1,51 @@
+AVRO_FILE=$1
+SCHEMA=$2
+JSON_FILE=$3
+
+
+python -c "import fastavro" || python -m pip install fastavro
+
+
+
+for var in "$@"
+do
+python - <<EOF
+from fastavro import reader, json_writer
+from fastavro import parse_schema
+from fastavro.schema import load_schema
+from fastavro import json_reader
+import argparse
+import json
+import os
+import json
+from uuid import UUID
+from io import BytesIO
+
+
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+        return json.JSONEncoder.default(self, obj)
+
+
+# SCHEMA = load_schema("schemas/document_schema.avsc")
+
+is_printed=True
+full_json = []
+with BytesIO(open("${var}", "rb").read()) as fo:
+    avro_reader = reader(fo)
+    for record in avro_reader:
+        if record["content"] is not None:
+            if is_printed:
+                record["content"] = str(record["content"].hex())[:20] + " ..."
+            else:
+                record["content"] = record["content"].hex()
+        full_json.append(record)
+if is_printed:
+    print(json.dumps(full_json, indent=4, cls=UUIDEncoder))
+EOF
+done
+
+# vim: ft=bash
