@@ -7,7 +7,6 @@
 
 # Get machine operative system
 export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
-echo "Machine OS: $MACHINEOS"
 
 # Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
@@ -27,7 +26,6 @@ eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
 # }}}
-
 
 # source basuc functions
 source $HOME/.dotfiles/zsh/ufunctions.sh
@@ -172,7 +170,6 @@ setopt AUTOPARAMSLASH # tab completing directory appends a slash
 
 # }}}
 
-
 # os-dependent config {{{
 
 # source "$HOME/.dotfiles/zsh/prompt.sh"
@@ -196,7 +193,6 @@ esac
 
 # test if ~/.wsl exists and source zsh/windows.sh if it does
 if [[ -f ~/.wsl ]]; then
-  echo "WSL detected"
   source "$HOME/.dotfiles/zsh/windows.sh"
 fi
 
