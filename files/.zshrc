@@ -271,12 +271,8 @@ source $DOTFILES/zsh/aliases.sh
 
 # common settings for bash and zsh
 source $HOME/.dotfiles/zsh/common.sh
-<<<<<<< Updated upstream
 source $HOME/.dotfiles/zsh/serpe.sh
-||||||| Stash base
-=======
 source $HOME/.dotfiles/zsh/nvims.sh
->>>>>>> Stashed changes
 
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
