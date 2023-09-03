@@ -272,7 +272,7 @@ source $DOTFILES/zsh/aliases.sh
 # common settings for bash and zsh
 source $HOME/.dotfiles/zsh/common.sh
 source $HOME/.dotfiles/zsh/serpe.sh
-source $HOME/.dotfiles/zsh/nvims.sh
+# source $HOME/.dotfiles/zsh/nvims.sh
 
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
