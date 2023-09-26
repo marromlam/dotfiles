@@ -21,13 +21,13 @@ curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.co
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/homebrew/homebrew.sh
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/extra/keys.sh
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/extra/dotfiles.sh
+curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/scripts/reload_shell
 
-echo "Force homebrew" $0
 if [[ "$MACHINEOS" == "Mac" ]]; then
-  # rm -rf ${HOME}/tmp/homebrew.sh
+  echo "Installing homebrew on macOS (forced=$0)"
   bash ${HOME}/tmp/homebrew.sh $0
 else
-  # linuxbrew path
+  echo "Installing homebrew on Linux (forced=$0)"
   export HOMEBREW_PREFIX="$HOME/.linuxbrew"
   bash ${HOME}/tmp/linuxbrew.sh $0
 fi
@@ -36,10 +36,13 @@ fi
 printf " \n\n"
 bash ${HOME}/tmp/keys.sh $1
 
+# create projects folder
+mkdir -p ~/Projects/{work,personal}
+
 # clone dotfiles
 printf " \n\n"
 bash ${HOME}/tmp/dotfiles.sh $1
-source ${HOME}/.dotfiles/scripts/reload_shell
+source ${HOME}/tmp/reload_shell
 chsh -s `which zsh`
 
 # clone dotfiles
