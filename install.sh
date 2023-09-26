@@ -7,7 +7,14 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 # machine type
-export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
+unameOut="$(uname -s)"
+case "${unameOut}" in
+  Linux*)     MACHINEOS=Linux;;
+  Darwin*)    MACHINEOS=Mac;;
+  CYGWIN*)    MACHINEOS=Cygwin;;
+  MINGW*)     MACHINEOS=MinGw;;
+  *)          MACHINEOS="UNKNOWN:${unameOut}"
+esac
 
 # clone temp dir
 curl --create-dirs -O --output-dir ${HOME}/tmp/ https://raw.githubusercontent.com/marromlam/dotfiles/main/homebrew/linuxbrew.sh
