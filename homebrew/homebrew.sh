@@ -26,7 +26,7 @@ else
   echo "Homebrew already installed. Skipping."
 fi
 
-source ${HOME}/.dotfiles/scripts/reload_shell
+source ${HOME}/tmp/reload_shell
 brew install stow
 
 exit 0
