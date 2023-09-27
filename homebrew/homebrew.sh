@@ -26,7 +26,8 @@ else
   echo "Homebrew already installed. Skipping."
 fi
 
-source ${HOME}/tmp/reload_shell
+eval $($HOMEBREW_PREFIX/bin/brew shellenv)
+export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 brew install stow
 
 exit 0
