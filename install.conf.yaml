@@ -14,32 +14,37 @@
 - clean: ["~"]
 
 - link:
-    # ~/.dotfiles: ""
     ~/.ssh:
       force: true
       mode: 0600
-      path: ~/.private/files/.ssh
-    # ~/.gitignore: git/.gitignore
-    ~/.gitconfig: files/.gitconfig
-    ~/.gitmessage: files/.gitmessage
-    ~/.tmux.conf: files/.tmux.conf
-    ~/.bash_profile: files/.bash_profile
-    ~/.bashrc: files/.bashrc
-    ~/.zshrc: files/.zshrc
-    ~/.sh_profile: files/.sh_profile
-    ~/.rgignore: files/.rgignore
+      path: ~/Projects/personal/private/files/.ssh
+    ~/.gitconfig: 
+      force: true
+      path: files/.gitconfig
+    ~/.gitmessage:  
+      force: true
+      path: files/.gitmessage
+    ~/.tmux.conf:  
+      force: true
+      path: files/.tmux.conf
+    ~/.bash_profile:  
+      force: true
+      path: files/.bash_profile
+    ~/.bashrc:  
+      force: true
+      path: files/.bashrc
+    ~/.zshrc:  
+      force: true
+      path: files/.zshrc
+    ~/.sh_profile:  
+      force: true
+      path: files/.sh_profile
+    ~/.rgignore:  
+      force: true
+      path: files/.rgignore
     ~/.config:
       force: true
       path: files/.config
-    ~/.Brewfile:
-      if: "[ `uname` = Darwin ]"
-      path: homebrew/Brewfile
-    ~/.Brewfile:
-      if: "[ `uname` = Linux ]"
-      path: homebrew/BrewfileLinux
-    # ~/Library/Application Support/lazygit/config.yml:
-    #   if: "[ `uname` = Darwin ]"
-    #   path: .config/lazygit/config.yml
 
 - shell:
     - [source scripts/reload_shell, Reload shell]
