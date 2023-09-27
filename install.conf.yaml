@@ -7,7 +7,9 @@
     ~/.ssh:
       mode: 0600
     ~/.config:
-    ~/projects:
+    ~/Projects:
+    ~/Projects/work:
+    ~/Projects/personal:
 
 - clean: ["~"]
 
@@ -41,7 +43,7 @@
 
 - shell:
     - [source scripts/reload_shell, Reload shell]
-    - [zsh -c 'brew bundle --file=~/.Brewfile', Install homebrew dependencies]
+    - [zsh -c 'brew bundle --file=~/Projects/personal/dotfiles/homebrew/Brewfile', Install homebrew macOS dependencies]
     - [git submodule update --init --recursive, Installing submodules]
     - [bash extra/macos_settings.sh, Installing macOS config]
     - [bash extra/keyboard.sh, Installing keyboard config]
