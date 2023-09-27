@@ -12,18 +12,15 @@ echo $MACHINEOS
 
 # Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
-	echo "bien"
-	# homebrew path
 	if [[ "$(uname -m)" == "x86_64" ]]; then
-		# intel / rosseta
 		export HOMEBREW_PREFIX="/usr/local"
 	else
-		# running on Apple Sillicon
 		export HOMEBREW_PREFIX="/opt/homebrew"
 	fi
 else
   export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
+
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
@@ -90,24 +87,4 @@ fi
 # }}}
 
 
-
-docker-service () {
-        DOCKER_DISTRO="Ubuntu"
-        DOCKER_DIR=/mnt/wsl/shared-docker
-        export DOCKER_SOCK="$DOCKER_DIR/docker.sock"
-        export DOCKER_HOST="unix://$DOCKER_SOCK"
-        if [ ! -S "$DOCKER_SOCK" ]
-        then
-                mkdir -pm o=,ug=rwx "$DOCKER_DIR"
-                chgrp docker "$DOCKER_DIR"
-                /mnt/c/Windows/System32/wsl.exe -d $DOCKER_DISTRO sh -c "nohup sudo -b dockerd < /dev/null > $DOCKER_DIR/dockerd.log 2>&1"
-        fi
-}
-
-
-docker-service
-
-
-
-
-# . "$HOME/.cargo/env"
+# vim: ft=bash fdm=marker
