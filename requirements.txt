@@ -1,0 +1,5 @@
+pynvim
+neovim-remote
+matplotlib
+numpy
+scipy

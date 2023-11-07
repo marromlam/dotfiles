@@ -1,0 +1,112 @@
+cask_args appdir: '/Applications', force: true
+
+# Add standard taps
+# tap "homebrew/cask"
+tap "homebrew/cask-fonts"
+tap "homebrew/cask-versions"
+tap "homebrew/bundle"
+tap "homebrew/services"
+tap "browsh-org/homebrew-browsh"
+
+# Custom taps tap "koekeishiya/formulae"
+tap "Rigellute/tap"
+tap "Schniz/tap"
+tap "rlue/utils"
+tap "epk/epk"
+
+# Homebrew essentials
+brew "bat" # alternative to cat
+brew "calcurse"
+brew "browsh"
+#brew "composer"
+#brew "coreutils"
+#brew "dbus"
+#brew "editorconfig"
+#brew "fnm"
+#brew "fontconfig"
+#brew "fontforge"
+brew "fpp"                      # facebook path picker 
+brew "fzf"                      # fuzzy finder
+#brew "gawk"
+brew "git"
+brew "ydiff"
+#brew "gitlab-gem"
+brew "gnu-sed"
+#brew "ifstat"
+#brew "jq"
+#brew "lazydocker"
+brew "lazygit"                  # awesome git util
+#brew "mkcert"
+brew "git-delta"
+brew "gd"
+brew "btop"
+#brew "mosh"
+#brew "mycli"
+brew "ncurses"
+brew "neovim"
+brew "node"
+#brew "php"
+brew "pandoc"
+brew "pkg-config"
+#brew "portaudio"
+brew "python"
+#brew "rbenv"
+brew "readline"
+#brew "readydocker"
+brew "ripgrep"                  # like grep, but faster
+brew "rlue/utils/timer"
+#brew "ruby"
+# brew "skhd"                     # control 
+brew "spotify-tui"
+brew "spotifyd"
+#brew "starship"
+brew "stow"
+brew "tmux"                     # terminal multiplexer
+#brew "tmuxinator"
+#brew "tmuxinator-fzf-start"
+brew "tree"
+brew "wget"                     # like curl
+# brew "yabai"
+brew "yarn"
+# brew "sshfs"                    # mount ssh volumes
+brew "mupdf-tools"
+brew "ffmpeg"                   # video converter
+
+brew "shfmt"
+brew "exa"
+brew "gcc"
+
+# npm install fixjson 
+# brew install clang-format
+
+# App essentials
+cask "kitty"                      # best terminal on Earth
+# cask "mactex-no-gui"            # mactex without crap
+cask "transmission"             # torrent client
+# cask "inkscape"                 # draw
+# cask "brave-browser"            # chromium based browser
+cask "orion"
+# cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
+# cask "zoom"
+# cask "tidal"
+# cask "Mattermost"
+cask "keycastr"
+# cask "nteract"
+cask "wezterm"
+cask "rectangle"
+cask "grandperspective"
+cask "stremio"
+cask "obsidian"
+cask "colima"
+cask "docker"
+
+
+
+# Fonts
+cask "font-hasklug-nerd-font"   # I use this font as the nerd one
+cask "font-jetbrains-mono"
+cask "font-victor-mono"         # main font
+cask "font-iosevka"
+cask "font-sf-mono-nerd-font"
+cask "font-fire-code-nerd-font"
+cask "font-hack-nerd-font"

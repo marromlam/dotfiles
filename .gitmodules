@@ -1,0 +1,29 @@
+[submodule "dotbot"]
+	path = dotbot
+	url = https://github.com/anishathalye/dotbot
+	ignore = dirty
+
+[submodule "files/.config/tmux/plugins/tpm"]
+	path = files/.config/tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
+[submodule "zsh/plugins/fzf-marks"]
+	path = zsh/plugins/fzf-marks
+	url = https://github.com/urbainvaes/fzf-marks.git
+[submodule "zsh/plugins/alias-tips"]
+	path = zsh/plugins/alias-tips
+	url = https://github.com/djui/alias-tips.git
+[submodule "zsh/plugins/zsh-auto-notify"]
+	path = zsh/plugins/zsh-auto-notify
+	url = https://github.com/MichaelAquilina/zsh-auto-notify.git
+[submodule "zsh/plugins/zsh-autopair"]
+	path = zsh/plugins/zsh-autopair
+	url = https://github.com/hlissner/zsh-autopair.git
+[submodule "zsh/plugins/zsh-autosuggestions"]
+	path = zsh/plugins/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
+[submodule "zsh/plugins/zsh-completions"]
+	path = zsh/plugins/zsh-completions
+	url = https://github.com/zsh-users/zsh-completions.git
+[submodule "zsh/plugins/zsh-syntax-highlighting"]
+	path = zsh/plugins/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git

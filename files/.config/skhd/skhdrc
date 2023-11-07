@@ -1,0 +1,97 @@
+###############################################################################
+# Navigation (focussing)
+###############################################################################
+
+# Windows: Cmd + [DIR]
+cmd - h : yabai -m window --focus west
+cmd - j : yabai -m window --focus south
+cmd - k : yabai -m window --focus north
+cmd - l : yabai -m window --focus east
+
+# Spaces:  Cmd + [NUM]
+ctrl - 1 : yabai -m space --focus 1
+ctrl - 2 : yabai -m space --focus 2
+ctrl - 3 : yabai -m space --focus 3
+ctrl - 4 : yabai -m space --focus 4
+ctrl - 5 : yabai -m space --focus 5
+ctrl - 6 : yabai -m space --focus 6
+ctrl - 7 : yabai -m space --focus 7
+ctrl - 8 : yabai -m space --focus 8
+ctrl - 9 : yabai -m space --focus 9
+ctrl - 0 : yabai -m space --focus 10
+
+# Monitors: Cmd + Alt + [NUM]
+rcmd + ctrl - 1  : yabai -m display --focus 1
+rcmd + ctrl - 2  : yabai -m display --focus 2
+
+
+###############################################################################
+# Moving
+###############################################################################
+
+# "Swaps" with another Window, obtaining its size and position
+# Swap: Ctrl + Alt + [DIR]
+alt - h : yabai -m window --swap west
+alt - j : yabai -m window --swap south
+alt - k : yabai -m window --swap north
+alt - l : yabai -m window --swap east
+
+# Sends Window to Space and shifts focus
+# Send: Shift + Cmd + [NUM]
+lcmd + rcmd - 1 : yabai -m window --space  1; yabai -m space --focus 1
+lcmd + rcmd - 2 : yabai -m window --space  2; yabai -m space --focus 2
+lcmd + rcmd - 3 : yabai -m window --space  3; yabai -m space --focus 3
+lcmd + rcmd - 4 : yabai -m window --space  4; yabai -m space --focus 4
+lcmd + rcmd - 5 : yabai -m window --space  5; yabai -m space --focus 5
+lcmd + rcmd - 6 : yabai -m window --space  6; yabai -m space --focus 6
+lcmd + rcmd - 7 : yabai -m window --space  7; yabai -m space --focus 7
+lcmd + rcmd - 8 : yabai -m window --space  8; yabai -m space --focus 8
+lcmd + rcmd - 9 : yabai -m window --space  9; yabai -m space --focus 9
+
+# Sends Window to Monitor and shifts focus
+# Send Monitor: Ctrl + Cmd + [NUM]
+rcmd + alt - 1 : yabai -m window --display 1; yabai -m display --focus 1
+rcmd + alt - 2 : yabai -m window --display 2; yabai -m display --focus 2
+
+# Floating Move
+shift + ctrl - a : yabai -m window --move rel:-20:0
+shift + ctrl - s : yabai -m window --move rel:0:20
+shift + ctrl - w : yabai -m window --move rel:0:-20
+shift + ctrl - d : yabai -m window --move rel:20:0
+
+
+
+# Sizing: Shift + [Alt/Cmd] + [DIR] ###########################################
+
+# Auto
+f1 : yabai -m space --balance
+f2 : yabai -m window --resize left:-200:0 && yabai -m window --resize right:600:0
+
+# Increase (no decrease options, just resizing the relevant windows)
+rcmd + lalt + shift - h : yabai -m window --resize left:-40:0
+rcmd + lalt + shift - j : yabai -m window --resize bottom:0:40
+rcmd + lalt + shift - k : yabai -m window --resize top:0:-40
+rcmd + lalt + shift - l : yabai -m window --resize right:40:0
+
+
+# Toggling ####################################################################
+
+# Fullscreen (still includes gaps)
+rcmd - f : yabai -m window --toggle zoom-fullscreen
+
+# Float and center
+rcmd - t : yabai -m window --toggle float; yabai -m window --grid 4:4:1:1:2:2
+
+# Rotate
+rcmd - space : yabai -m space --rotate 90
+
+
+
+# Floating ####################################################################
+
+# Fill
+shift + alt - up     : yabai -m window --grid 1:1:0:0:1:1
+# Left
+shift + alt - left   : yabai -m window --grid 1:2:0:0:1:1
+# Right
+shift + alt - right  : yabai -m window --grid 1:2:1:0:1:1 

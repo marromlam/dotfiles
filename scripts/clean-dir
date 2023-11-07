@@ -1,0 +1,13 @@
+rm -rf *Zone.Identifier
+rm -rf */*/*Zone.Identifier
+rm -rf */*/*/*Zone.Identifier
+rm -rf */*/*/*/*Zone.Identifier
+rm -rf */*/*/*/*/*Zone.Identifier
+rm -rf */*/*/*/*/*/*Zone.Identifier
+rm -rf */*/*/*/*/*/*/*Zone.Identifier
+
+# Remove all .DS_Store files
+# find . -name '.DS_Store' -type f -delete #
+
+
+# vim: ft=sh

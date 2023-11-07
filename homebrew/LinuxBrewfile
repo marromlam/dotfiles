@@ -1,0 +1,47 @@
+# Custom taps
+tap "koekeishiya/formulae"
+tap "Rigellute/tap"
+tap "Schniz/tap"
+tap "rlue/utils"
+tap "epk/epk"
+
+
+# Homebrew essentials
+brew "gcc", args: ["force-bottle"]   # usually broken :')
+brew "ruby", args: ["force-bottle"]  # usually broken :')
+brew "glibc", args: ["force-bottle"] # usually broken :')
+brew "bat"                           # alternative to cat
+brew "bottom"                        # alternative to htop
+brew "calcurse"
+#brew "fnm"
+brew "fpp"                          # facebook path picker
+brew "fzf"                          # fuzzy finder
+brew "ruby", args: ["force-bottle"] # broken
+brew "git"                          # updated git
+#brew "lazydocker"
+brew "lazygit"                      # awesome git util
+brew "git-delta"                    # pretty git diffs
+#brew "mkcert"
+#brew "mosh"
+#brew "mycli"
+brew "ncurses"                      # needed for a bunch of stuff
+brew "neovim"                       # best editor on Earth
+# brew "vim"                          # 2nd best editor on Earth
+brew "node"
+brew "pandoc"
+brew "pkg-config"
+brew "python"
+brew "ripgrep"                      # like grep, but faster
+brew "rlue/utils/timer"
+brew "stow"                         # to create symbolic links
+# brew "tmux"                       # terminal multiplexer
+brew "tree"                         # shows directory tree
+brew "vifm", args: ["force-bottle"] # file explorer with vim keys
+# brew "wget"                       # like curl
+brew "sshfs"                        # mount ssh volumes
+brew "zsh-syntax-highlighting"
+brew "zsh-autosuggestions"
+brew "texlive"
+
+brew "rust"                         # for compile rust
+brew "rust-analyzer"                # for lint rust

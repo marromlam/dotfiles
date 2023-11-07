@@ -1,0 +1,65 @@
+_jukitty(){
+  #nvim $1
+
+  # 1 - First export the display
+  export DISPLAY=:0.0
+  
+  # 2 - Check whether lemonade is running
+  ps cax | grep lemonade> /dev/null
+  if [ $? -eq 0 ]; then
+    echo "=  lemonade is running.                                                        ="
+  else
+    echo "=  lemonade was not running... lemonade was launched.                          ="
+    nohup lemonade server -allow 127.0.0.1 &
+  fi
+  
+  # 3 - Set  
+  full_file=$1
+  
+  if [[ "${full_file:0:6}" == "scp://" ]]; then
+    echo "file on server"
+    the_server="$(cut -d'/' -f3 <<<"$full_file")"
+    offset=${#the_server}
+    offset=$((offset + 6 + 1)) 
+    the_file="${full_file:$offset:${#full_file}}"
+    echo $the_server
+    echo $the_file
+  else
+    echo "local file"
+    the_server="local"
+    the_file="${full_file}"
+    echo $the_file
+  fi
+
+
+  # 3 - Generate random string as window titles
+  EDITOR_ID=`xxd -l4 -ps /dev/urandom`
+  KERNEL_ID=`xxd -l4 -ps /dev/urandom`
+  
+  # 4 - Launch a new tab / os-window and split it
+  KE_ID=`kitty @ launch --type=tab --title $EDITOR_ID --keep-focus`
+  KK_ID=`kitty @ launch -m title:$EDITOR_ID --title $KERNEL_ID --keep-focus`
+  
+  # 5 -put juKitty as window name
+  kitty @ set-tab-title --match title:$EDITOR_ID "texKitty - nvim"
+  
+  echo "keditor" $KE_ID
+  echo "kkernel" $KK_ID
+  
+  # export KITTY_WINDOW_ID to be the one in the KKERNEL_ID window
+  # open nvim in first window
+  if [[ $the_server == "local" ]]; then
+    kitty @ send-text --match title:$EDITOR_ID "nvim $the_file\n"
+  else
+    kitty @ send-text --match title:$EDITOR_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
+    kitty @ send-text --match title:$EDITOR_ID "export KITTY_WINDOW_ID=${KK_ID}\n"
+    kitty @ send-text --match title:$EDITOR_ID "vim $the_file\n"
+    kitty @ send-text --match title:$KERNEL_ID "ssh -R 2489:127.0.0.1:2489 $the_server\n"
+  fi
+  
+  kitty @ focus-tab --match title:$KERNEL_ID
+  kitty @ send-text --match title:$KERNEL_ID "clc; echo juKitty kernel running at ${KERNEL_ID} with window ID = ${KK_ID}\n"
+}
+
+_jukitty "$@"
+

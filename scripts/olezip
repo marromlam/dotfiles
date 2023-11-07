@@ -1,0 +1,12 @@
+#!/bin/bash
+if [[ $# -ge 1 ]]; then
+    for a in $(unzip -l "$1" \*oleObject\*.bin | grep oleObject | cut -c28-); do
+        o=$(uuidgen).zip 
+        unzip -p "$1" "${a##+([[:space:]])}" > $o
+        unzip -x $o
+        rm $o
+    done
+fi
+
+
+# vim: ft=bash

@@ -1,0 +1,23 @@
+### Source bashrc
+##source "$HOME/.bashrc"
+##
+### Source local bashrc
+##if [ -f "$HOME/.bashrc.local" ]; then
+##  source "$HOME/.bashrc.local"
+##fi
+
+THISSHELL=`ps -p $$`
+THISSHELL=`echo -n $THISSHELL | tail -c 4`
+if [ $THISSHELL!="bash" ]; then
+  export THISSHELL="zsh"
+fi
+
+
+
+
+
+
+
+
+
+#source $(brew --prefix)/etc/bash_completion

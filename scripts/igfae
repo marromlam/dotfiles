@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+echo "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "⠀⠀⠀⠀⠀⠀⠀⢀⡠⣴⡔⡶⡷⡶⡒⣴⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "⠀⠀⠀⠀⢀⣤⣮⡻⣳⢹⢽⠜⡯⡏⡪⣟⢞⢵⣻⢶⣄⡀⠀⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⣀⣀⣀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⣀⣀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⠀⠀⠀"
+echo "⠀⠀⠀⣰⢻⣳⣳⡫⣖⠕⢭⢣⠣⡃⡎⢇⣞⣝⢾⢽⡺⢷⡀⠀⠀⠀⠀⠀⢹⡧⠀⠀⠀⠀⢀⣶⠟⠋⠉⠉⠉⠉⠋⠀⠀⠀⠀⣿⠍⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⣸⡝⢿⡄⠀⠀⠀⠀⠀⠀⢐⣿⠉⠉⠉⠉⠉⠉⠀⠀⠀"
+echo "⠀⠀⢰⣛⡳⡲⢎⣚⠜⡍⢆⠑⠌⡐⠨⡪⡢⡓⣹⡸⣪⣷⡻⡀⠀⠀⠀⠀⢹⡗⠀⠀⠀⠀⣯⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠅⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⡟⠀⠈⣿⡄⠀⠀⠀⠀⠀⢐⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "⠀⠀⣫⣫⡫⡫⣚⠔⢅⠊⠄⠁⠁⠀⡁⡂⠆⠣⡓⡭⣕⢶⢽⡆⠀⠀⠀⠀⣹⣏⠀⠀⠀⢈⣿⠂⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⣿⠗⠗⠗⠗⠗⠷⠀⠀⠀⢠⡷⠁⢀⠀⡘⣷⡀⠀⠀⠀⠀⢐⣯⠷⠳⠗⠗⠗⠗⠀⠀⠀"
+echo "⠀⠀⣽⣕⡭⡝⡌⡍⡌⢌⠐⡀⠀⡀⢀⢐⢘⠜⡜⣖⣖⣗⡷⡇⠀⠀⠀⠀⢼⣇⠀⠀⠀⠀⢻⣅⠀⠀⠀⠀⠀⢸⣗⠀⠀⠀⠠⣿⠅⠀⠀⠀⠀⠀⠀⠀⢠⣿⠁⠐⠛⠙⠋⠻⣳⡀⠀⠀⠀⢐⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "⠀⠀⢱⣵⢞⣞⢮⡣⢇⢕⢌⠂⠄⠢⡐⢄⢢⢱⠱⢦⣣⣓⢿⠁⠀⠀⠀⠀⢺⡧⠀⠀⠀⠀⠈⠛⢷⣤⣄⣄⣠⣹⣗⠀⠀⠀⠀⣿⠅⠀⠀⠀⠀⠀⠀⢀⣾⠃⠀⠀⠀⠀⠀⠀⢹⣧⠀⠀⠀⢐⣿⣄⣄⣄⣄⣄⣄⡀⠀⠀"
+echo "⠀⠀⠀⢿⣽⡺⡕⣕⢧⣣⢃⢎⠬⡸⣐⢵⡱⣌⠝⢶⣕⠯⠇⠀⠀⠀⠀⠀⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠁⠉⠁⠁⠀⠀⠀⠀⠀⠉⠁⠀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⠀⠀⠀⠁⠁⠉⠈⠁⠁⠉⠀⠀⠀"
+echo "⠀⠀⠀⠀⠙⢼⣽⣺⢕⡵⡽⡐⡽⣌⢞⢜⣞⡮⣟⡦⠝⠉⠀⠀⠀⠀                                          ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "⠀⠀⠀⠀⠀⠀⠈⠃⠿⢽⡽⡸⣽⢾⡜⣇⠷⠻⠉⠀⠀⠀⠀⠀⠀⠀     Instituto Galego de Fisica de Altas Enerxias     "
+echo "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠈⠁⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+echo "================================================================================"
+
+
+# Parse arguments
+HOST=$1
+
+# Check whether lemonade is running
+# ps cax | grep lemonade> /dev/null
+# if [ $? -eq 0 ]; then
+#   echo "=  lemonade is running.                                                        ="
+# else
+#   echo "=  lemonade was not running... lemonade was launched.                          ="
+#   nohup lemonade server -allow 127.0.0.1 &
+# fi
+
+# Set display variable
+export DISPLAY=:0.0
+echo "=  export display variable.                                                    ="
+
+# Command to attach tmux session
+CMND="/home3/marcos.romero/.linuxbrew/bin/tmux attach -t IGFAE"
+
+# Connect and attach
+echo "Connection to diskpool1.igfae.usc.es is opened."
+# ssh -R 2489:127.0.0.1:2489 -t $HOST $cmnd
+ssh -t $HOST $CMND
+
+echo "================================================================================"
+
+
+
+
+mp3p () { 
+ youtube-dl --ignore-errors --sleep-interval 30 -i -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 -o '%(playlist)s/%(playlist_index)s - %(title)s.%(ext)s' "$1"
+}
+
+# vim:ft=sh

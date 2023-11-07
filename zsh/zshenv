@@ -1,0 +1,66 @@
+export DOTFILES=$HOME/.dotfiles
+export PROJECTS_DIR=$HOME/projects
+export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
+export TMPDIR=$HOME/tmp
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+export LG_CONFIG_FILE=$HOME/.config/lazygit/config.yml
+export MACHINE=$(cat ~/.machine)
+export BROWSER="$HOMEBREW_PREFIX/bin/browsh"
+export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
+
+export DISPLAY=:0
+
+export MANPATH="/usr/local/man:$MANPATH"
+if which nvim >/dev/null; then
+  export MANPAGER='nvim +Man!'
+fi
+export BAT_PAGER="less -RF"
+
+# export languages
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# preferred editor for local and remote sessions
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+else
+    export VISUAL="nvim"
+    export EDITOR="nvim"
+fi
+
+export USE_EDITOR=$EDITOR
+
+# if [ -f "$HOME/.environment.secret.sh" ]; then
+#   source $HOME/.environment.secret.sh
+# fi
+#
+# if [ -f "$HOME/.environment.local.sh" ]; then
+#   source $HOME/.environment.local.sh
+# fi
+
+if ! type "$bat" > /dev/null; then
+  export BAT_THEME="base16"
+fi
+
+# Setting ag as the default source for fzf
+
+# --files: List files that would be searched but do not search
+# --no-ignore: Do not respect .gitignore, etc...
+# --hidden: Search hidden files and folders
+# --follow: Follow symlinks
+# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+# Need to escape the "!" and "*" characters using /
+# --no-ignore = this flag shows node modules etc
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+export FZF_DEFAULT_OPTS="--history=$HOME/.fzf_history"
+
+# To apply to the command to CTRL-T as well
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# Don't open FZF in a separate split in tmux
+export FZF_TMUX=0
+
+# # Ripgrep configuration file
+# export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
+source ~/.dotfiles/zsh/ufunctions.sh
+source ~/.dotfiles/zsh/common.sh

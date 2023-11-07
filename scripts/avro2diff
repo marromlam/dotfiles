@@ -1,0 +1,6 @@
+avro2json $1 > file1.json
+avro2json $2 > file2.json
+vimdiff file1.json file2.json
+rm file1.json file2.json
+
+# vim: ft=sh
