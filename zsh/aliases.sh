@@ -44,7 +44,6 @@ fi
 
 # }}}
 
-alias cl='clear'
 alias clc="clear && printf '\e[3J'" # clear terminal window and clean history
 
 alias restart="exec $SHELL"
@@ -206,5 +205,27 @@ function cs-ssh() {
 
 #
 # }}}
+#
+#
+# Mounting {{{
 
-# vim:foldmethod=marker
+select_partition() {
+	local partition
+
+	# Use lsblk to list all partitions (excluding loops) not mounted and pipe to fzf for selection
+	PARTITION=$(lsblk -o NAME,SIZE,TYPE,MOUNTPOINT -n | awk '$3 == "part" {gsub(/[├└]─/, "", $1); print $1}' | fzf --height 50% --reverse --prompt="Select a partition to mount: " --header="NAME SIZE TYPE")
+
+	# Check if a partition was selected
+	if [ -n "$PARTITION" ]; then
+		echo "Selected partition: $PARTITION"
+		# Perform further actions with the selected partition, e.g., mount it
+		# Add your custom logic here
+		sudo mount /dev/$PARTITION /mnt/
+	else
+		echo "No partition selected."
+	fi
+}
+
+# }}}
+
+# vim:foldmethod=marker et
