@@ -1,5 +1,5 @@
 #!/bin/bash
-## create a boostrap installer for conda
+# create a boostrap installer for conda
 #
 
 CONDA_PREFIX=$HOME/conda
@@ -37,24 +37,15 @@ function __boostrap_conda() {
 }
 
 function conda() {
-# check if the conda prefix exists
-# if it does not exist, then install conda
-if [[ ! -d "$CONDA_PREFIX" ]]; then
-    __boostrap_conda
-    source $CONDA_PREFIX/bin/activate
-else
-    if ! which "conda" > /dev/null; then
-      source $CONDA_PREFIX/bin/activate
-    fi
-fi
-unset -f __boostrap_conda
-unset -f conda
-conda $@
+  # check if the conda prefix exists
+  # if it does not exist, then install conda
+  if [[ ! -d "$CONDA_PREFIX" ]]; then
+      __boostrap_conda
+  fi
+  source $CONDA_PREFIX/bin/activate
+  unset -f __boostrap_conda
+  # unset -f conda
+  conda $@
 }
-
-
-
-
-
 
 # vim: ft=bash
