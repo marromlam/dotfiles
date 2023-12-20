@@ -759,7 +759,7 @@ function mrl.ui.statusline.render()
   local lsp_clients = mrl.map(function(client)
     return {
       {
-        { client.name == "copilot" and "" or client.name, hls.client },
+        { client.name == "copilot" and "" or client.name, hls.client },
         { space },
         { "", hls.metadata_prefix },
       },
