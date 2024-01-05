@@ -329,10 +329,11 @@ wezterm.log_info('Successfully loaded wezterm.lua. Returning config.')
 return {
     default_prog = DEFAULT_PROG,
     font = wezterm.font_with_fallback({
-        'Cartograph CF',
+        -- 'Cartograph CF',
+        'Monaspace Neon',
         --     -- 'Monolisa',
         --     --[[ "FiraCode NF", ]]
-        'FiraCode Nerd Font',
+        -- 'FiraCode Nerd Font',
         -- 'Hack Nerd Font', -- nerd fonts extracted from there
         --     -- 'Iosevka',
         --     --[[ { family = 'JetBrains Mono', weight = 'Medium' }, ]]
@@ -341,12 +342,53 @@ return {
         --     -- { family = 'Fira Code Nerd Font',    scale = 0.55 }, -- nerd fonts extracted from there
         --     -- { family="Symbols Nerd Font Mono", scale=0.5}, -- nerd fonts extracted from there
         -- 'Victor Mono',
-        -- { family = 'Symbols Nerd Font Mono', scale = 0.75 },
+        { family = 'Symbols Nerd Font Mono', scale = 0.75 },
         --     -- "SF Pro",
         --     -- "DejaVu Sans Mono",
         --     -- "ComicMono NF",
         --     -- "Liga SFMono Nerd Font",
     }),
+    font_rules = {
+        --     -- Non-italic {{{
+        --     {
+        --         italic = false,
+        --         intensity = 'Normal',
+        --         font = wezterm.font('Monaspace Neon', { weight = 'Regular' }),
+        --     },
+        --     {
+        --         italic = false,
+        --         intensity = 'Normal',
+        --         -- intensity = 'Half', -- Normal+Half: Documentation
+        --         underline = 'Single',
+        --         font = wezterm.font('Monaspace Xenon', { weight = 'Regular' }),
+        --     },
+        --     {
+        --         italic = false,
+        --         intensity = 'Bold',
+        --         font = wezterm.font('Monaspace Neon', { weight = 'Black' }),
+        --     },
+        --     -- }}}
+        -- Italic {{{
+        {
+            italic = true,
+            intensity = 'Normal', -- Italic+Normal: normal italic text
+            font = wezterm.font('Monaspace Radon', { weight = 'Regular' }),
+        },
+        {
+            italic = true,
+            intensity = 'Half', -- Italic+Half: Copilot
+            font = wezterm.font('Monaspace Krypton', { weight = 'Black' }),
+        },
+        {
+            italic = true,
+            intensity = 'Bold', -- Italic+Bold: Documentation
+            font = wezterm.font(
+                'Monaspace Neon',
+                { weight = 'Black', style = 'Italic' }
+            ),
+        },
+        -- }}}
+    },
     font_size = 17,
     -- line_height = 1.05,
     cell_width = 1.0,
@@ -374,7 +416,6 @@ return {
     --[[ tab_bar_at_bottom = false, ]]
     use_fancy_tab_bar = false,
     show_new_tab_button_in_tab_bar = false,
-    window_background_opacity = 1.0,
     tab_max_width = 50,
     hide_tab_bar_if_only_one_tab = true,
     disable_default_key_bindings = true,
@@ -385,7 +426,8 @@ return {
         ['CustomDay'] = CUSTOM_DAY,
         ['CustomNight'] = CUSTOM_NIGHT,
     },
-    window_background_opacity = 0.8,
+    -- window_background_opacity = 0.8,
+    window_background_opacity = 1,
     text_background_opacity = 0.8,
     macos_window_background_blur = 10,
     tab_bar_style = {
