@@ -1,0 +1,20 @@
+# this is a wrapper around gh that sets the correct token
+# depending on the current path
+# this is useful because I have a personal and a work GITHUB_TOKEN§
+# and I don't want to have to think about which one to use
+
+
+# check if the current path is in $HOME/Projects/work
+# if so, use the work token instead of the personal one
+if [[ $PWD == $HOME/Projects/work* ]]; then
+    source $HOME/.ssh/work_token
+else
+    source $HOME/.ssh/personal_token
+fi
+
+echo $GITHUB_TOKEN
+
+$HOMEBREW_PREFIX/bin/gh $@
+
+
+# vim: ft=bash
