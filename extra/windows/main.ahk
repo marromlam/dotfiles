@@ -12,12 +12,18 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 ; SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; AutoHotkey v2 script
 SetWorkingDir(A_ScriptDir)
+#NoTrayIcon
 
 
+
+; LOAD DLL {{{
+
+; TODO: figure out how tyo move this to desktop_manaker.ahk
 
 VDA_PATH := A_ScriptDir . "\VirtualDesktopAccessor.dll"
-; MsgBox("hola")
 hVirtualDesktopAccessor := DllCall("LoadLibrary", "Str", VDA_PATH, "Ptr")
+If (! hVirtualDesktopAccessor)
+  MsgBox  Load of %VDA_PATH%  failed!
 
 GetDesktopCountProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "GetDesktopCount", "Ptr")
 GoToDesktopNumberProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "GoToDesktopNumber", "Ptr")
@@ -30,150 +36,26 @@ GetDesktopNameProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, 
 SetDesktopNameProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "SetDesktopName", "Ptr")
 CreateDesktopProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "CreateDesktop", "Ptr")
 RemoveDesktopProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "RemoveDesktop", "Ptr")
-
-; On change listeners
 RegisterPostMessageHookProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "RegisterPostMessageHook", "Ptr")
 UnregisterPostMessageHookProc := DllCall("GetProcAddress", "Ptr", hVirtualDesktopAccessor, "AStr", "UnregisterPostMessageHook", "Ptr")
 
-GetDesktopCount() {
-    global GetDesktopCountProc
-    count := DllCall(GetDesktopCountProc, "Int")
-    return count
-}
-
-MoveCurrentWindowToDesktop(number) {
-    global MoveWindowToDesktopNumberProc, GoToDesktopNumberProc
-    activeHwnd := WinGetID("A")
-    DllCall(MoveWindowToDesktopNumberProc, "Ptr", activeHwnd, "Int", number, "Int")
-    DllCall(GoToDesktopNumberProc, "Int", number, "Int")
-}
-
-GoToPrevDesktop() {
-    global GetCurrentDesktopNumberProc, GoToDesktopNumberProc
-    current := DllCall(GetCurrentDesktopNumberProc, "Int")
-    last_desktop := GetDesktopCount() - 1
-    ; If current desktop is 0, go to last desktop
-    if (current = 0) {
-        MoveOrGotoDesktopNumber(last_desktop)
-    } else {
-        MoveOrGotoDesktopNumber(current - 1)
-    }
-    return
-}
-
-GoToNextDesktop() {
-    global GetCurrentDesktopNumberProc, GoToDesktopNumberProc
-    current := DllCall(GetCurrentDesktopNumberProc, "Int")
-    last_desktop := GetDesktopCount() - 1
-    ; If current desktop is last, go to first desktop
-    if (current = last_desktop) {
-        MoveOrGotoDesktopNumber(0)
-    } else {
-        MoveOrGotoDesktopNumber(current + 1)
-    }
-    return
-}
-
-GoToDesktopNumber(num) {
-    global GoToDesktopNumberProc
-    DllCall(GoToDesktopNumberProc, "Int", num, "Int")
-    return
-}
-MoveOrGotoDesktopNumber(num) {
-    ; If user is holding down Mouse left button, move the current window also
-    if (GetKeyState("LButton")) {
-        MoveCurrentWindowToDesktop(num)
-    } else {
-        GoToDesktopNumber(num)
-    }
-    return
-}
-
-
-CreateDesktop() {
-    global CreateDesktopProc
-    ran := DllCall(CreateDesktopProc, "Int")
-    return ran
-}
-RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
-    global RemoveDesktopProc
-    ran := DllCall(RemoveDesktopProc, "Int", remove_desktop_number, "Int", fallback_desktop_number, "Int")
-    return ran
-}
-
-
-; Move window to desktop 1-9 {{{
-
-; RAlt::LAlt
-!+1::MoveCurrentWindowToDesktop(0)
-!@::MoveCurrentWindowToDesktop(1)
-#!::MoveCurrentWindowToDesktop(2)
-+!4::MoveCurrentWindowToDesktop(3)
-+!5::MoveCurrentWindowToDesktop(4)
-+!6::MoveCurrentWindowToDesktop(5)
-+!7::MoveCurrentWindowToDesktop(6)
-+!8::MoveCurrentWindowToDesktop(7)
-+!9::MoveCurrentWindowToDesktop(8)
-+!0::MoveCurrentWindowToDesktop(9)
-
-; }}}
-
-; switch to desktop 1-9 {{{
-
-#1::GoToDesktopNumber(0)
-#2::GoToDesktopNumber(1)
-#3::GoToDesktopNumber(2)
-#4::GoToDesktopNumber(3)
-#5::GoToDesktopNumber(4)
-#6::GoToDesktopNumber(5)
-#7::GoToDesktopNumber(6)
-#8::GoToDesktopNumber(7)
-#9::GoToDesktopNumber(8)
-#0::GoToDesktopNumber(9)
-
-; }}} 
-
-
-; START 1! ----------------
-; FINAL 1! 2@ 3# 4$ 5% 6^ 7& 8* 9( 0) -_ =+ 
-
-
-
-
-
-
-
-
-
-
-
-; Application and tab swiching {{{
-; LWin & Tab::AltTab
-; LWin & Shift::ShiftAltTab
-
-LWin & Tab::
-    AltTabMenu := true
-    If GetKeyState("Shift","P")
-        Send {Alt Down}{Shift Down}{Tab}
-    else
-        Send {Alt Down}{Tab}
-return
-
-#If (AltTabMenu)
-
-    ~*LWin Up::
-        Send {Shift Up}{Alt Up}
-        AltTabMenu := false
-    return
-
-#If
-
 ; }}}
 
 
+
+
+
+; MAIN SWICHES
+
+
+; Block Windows key
 ~LWin Up:: return
 ~RWin Up:: return
 
+
+
+
+; MAC-LIKE SHORTS
 
 LCtrl & Left::SendEvent {LWin down}{LCtrl down}{Left down}{LWin up}{LCtrl up}{Left up}
 LCtrl & Right::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up}{Right up}
@@ -218,28 +100,13 @@ LWin & XButton2::SendEvent {LWin down}{LCtrl down}{Right down}{LWin up}{LCtrl up
 $Ctrl::CapsLock
 $CapsLock::Ctrl
 
+
 ; Screenshot: Windows logo key + Shift + S
 #+4::Send {LWin down}{Shift down}{s}{LWin up}{Shift up}
 
 
-
-
-
-; TODO fix some wrong symbols here
-;$`::Send `±
-;$+`::Send `§
-
-;+$+::Send c
-
-;ZZz
-;
-;
-
-
-
-
-F3::Send {Win}{Tab}
-
+; MEDIA KEYS
+F3::SendInput {Win}{Tab}
 F7::SendInput {Media_Prev}
 F8::SendInput {Media_Play_Pause}
 F9::SendInput {Media_Next}
@@ -249,53 +116,8 @@ F12::SendInput {Volume_Up}
 
 
 
-#IfWinActive  ; This puts subsequent remappings and hotkeys in effect for all windows.
 
-#a::Send ^a
-#b::Send ^b
-#c::Send ^c
-#d::Send ^d
-#e::Send ^e
-#f::Send ^f
-#g::Send ^g
-#h::Send ^h
-#i::Send ^i
-#j::Send ^j
-#k::Send ^k
-#l::Send ^l
-#m::Send ^m
-#n::Send ^n
-#o::Send ^o
-#p::Send ^p
-#q::Send ^q
-#r::Send ^r
-#s::Send ^s
-#t::Send ^t
-#u::Send ^u
-#v::Send ^v
-#w::Send ^w
-#x::Send ^x
-#y::Send ^y
-#z::Send ^z
-;#1::Send ^1
-;#2::Send ^2
-;#3::Send ^3
-;#4::Send ^4
-;#5::Send ^5
-;#6::Send ^6
-;#7::Send ^7
-;#8::Send ^8
-;#9::Send ^9
-;#0::Send ^0
 
-#+z::Send ^y
-return
-#If
-
-; windows space to ctrl space
-#Space::!Space
-
+#include desktop_manager.ahk
+#include general.ahk
 #include vcxsrv.ahk
-
-
-; vim: fdm=marker
