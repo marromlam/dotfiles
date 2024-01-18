@@ -8,4 +8,5 @@ return {
   { "nvim-lualine/lualine.nvim", enabled = false },
   { "nvim-telescope/telescope.nvim", enabled = false },
   { "nvim-neo-tree/neo-tree.nvim", enabled = false, cond = false },
+  { "folke/flash.nvim", enabled = false, cond = false },
 }
