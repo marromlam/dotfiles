@@ -65,3 +65,6 @@ files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/*
 files/.config/lazygit/state.yml
+
+files/.config/browsh/firefox_profile/cache2/*
+files/.config/browsh/firefox_profile/storage/*
