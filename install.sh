@@ -66,7 +66,7 @@ mkdir -p ~/Projects/{work,personal}
 
 # install private dotfiles
 printf " \n\n"
-bash ${HOME}/tmp/keys.sh
+bash ${HOME}/tmp/keys.sh $1
 
 # create projects folder
 
