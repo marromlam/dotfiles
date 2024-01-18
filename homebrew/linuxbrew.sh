@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -f "$HOMEBREW_PREFIX/bin/brew" ]]; then
+if [[ -d "$HOMEBREW_PREFIX/bin" ]]; then
 	eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 else
 	git clone https://github.com/Homebrew/brew $HOMEBREW_PREFIX/Homebrew
