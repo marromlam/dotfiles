@@ -1,5 +1,5 @@
 set -e
-FC=${HOME}/.private
+FC=${HOME}/Projects/personal/private-dotfiles
 HTTPS_OR_SSH=${HOME}/.ssh_keys_present
 
 if test "$1" = "-f"; then

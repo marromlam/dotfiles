@@ -55,18 +55,20 @@ echo "Machine: $MACHINE"
 if [[ "$MACHINE" == "x64-wsl" ]]; then
 	bash $HOME/tmp/preflight_wsl.sh
 	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+	ln -sf $HOME/Projects/personal/homebrew/BrewfileLinux $HOME/.Brewfile
 	sudo mkdir -p /home/linuxbrew/.linuxbrew
 	sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew
 	echo "Installing homebrew on Linux (forced=$0)"
 	bash ${HOME}/tmp/linuxbrew.sh $0
 fi
 
+mkdir -p ~/Projects/{work,personal}
+
 # install private dotfiles
 printf " \n\n"
-bash ${HOME}/tmp/keys.sh $1
+bash ${HOME}/tmp/keys.sh
 
 # create projects folder
-mkdir -p ~/Projects/{work,personal}
 
 # clone dotfiles
 printf " \n\n"
