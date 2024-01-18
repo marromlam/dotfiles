@@ -1,5 +1,6 @@
 local wezterm = require('wezterm')
 local navigate = require('navigate')
+local fonts = require('font')
 local navigate = {}
 
 -- which os we use
@@ -19,67 +20,6 @@ end
 local utils = require('utils')
 local my_keys = require('keys')
 local theme = require('theme')
-
-local function is_inside_vim(pane)
-    local tty = pane:get_tty_name()
-    if tty == nil then return false end
-
-    local success, stdout, stderr = wezterm.run_child_process({
-        'sh',
-        '-c',
-        'ps -o state= -o comm= -t'
-            .. wezterm.shell_quote_arg(tty)
-            .. ' | '
-            .. "grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|tmux)(diff)?$'",
-    })
-    wezterm.log_info('is_inside_vim: ' .. tostring(success))
-
-    return success
-end
-
-local function is_outside_vim(pane) return not is_inside_vim(pane) end
-
-local function bind_if(cond, key, mods, action)
-    local function callback(win, pane)
-        if cond(pane) then
-            win:perform_action(action, pane)
-        else
-            win:perform_action(
-                wezterm.action.SendKey({ key = key, mods = mods }),
-                pane
-            )
-        end
-    end
-
-    return { key = key, mods = mods, action = wezterm.action_callback(callback) }
-end
-
-navigate = {
-    bind_if(
-        is_outside_vim,
-        'h',
-        'CTRL',
-        wezterm.action.ActivatePaneDirection('Left')
-    ),
-    bind_if(
-        is_outside_vim,
-        'l',
-        'CTRL',
-        wezterm.action.ActivatePaneDirection('Right')
-    ),
-    bind_if(
-        is_outside_vim,
-        'j',
-        'CTRL',
-        wezterm.action.ActivatePaneDirection('Down')
-    ),
-    bind_if(
-        is_outside_vim,
-        'k',
-        'CTRL',
-        wezterm.action.ActivatePaneDirection('Up')
-    ),
-}
 
 local colors = {
     rosewater = '#F4DBD6',
@@ -156,13 +96,14 @@ wezterm.on('format-tab-title', function(tab)
     })
 end)
 
--- wezterm.on("update-right-status", function(window)
---      window:set_right_status(wezterm.format({
---              -- { Attribute = { Intensity = "Bold" } },
---              --[[ { Text = wezterm.strftime(" %A, %d %B %Y %I:%M %p ") }, ]]
---              { Text = get_current_working_dir(tab) },
---      }))
--- end)
+wezterm.on('update-right-status', function(window)
+    window:set_right_status(wezterm.format({
+        -- { Attribute = { Intensity = "Bold" } },
+        -- { Text = wezterm.strftime(" %A, %d %B %Y %I:%M %p ") },
+        -- { Text = get_current_working_dir(tab) },
+        -- { Text = wezterm.shell_quote_arg(pane:get_tty_name()) },
+    }))
+end)
 
 -- }}}
 
@@ -329,69 +270,11 @@ wezterm.log_info('Successfully loaded wezterm.lua. Returning config.')
 return {
     default_prog = DEFAULT_PROG,
     font = wezterm.font_with_fallback({
-        -- 'Cartograph CF',
-        'Monaspace Neon',
-        --     -- 'Monolisa',
-        --     --[[ "FiraCode NF", ]]
-        -- 'FiraCode Nerd Font',
-        -- 'Hack Nerd Font', -- nerd fonts extracted from there
-        --     -- 'Iosevka',
-        --     --[[ { family = 'JetBrains Mono', weight = 'Medium' }, ]]
-        --     --[[ {family="Iosevka Term SS05", weight = "Regular" }, ]]
-        --     -- { family = "Hack Nerd Font", scale = 0.85 }, -- nerd fonts extracted from there
-        --     -- { family = 'Fira Code Nerd Font',    scale = 0.55 }, -- nerd fonts extracted from there
-        --     -- { family="Symbols Nerd Font Mono", scale=0.5}, -- nerd fonts extracted from there
-        -- 'Victor Mono',
-        { family = 'Symbols Nerd Font Mono', scale = 0.75 },
-        --     -- "SF Pro",
-        --     -- "DejaVu Sans Mono",
-        --     -- "ComicMono NF",
-        --     -- "Liga SFMono Nerd Font",
-    }),
-    font_rules = {
-        --     -- Non-italic {{{
-        --     {
-        --         italic = false,
-        --         intensity = 'Normal',
-        --         font = wezterm.font('Monaspace Neon', { weight = 'Regular' }),
-        --     },
-        --     {
-        --         italic = false,
-        --         intensity = 'Normal',
-        --         -- intensity = 'Half', -- Normal+Half: Documentation
-        --         underline = 'Single',
-        --         font = wezterm.font('Monaspace Xenon', { weight = 'Regular' }),
-        --     },
-        --     {
-        --         italic = false,
-        --         intensity = 'Bold',
-        --         font = wezterm.font('Monaspace Neon', { weight = 'Black' }),
-        --     },
-        --     -- }}}
-        -- Italic {{{
-        {
-            italic = true,
-            intensity = 'Normal', -- Italic+Normal: normal italic text
-            font = wezterm.font('Monaspace Radon', { weight = 'Regular' }),
-        },
-        {
-            italic = true,
-            intensity = 'Half', -- Italic+Half: Copilot
-            font = wezterm.font('Monaspace Krypton', { weight = 'Black' }),
-        },
-        {
-            italic = true,
-            intensity = 'Bold', -- Italic+Bold: Documentation
-            font = wezterm.font(
-                'Monaspace Neon',
-                { weight = 'Black', style = 'Italic' }
-            ),
-        },
-        -- }}}
-    },
-    font_size = 17,
-    -- line_height = 1.05,
-    cell_width = 1.0,
+    -- fonts
+    font = fonts.font,
+    font_size = fonts.font_size,
+    line_height = fonts.line_height,
+    cell_width = fonts.cell_width,
     --[[ max_fps = 60, ]]
     --[[ enable_wayland = false, ]]
     pane_focus_follows_mouse = false,
@@ -400,24 +283,24 @@ return {
     check_for_updates = false,
     -- window_decorations = "RESIZE",
     window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
-    -- integrated_title_button_style = 'MacOsNative',
+    -- integrated_title_button_style = "MacOsNative",
     integrated_title_button_style = 'Windows',
-    -- integrated_title_button_style = 'Gnome',
-    integrated_title_button_alignment = 'Left',
-    integrated_title_buttons = { 'Close', 'Maximize', 'Hide' },
-    integrated_title_button_color = 'red',
+    -- integrated_title_button_style = "Gnome",
+    -- integrated_title_button_alignment = "Left",
+    -- integrated_title_buttons = { "Close", "Maximize", "Hide" },
+    -- integrated_title_button_color = "red",
     window_close_confirmation = 'NeverPrompt',
     audible_bell = 'Disabled',
     window_padding = { left = 0, right = 0, top = 0, bottom = 0 },
-    initial_cols = 80,
-    initial_rows = 40,
+    initial_cols = 256,
+    initial_rows = 71,
     -- inactive_pane_hsb = { saturation = 1.0, brightness = 0.85 },
     enable_scroll_bar = false,
     --[[ tab_bar_at_bottom = false, ]]
     use_fancy_tab_bar = false,
     show_new_tab_button_in_tab_bar = false,
     tab_max_width = 50,
-    hide_tab_bar_if_only_one_tab = true,
+    hide_tab_bar_if_only_one_tab = false,
     disable_default_key_bindings = true,
     --front_end = "WebGpu",
 
@@ -426,8 +309,7 @@ return {
         ['CustomDay'] = CUSTOM_DAY,
         ['CustomNight'] = CUSTOM_NIGHT,
     },
-    -- window_background_opacity = 0.8,
-    window_background_opacity = 1,
+    window_background_opacity = 0.8,
     text_background_opacity = 0.8,
     macos_window_background_blur = 10,
     tab_bar_style = {
@@ -452,7 +334,6 @@ return {
         button_hover_bg = '#3b3052',
     },
     integrated_title_button_color = 'red',
-
     -- }}}
     --
     -- keys {{{
@@ -495,8 +376,9 @@ return {
             serve_command = { 'wsl', 'wezterm-mux-server', '--daemonize' },
         },
     },
+    -- default_domain = "WSL:Ubuntu",
     -- default_gui_startup_args = { 'connect', 'wsl' },
     -- }}}
 }
 
--- vim: fdm=marker ts=2 sw=2 sts=2 et
+-- vim: fdm=marker ts=4 sw=4 sts=4 et

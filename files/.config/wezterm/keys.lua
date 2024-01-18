@@ -55,9 +55,22 @@ return {
         action = wezterm.action.CloseCurrentPane({ confirm = false }),
     },
     -- }}}
-    -- pane sizing {{{
-    { key = 'z',   mods = LEADER_KEY, action = wezterm.action.TogglePaneZoomState },
-    { key = 'F11', mods = '',         action = wezterm.action.ToggleFullScreen },
+    {
+        key = 'z',
+        mods = LEADER_KEY,
+        action = wezterm.action.TogglePaneZoomState,
+    },
+    {
+        key = 'f',
+        mods = LEADER_KEY,
+        action = wezterm.action({ Search = { CaseSensitiveString = '' } }),
+    },
+    { key = ' ', mods = LEADER_KEY, action = 'ActivateCopyMode' },
+    {
+        key = 'F11',
+        mods = '',
+        action = wezterm.action.ToggleFullScreen,
+    },
     {
         key = 'h',
         mods = 'ALT|SHIFT',
@@ -88,12 +101,24 @@ return {
         mods = 'ALT',
         action = wezterm.action({ ActivateTabRelative = 1 }),
     },
-    { key = '{', mods = 'SHIFT|ALT', action = wezterm.action.MoveTabRelative(-1) },
-    { key = '}', mods = 'SHIFT|ALT', action = wezterm.action.MoveTabRelative(1) },
+    {
+        key = '{',
+        mods = 'SHIFT|ALT',
+        action = wezterm.action.MoveTabRelative(-1),
+    },
+    {
+        key = '}',
+        mods = 'SHIFT|ALT',
+        action = wezterm.action.MoveTabRelative(1),
+    },
     -- }}}
     -- copy and paste {{{
-    { key = 'v', mods = 'ALT',       action = wezterm.action.ActivateCopyMode },
-    { key = 'c', mods = LEADER_KEY,  action = wezterm.action({ CopyTo = 'Clipboard' }) },
+    { key = 'v', mods = 'ALT', action = wezterm.action.ActivateCopyMode },
+    {
+        key = 'c',
+        mods = LEADER_KEY,
+        action = wezterm.action({ CopyTo = 'Clipboard' }),
+    },
     {
         key = 'v',
         mods = LEADER_KEY,
@@ -101,20 +126,60 @@ return {
     },
     -- }}}
     -- font size {{{
-    { key = '=', mods = LEADER_KEY,             action = wezterm.action.IncreaseFontSize },
-    { key = '-', mods = LEADER_KEY,             action = wezterm.action.DecreaseFontSize },
+    { key = '=', mods = LEADER_KEY, action = wezterm.action.IncreaseFontSize },
+    { key = '-', mods = LEADER_KEY, action = wezterm.action.DecreaseFontSize },
     -- }}}
     -- shorcuts {{{
-    { key = '1', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 0 }) },
-    { key = '2', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 1 }) },
-    { key = '3', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 2 }) },
-    { key = '4', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 3 }) },
-    { key = '5', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 4 }) },
-    { key = '6', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 5 }) },
-    { key = '7', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 6 }) },
-    { key = '8', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 7 }) },
-    { key = '9', mods = LEADER_KEY,             action = wezterm.action({ ActivateTab = 8 }) },
-    { key = 'L', mods = LEADER_KEY .. '|SHIFT', action = wezterm.action.ShowDebugOverlay },
+    {
+        key = '1',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 0 }),
+    },
+    {
+        key = '2',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 1 }),
+    },
+    {
+        key = '3',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 2 }),
+    },
+    {
+        key = '4',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 3 }),
+    },
+    {
+        key = '5',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 4 }),
+    },
+    {
+        key = '6',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 5 }),
+    },
+    {
+        key = '7',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 6 }),
+    },
+    {
+        key = '8',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 7 }),
+    },
+    {
+        key = '9',
+        mods = LEADER_KEY,
+        action = wezterm.action({ ActivateTab = 8 }),
+    },
+    {
+        key = 'L',
+        mods = 'CTRL|SHIFT',
+        action = wezterm.action.ShowDebugOverlay,
+    },
     -- }}}
 }
 
