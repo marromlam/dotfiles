@@ -55,7 +55,7 @@ echo "Machine: $MACHINE"
 if [[ "$MACHINE" == "x64-wsl" ]]; then
 	bash $HOME/tmp/preflight_wsl.sh
 	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-	ln -sf $HOME/Projects/personal/homebrew/BrewfileLinux $HOME/.Brewfile
+	ln -sf $HOME/Projects/personal/dotfiles/homebrew/BrewfileLinux $HOME/.Brewfile
 	sudo mkdir -p /home/linuxbrew/.linuxbrew
 	sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew
 	echo "Installing homebrew on Linux (forced=$0)"
