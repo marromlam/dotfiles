@@ -1,0 +1,4 @@
+export BROWSER=browsh
+aws configure sso
+
+# vim: ft=sh
