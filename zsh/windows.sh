@@ -6,6 +6,7 @@ alias winword='"/mnt/c/Program Files/Microsoft Office/root/Office16/WINWORD.EXE"
 export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
 export PATH="$PATH:/mnt/c/Windows/System32/WindowsPowerShell/v1.0"
 export PATH="$PATH:/mnt/c/WINDOWS/system32"
+export PATH="$PATH:/mnt/c/WINDOWS"
 export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
 
 docker-service() {
@@ -18,4 +19,21 @@ docker-service() {
 		chgrp docker "$DOCKER_DIR"
 		/mnt/c/Windows/System32/wsl.exe -d $DOCKER_DISTRO sh -c "nohup sudo -b dockerd < /dev/null > $DOCKER_DIR/dockerd.log 2>&1"
 	fi
+}
+
+# if .vcxsrv-display exists, then set DISPLAY
+if [ -f $HOME/.vcxsrv ]; then
+	export DISPLAY="$(cat $HOME/.vcxsrv)"
+fi
+
+get-vcxsrv-display() {
+	# Get the IP address of the Wi-Fi interface
+	IP4_ADDRESS=$(powershell.exe Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Wi-Fi | grep IPAddress | awk '{print $3}')
+
+	# Create .vcxsrv-display file
+	rm -rf $HOME/.vcxsrv
+	echo "${IP4_ADDRESS}" >$HOME/.vcxsrv
+	sed -i 's/:0//g' ~/.vcxsrv
+	dos2unix $HOME/.vcxsrv >/dev/null 2>&1
+	echo "$(cat $HOME/.vcxsrv):0" >$HOME/.vcxsrv
 }
