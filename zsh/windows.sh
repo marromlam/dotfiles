@@ -37,3 +37,26 @@ get-vcxsrv-display() {
 	dos2unix $HOME/.vcxsrv >/dev/null 2>&1
 	echo "$(cat $HOME/.vcxsrv):0" >$HOME/.vcxsrv
 }
+
+sync-windows-config() {
+
+	# Some of the dotfiles in WSL must be configured such that they are
+	# **copied** in the Windows system. They will live under ~/.config
+	# directory.
+	#
+	#
+	LINUX_CONFIG=~/Projects/personal/dotfiles/files/.config
+	WINDOWS_CONFIG=/mnt/c/Users/marcos.romero/.config
+	mkdir -p $WINDOWS_CONFIG
+	chmod -R 777 $WINDOWS_CONFIG
+
+	# Wezterm is a GUI app living on Windows system, so its dotfiles
+	# are copied to WINDOWS_CONFIG folder
+	cp -r {$LINUX_CONFIG,$WINDOWS_CONFIG}/wezterm
+
+	# Install some Windows app without sudo permisions
+	WINDOWS_APPLICATIONS=/mnt/c/Users/marcos.romero/Applications/
+	mkdir -p $WINDOWS_APPLICATIONS
+	chmod -R 777 $WINDOWS_APPLICATIONS
+
+}
