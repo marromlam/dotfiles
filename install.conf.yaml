@@ -55,7 +55,7 @@
     - [bash extra/macos_settings.sh, Installing macOS config]
     - [bash extra/keyboard.sh, Installing keyboard config]
     - [
-        zsh -c 'source ~/.zshrc; python3 -m pip install -r requirements.txt',
+        zsh -c 'source ~/.zshrc; python3 -m pip install -r $HOME/.dotfiles/requirements.txt',
         Installing python packages,
       ]
     - [
