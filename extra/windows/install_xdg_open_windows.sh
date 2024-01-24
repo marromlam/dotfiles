@@ -19,12 +19,13 @@ mkdir -p $HOMEBREW_PREFIX/Cellar/xdg-open
 
 # download xdg-open script from github
 pushd $HOMEBREW_PREFIX/Cellar/xdg-open
-wget -O xdg_open_wsl.py https://github.com/cpbotha/xdg-open-wsl/blob/master/xdg_open_wsl/xdg_open_wsl.py
+wget -O xdg_open_wsl.py https://raw.githubusercontent.com/cpbotha/xdg-open-wsl/master/xdg_open_wsl/xdg_open_wsl.py
+
 chmod +x xdg_open_wsl.py
 popd
 
 # link xdg-open to open and put it in Homebrew bin
-ln -s $HOMEBREW_PREFIX/Cellar/xdg-open/xdg_open_wsl.py $HOMEBREW_PREFIX/bin/xdg-open
-ln -s $HOMEBREW_PREFIX/bin/xdg-open $HOMEBREW_PREFIX/bin/open
+ln -sf $HOMEBREW_PREFIX/Cellar/xdg-open/xdg_open_wsl.py $HOMEBREW_PREFIX/bin/xdg-open
+ln -sf $HOMEBREW_PREFIX/bin/xdg-open $HOMEBREW_PREFIX/bin/open
 
 # vim: ft=sh
