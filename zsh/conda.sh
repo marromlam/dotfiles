@@ -2,8 +2,8 @@
 # create a boostrap installer for conda
 #
 
-CONDA_PREFIX=$HOME/conda
-export CONDA_ORIGIN=$HOME/conda
+CONDA_PREFIX=/opt/conda
+export CONDA_ORIGIN=/opt/conda
 
 
 function __boostrap_conda() {
@@ -33,7 +33,11 @@ function __boostrap_conda() {
 
   # install conda, withoud prompting the user
   # and without adding the conda path to the .bashrc
+  sudo mkdir -p /opt
+  sudo chown -R $(whoami) /opt
   bash $CONDA_INSTALLER -b -p $CONDA_ORIGIN
+  conda config --append channels conda-forge
+  conda config --append channels conda-forge
 }
 
 function conda() {

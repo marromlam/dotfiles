@@ -3,3 +3,4 @@ neovim-remote
 matplotlib
 numpy
 scipy
+click
