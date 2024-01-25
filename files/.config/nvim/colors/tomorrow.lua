@@ -50,7 +50,7 @@ require("mini.base16").setup({
         -- base0D = "#26BBD9",
         -- base0E = "#EE64AC",
         -- base0F = "#F09383",
-        --
+
         base00 = "#1d1f21",
         base01 = "#282a2e",
         base02 = "#373b41",
@@ -59,6 +59,7 @@ require("mini.base16").setup({
         base05 = "#c5c8c6",
         base06 = "#e0e0e0",
         base07 = "#ffffff",
+        --
         base08 = "#cc6666", -- red
         base09 = "#de935f", -- orange
         base0A = "#f0c674", -- yellow
@@ -67,6 +68,15 @@ require("mini.base16").setup({
         base0D = "#81a2be", -- blue
         base0E = "#b294bb", -- purple
         base0F = "#a3685a", -- brown
+        --
+        -- base08 = "#ff5555",
+        -- base09 = "#cc5555",
+        -- base0A = "#ffff55",
+        -- base0B = "#55cc55",
+        -- base0C = "#55ffff",
+        -- base0D = "#5455cb",
+        -- base0E = "#cc55cc",
+        -- base0F = "#cdcd55",
     },
 
     -- Whether to support cterm colors. Can be boolean, `nil` (same as
