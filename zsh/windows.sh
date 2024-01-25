@@ -33,8 +33,8 @@ get-vcxsrv-display() {
 	# Create .vcxsrv-display file
 	rm -rf $HOME/.vcxsrv
 	echo "${IP4_ADDRESS}" >$HOME/.vcxsrv
-	sed -i 's/:0//g' ~/.vcxsrv
 	dos2unix $HOME/.vcxsrv >/dev/null 2>&1
+	sed -i 's/:0//g' ~/.vcxsrv
 	echo "$(cat $HOME/.vcxsrv):0" >$HOME/.vcxsrv
 }
 
@@ -52,11 +52,16 @@ sync-windows-config() {
 
 	# Wezterm is a GUI app living on Windows system, so its dotfiles
 	# are copied to WINDOWS_CONFIG folder
-	cp -r {$LINUX_CONFIG,$WINDOWS_CONFIG}/wezterm
+	# cp -r {$LINUX_CONFIG,$WINDOWS_CONFIG}/wezterm
 
 	# Install some Windows app without sudo permisions
 	WINDOWS_APPLICATIONS=/mnt/c/Users/marcos.romero/Applications/
 	mkdir -p $WINDOWS_APPLICATIONS
 	chmod -R 777 $WINDOWS_APPLICATIONS
+
+	ln -sf /mnt/c/Users/marcos.romero/Downloads $HOME/Downloads
+	ln -sf /mnt/c/Users/marcos.romero/Documents $HOME/Documents
+	ln -sf /mnt/c/Users/marcos.romero/Desktop $HOME/Desktop
+	ln -sf /mnt/c/Users/marcos.romero/Applications $HOME/Applications
 
 }
