@@ -24,7 +24,7 @@ sudo apt-get update -y
 sudo apt install x11-apps mesa-utils -y
 
 # install all necesary packages for installing homebrew
-sudo apt-get install build-essential curl file git ruby zsh -y
+sudo apt-get install build-essential curl file git ruby zsh bc -y
 
 # # install docker
 # sudo apt-get update
