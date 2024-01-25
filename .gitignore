@@ -117,3 +117,8 @@ files/.config/browsh/firefox_profile/times.json
 files/.config/browsh/firefox_profile/webappsstore.sqlite
 files/.config/browsh/firefox_profile/webappsstore.sqlite-wal
 files/.config/browsh/firefox_profile/xulstore.json
+files/.config/browsh/firefox_profile/AlternateServices.txt
+files/.config/browsh/firefox_profile/SiteSecurityServiceState.txt  
+
+cache_directory
+
