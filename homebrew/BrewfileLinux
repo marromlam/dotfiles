@@ -29,6 +29,7 @@ brew "fzf"                      # fuzzy finder
 #brew "gawk"
 brew "git"
 #brew "gitlab-gem"
+brew 'imagemagick'
 brew "gnu-sed"
 #brew "ifstat"
 #brew "jq"
