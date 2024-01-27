@@ -3,12 +3,11 @@
 if [[ -d "$HOMEBREW_PREFIX/Cellar/termpdf.py" ]]; then
   echo "termpdf is already installed"
 else
-  git clone git@github.com:marromlam/pdfcat.git $HOMEBREW_PREFIX/Cellar/termpdf.py
-  pushd $HOMEBREW_PREFIX/Cellar/termpdf.py
+  git clone git@github.com:marromlam/pdfcat.git $HOMEBREW_PREFIX/Cellar/pdfcat
+  pushd $HOMEBREW_PREFIX/Cellar/pdfcat
   $HOMEBREW_PREFIX/bin/python3 -m pip install -r requirements.txt
-  $HOMEBREW_PREFIX/bin/python3 -m pip install -e ../termpdf.py
-  ln -sf $HOMEBREW_PREFIX/Cellar/termpdf.py/termpdf.py $HOMEBREW_PREFIX/bin
-  ln -sf $HOMEBREW_PREFIX/Cellar/termpdf.py/termpdf.py $HOMEBREW_PREFIX/bin/pdfcat
+  $HOMEBREW_PREFIX/bin/python3 -m pip install -e ../pdfcat
+  ln -sf $HOMEBREW_PREFIX/Cellar/pdfcat/pdfcat.py $HOMEBREW_PREFIX/bin/pdfcat
   popd
 fi
 
