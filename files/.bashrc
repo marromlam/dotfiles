@@ -21,6 +21,7 @@ else
   export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 
+	export HOMEBREW_PREFIX="/opt/homebrew"
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 

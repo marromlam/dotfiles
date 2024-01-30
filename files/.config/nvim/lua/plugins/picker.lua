@@ -248,7 +248,7 @@ return {
             ["<esc>"] = "close",
           },
           -- fzf = {
-          --     ["<esc>"] = "close",
+          --   ["<c-c>"] = "close",
           -- },
         },
         highlights = {

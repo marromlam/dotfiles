@@ -1,15 +1,15 @@
 prSections:
   - title: My Pull Requests
-    filters: is:open author:@me
+    filters: is:open author:marromlam author:propylon-marcos
   - title: Needs My Review
-    filters: is:pr is:open archived:false sort:updated-desc user:marromlam
+    filters: is:pr is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos
   - title: Neovim Issues
     filters: is:open repo:neovim/neovim
 issuesSections:
   - title: My Open Source Projects
-    filters: is:issue is:open archived:false sort:updated-desc user:marromlam
+    filters: is:issue is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos
   - title: My Issues
-    filters: is:open author:@me
+    filters: is:open author:marromlam author:propylon-marcos
   - title: Neovim Issues
     filters: is:open repo:neovim/neovim
 defaults:
@@ -20,9 +20,7 @@ defaults:
   issuesLimit: 20
   view: issues
 repoPaths:
-  wezterm: /home/marcos/Projects/personal/wezterm
-  tex-omml: /home/marcos/Projects/work/tex-omml
-
+  neovim/neovim: $PROJECTS_DIR/contributing/neovim
 keybindings:
   prs:
     - key: c
