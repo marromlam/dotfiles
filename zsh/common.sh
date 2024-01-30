@@ -15,7 +15,8 @@ export TEXINPUTS=".:~/beamer-compostela:"
 
 # System paths
 SYS_PATHS=(
-        "$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin"
+	"$HOME/.dotfiles/scripts" # Personal scripts
+	"$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin"
 	"$HOMEBREW_PREFIX/sbin" # Brew scripts
 	"$HOMEBREW_PREFIX/bin"  # Brew scripts
 )

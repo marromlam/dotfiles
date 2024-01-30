@@ -8,6 +8,7 @@ tap "homebrew/bundle"
 tap "homebrew/services"
 tap "browsh-org/homebrew-browsh"
 tap "koekeishiya/formulae"
+tap "iina/homebrew-mpv-iina"
 
 # Custom taps tap "koekeishiya/formulae"
 tap "Rigellute/tap"
@@ -76,6 +77,8 @@ brew "ffmpeg"                   # video converter
 brew "shfmt"
 brew "exa"
 brew "gcc"
+
+brew "mpv-iina"
 
 # npm install fixjson 
 # brew install clang-format
