@@ -1,13 +1,28 @@
-AVRO_FILE=$1
-SCHEMA=$2
-JSON_FILE=$3
+
+# check if the first argument is -f or --file we set is_printed to True
+# else we set it to False
+if [ "$1" == "-f" ] || [ "$1" == "--file" ]; then
+    is_printed=False
+else
+    is_printed=True
+fi
+
+# if the first argument is -f or --file, the avros are $@ from the second
+# argument, else the avros are $@ from the first argument
+if [ "$1" == "-f" ] || [ "$1" == "--file" ]; then
+    AVROS=${@:2}
+  else
+    AVROS=$@
+fi
+
 
 
 python -c "import fastavro" || python -m pip install fastavro
 
 
 
-for var in "$@"
+
+for var in "$AVROS"
 do
 python - <<EOF
 from fastavro import reader, json_writer
@@ -30,9 +45,8 @@ class UUIDEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-# SCHEMA = load_schema("schemas/document_schema.avsc")
 
-is_printed=True
+is_printed=${is_printed}
 full_json = []
 with BytesIO(open("${var}", "rb").read()) as fo:
     avro_reader = reader(fo)
@@ -41,10 +55,9 @@ with BytesIO(open("${var}", "rb").read()) as fo:
             if is_printed:
                 record["content"] = str(record["content"].hex())[:20] + " ..."
             else:
-                record["content"] = record["content"].hex()
+                record["content"] = str(record["content"].hex())
         full_json.append(record)
-if is_printed:
-    print(json.dumps(full_json, indent=4, cls=UUIDEncoder))
+print(json.dumps(full_json, indent=4, cls=UUIDEncoder))
 EOF
 done
 
