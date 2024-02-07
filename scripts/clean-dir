@@ -7,7 +7,7 @@ rm -rf */*/*/*/*/*/*Zone.Identifier
 rm -rf */*/*/*/*/*/*/*Zone.Identifier
 
 # Remove all .DS_Store files
-# find . -name '.DS_Store' -type f -delete #
-
+find $HOME/Projects -maxdepth 20 -type d -name "__pycache__" -print0 | xargs -0 -I {} rm -rf "{}"
+find $HOME/Projects -maxdepth 20 -type f -name ".DS_Store" -print0 | xargs -0 -I {} rm -rf "{}"
 
 # vim: ft=sh
