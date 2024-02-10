@@ -10,7 +10,7 @@ export PATH="$PATH:/mnt/c/WINDOWS"
 export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
 
 docker-service() {
-	DOCKER_DISTRO="Ubuntu"
+	DOCKER_DISTRO="Debian"
 	DOCKER_DIR=/mnt/wsl/shared-docker
 	export DOCKER_SOCK="$DOCKER_DIR/docker.sock"
 	export DOCKER_HOST="unix://$DOCKER_SOCK"
