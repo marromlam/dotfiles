@@ -8,15 +8,15 @@ def main(args):
 
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
-    window_title = "termpdf"
+    window_title = "live_preview"
     termpdf_cmd = "termpdf.py"
     cmd = termpdf_cmd + " " + os.path.expanduser(args[1])
 
     # Runs a command in the window
     def run_cmd(window):
         _cmd = cmd + "\x0d"
-        _cmd = _cmd.encode('utf-8')
-        boss.child_monitor.needs_write(window.id, _cmd )
+        _cmd = _cmd.encode("utf-8")
+        boss.child_monitor.needs_write(window.id, _cmd)
 
     # Try to find an existing pdf window
     for window in boss.match_windows("title:" + window_title):
@@ -52,7 +52,7 @@ def handle_result(args, result, target_window_id, boss):
     # Create the new window
     window = tab.new_window(override_title=window_title, location="vsplit")
     # Write the termpdf.py command
-    boss.child_monitor.needs_write(window.id, "ssh gpu219\x0d")
+    # boss.child_monitor.needs_write(window.id, "ssh gpu219\x0d")
     run_cmd(window)
     # Switch the active window back to what it was
     boss.set_active_window(active_window)

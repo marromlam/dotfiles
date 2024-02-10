@@ -29,15 +29,6 @@ return {
   },
 
   {
-    "lervag/vimtex",
-    disable = false,
-    ft = "tex",
-    config = function()
-      require("luavim.plugins.config.vimtex")
-    end,
-  },
-
-  {
     "saecki/crates.nvim",
     event = { "BufRead Cargo.toml" },
     requires = { { "nvim-lua/plenary.nvim" } },
