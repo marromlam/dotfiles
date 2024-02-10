@@ -76,15 +76,25 @@ brew "pyright"                    # python
 brew "flake8"
 brew "black"
 
-brew "shfmt"  # bash
+brew "bash"
+brew "shfmt"                      # bash
+brew "bash-language-server"
 
 brew "texlive"                    # latex
 # cask "mactex-no-gui"            # mactex without crap
+brew "texlab"
+brew "bibtex-tidy"
+brew "latexindent"
+brew "pandoc"
+
+brew "lua"                        # lua
+brew "stylua"
+brew "lua-language-server"
+
 
 #brew "mycli"
 brew "ncurses"
 #brew "php"
-brew "pandoc"
 brew "pkg-config"
 #brew "portaudio"
 #brew "rbenv"

@@ -122,3 +122,7 @@ files/.config/browsh/firefox_profile/SiteSecurityServiceState.txt
 
 cache_directory
 
+
+package-lock.json
+yarn.lock
+node_modules/*
