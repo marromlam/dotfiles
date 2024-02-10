@@ -16,10 +16,37 @@ tap "Schniz/tap"
 tap "rlue/utils"
 tap "epk/epk"
 
-# Homebrew essentials
-brew "bat" # alternative to cat
-brew "calcurse"
-brew "browsh"
+# Homebrew essentials --------------------------------------------------------
+#
+# cli tools
+brew "bat"                        # alternative to cat
+brew "calcurse"                   # TODO: What is this one
+brew "git"
+brew "git-delta"
+brew "browsh"                     # terminal browser
+brew "fpp"                        # facebook path picker 
+brew "fzf"                        # fuzzy finder
+brew "ripgrep"                    # like grep, but faster
+brew "ydiff"
+brew "gnu-sed"
+brew "neovim"
+brew "lazygit"                    # awesome git util
+brew "jq"                         # json-query
+brew "yq"                         # yaml-query
+brew "btop"                       # like top, but better
+brew "tmux"                       # terminal multiplexer
+brew "tree"                       # show a tree
+brew "wget"                       # like curl
+brew "stow"                       # linking files and folders
+brew "exa"                        # like ls but better
+
+# brew "mosh"                       # similar to ssh
+
+# Window manager
+# brew "yabai"
+# brew "skhd"                     # control
+
+#brew "starship"
 #brew "composer"
 #brew "coreutils"
 #brew "dbus"
@@ -27,90 +54,86 @@ brew "browsh"
 #brew "fnm"
 #brew "fontconfig"
 #brew "fontforge"
-brew "fpp"                      # facebook path picker 
-brew "fzf"                      # fuzzy finder
 #brew "gawk"
-brew "git"
-brew "ydiff"
 #brew "gitlab-gem"
-brew "gnu-sed"
 #brew "ifstat"
-#brew "jq"
-#brew "lazydocker"
-brew "lazygit"                  # awesome git util
 #brew "mkcert"
-brew "git-delta"
-brew "gd"
-brew "btop"
-#brew "mosh"
+brew "gd"    # TODO: what is this
+
+# Language compilers and runners ----------------------------------------------
+#
+brew "node"
+brew "yarn"
+brew "xmlformat"  # web
+brew "prettier"
+# npm install fixjson 
+
+brew "gcc"
+brew 'clang-format'               # C-like
+
+brew "python"
+brew "pyright"                    # python
+brew "flake8"
+brew "black"
+
+brew "shfmt"  # bash
+
+brew "texlive"                    # latex
+# cask "mactex-no-gui"            # mactex without crap
+
 #brew "mycli"
 brew "ncurses"
-brew "neovim"
-brew "node"
 #brew "php"
 brew "pandoc"
 brew "pkg-config"
 #brew "portaudio"
-brew "python"
 #brew "rbenv"
 brew "readline"
 #brew "readydocker"
-brew "ripgrep"                  # like grep, but faster
 brew "rlue/utils/timer"
-#brew "ruby"
-brew "skhd"                     # control
 brew "spotify-tui"
 brew "spotifyd"
-#brew "starship"
-brew "stow"
-brew "tmux"                     # terminal multiplexer
 #brew "tmuxinator"
 #brew "tmuxinator-fzf-start"
-brew "tree"
-brew "wget"                     # like curl
-# brew "yabai"
-brew "yarn"
 # brew "sshfs"                    # mount ssh volumes
-brew "mupdf-tools"
-brew "ffmpeg"                   # video converter
+brew "mupdf-tools"                # tools for pdf  -- TODO: maybe not needed
+brew "ffmpeg"                     # video converter
 
-brew "shfmt"
-brew "exa"
-brew "gcc"
+#brew "ruby"
 
-brew "mpv-iina"
 
-# npm install fixjson 
-# brew install clang-format
+# Containerization ------------------------------------------------------------
+brew "docker"
+brew "colima"
+brew "lazydocker"
 
-# App essentials
+
+
+# GUI Applications ------------------------------------------------------------
+#
+cask "iina"                       # video player
+cask "transmission"               # torrent client
+
 cask "kitty"                      # best terminal on Earth
-# cask "mactex-no-gui"            # mactex without crap
-cask "transmission"             # torrent client
-# cask "inkscape"                 # draw
-# cask "brave-browser"            # chromium based browser
-cask "orion"
-# cask "adobe-acrobat-reader"     # allows to digitally sign pdfs 
-# cask "zoom"
-# cask "tidal"
-# cask "Mattermost"
-cask "keycastr"
-# cask "nteract"
-cask "wezterm"
-cask "rectangle"
-cask "grandperspective"
-cask "stremio"
-cask "obsidian"
-cask "colima"
-cask "docker"
+# cask "wezterm"
+
+# cask "inkscape"                    # draw
+
+# cask "brave-browser"               # chromium based browser
+cask "orion"                       # browser
+
+cask "obsidian"                    # knowledge
+cask "rectangle"                   # window manager
+cask "grandperspective"            # tools to show up large files
+cask "keycastr"                    # cast keys on screen
 
 
 
-# Fonts
+# Fonts -----------------------------------------------------------------------
 cask "font-hasklug-nerd-font"   # I use this font as the nerd one
 cask "font-jetbrains-mono"
 cask "font-victor-mono"         # main font
 cask "font-iosevka"
 cask "font-sf-mono-nerd-font"
-cask "font-fire-code-nerd-font"
+cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
