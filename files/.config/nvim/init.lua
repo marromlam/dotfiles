@@ -211,7 +211,6 @@ vim.api.nvim_set_hl(0, "WinSeparator", {
 -- hi link @string.documentation.python SpecialComment
 -- ]])
 
-
 vim.cmd([[
 autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
 autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
