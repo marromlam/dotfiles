@@ -112,10 +112,11 @@ function set-prompt() {
   local dots_prompt_failure_icon="%F{red}✘ %f"
   local execution_time="%F{yellow}%{$__DOTS[ITALIC_ON]%}${cmd_exec_time}%{$__DOTS[ITALIC_OFF]%}%f "
 
-  local current_eviron="%F{red}% -<$(get_env)>-"
-  local placeholder="(%F{blue}%{$__DOTS[ITALIC_ON]%}…%{$__DOTS[ITALIC_OFF]%}%f)"
-  local top_left="%B%F{10}%1~%f%b${current_eviron}${_git_status_prompt:-$placeholder}"
-  local top_right="${vim_mode}${execution_time}%F{240}%*%f"
+  # local current_eviron="%F{red}% ⏣ ◣♯⚕i⚯ 🮤 	🭑  	🭔 ⚎ ⚈ ♨ ♞ 🬅 🬖 ❖ $(get_env)"
+  local current_eviron=" $(get_env)"
+  local placeholder="(%F{red}%{$__DOTS[ITALIC_ON]%}…%{$__DOTS[ITALIC_OFF]%}%f)"
+  local top_left="%B%F{blue}%1~%f%b${_git_status_prompt:-$placeholder}"
+  local top_right="${vim_mode}${current_eviron}${execution_time}%F{240}%*%f"
   local bottom_left="%(1j.%F{cyan}%j✦%f .)%(?.${dots_prompt_icon}.${dots_prompt_failure_icon})"
 
   PROMPT="$(_fill_line "$top_left" "$top_right")"$'\n'$bottom_left
