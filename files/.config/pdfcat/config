@@ -1,0 +1,6 @@
+{
+  "TINT_COLOR": "yellowgreen",
+  "KITTYCMD": "kitty --single-instance --instance-group=1",
+  "ALPHA": true,
+  "TINT_COLOR": "yellowgreen"
+}
