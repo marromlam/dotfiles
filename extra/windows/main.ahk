@@ -117,7 +117,7 @@ F12::SendInput {Volume_Up}
 
 
 
-
 #include desktop_manager.ahk
 #include general.ahk
 #include vcxsrv.ahk
+#include native.ahk
