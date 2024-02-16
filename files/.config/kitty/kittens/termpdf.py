@@ -10,7 +10,21 @@ def main(args):
 def handle_result(args, result, target_window_id, boss):
     window_title = "live_preview"
     termpdf_cmd = "termpdf.py"
-    cmd = termpdf_cmd + " " + os.path.expanduser(args[1])
+
+    page = None
+    if len(args) > 2:
+        page = args[2]
+
+    cmd = " ".join(
+        [
+            " ",  # this is intended, so it is not saved in history
+            termpdf_cmd,
+            "--invert-colors",
+            "--transparent",
+            f"--page-number {page}" if len(args) > 2 else "",
+            os.path.expanduser(args[1]),
+        ]
+    )
 
     # Runs a command in the window
     def run_cmd(window):
@@ -25,7 +39,7 @@ def handle_result(args, result, target_window_id, boss):
         fg_cmd = " ".join(window.child.foreground_cmdline)
         if cmd in fg_cmd:
             # Send refresh
-            boss.child_monitor.needs_write(window.id, "\x12")
+            boss.child_monitor.needs_write(window.id, b"\x12")
         elif termpdf_cmd in fg_cmd:
             # There is a termpdf.py running, but with a different doc
             # Send safe quit
