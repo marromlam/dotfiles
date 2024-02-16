@@ -126,3 +126,7 @@ cache_directory
 package-lock.json
 yarn.lock
 node_modules/*
+
+
+files/.config/inkscape-figures/roots
+
