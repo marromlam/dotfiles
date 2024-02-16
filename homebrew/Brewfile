@@ -138,6 +138,28 @@ cask "grandperspective"            # tools to show up large files
 cask "keycastr"                    # cast keys on screen
 
 
+# Others ----------------------------------------------------------------------
+#
+# cask "debit-and-credit"            # finance
+# cask 'apple-configurator'         # apple
+# cask "monday.dotcom"
+# caskk "firefox"
+# cask "synergy"
+# cask "barrier"
+# cask "ip-scanner"
+# cask "tomito"
+# cask "caffeine"
+# cask "raspberry-pi-imager"
+# cask "balenaetcher"                 # iso and image writer
+# cask "zerotier-one"
+# cask "whatsapp"
+# cask "add-guard"
+# cask "autofirma"
+
+# cask "microsoft-teams"
+# cask "microsoft-office"
+
+
 
 # Fonts -----------------------------------------------------------------------
 cask "font-hasklug-nerd-font"   # I use this font as the nerd one
