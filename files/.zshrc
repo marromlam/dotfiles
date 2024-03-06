@@ -266,6 +266,9 @@ bindkey -e # emacs
 # bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
 # bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
 # bindkey -M '^f' fzf-history-widget
+rgfzf-widget() ${HOME}/.dotfiles/scripts/rgfzf
+zle -N rgfzf-widget
+bindkey '^g' rgfzf-widget
 
 # }}}
 
@@ -283,6 +286,13 @@ source $HOME/.dotfiles/zsh/tmux_aliases.sh
 
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
+
+
+tmux-sessionizer-widget() ${HOME}/.dotfiles/scripts/tmux-sessionizer
+zle -N tmux-sessionizer-widget
+bindkey '^t' tmux-sessionizer-widget
+
+# bindkey -s '^t' "^u^M"
 
 # }}}
 
