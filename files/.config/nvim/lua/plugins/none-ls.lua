@@ -1,6 +1,7 @@
 return {
   "nvimtools/none-ls.nvim",
   event = "LazyFile",
+  commit = "912f81829e9ab4ee3d54c3ea5a304c264f0003bc",
   dependencies = { "mason.nvim" },
   opts = function()
     local nls = require("null-ls")
@@ -76,6 +77,7 @@ return {
         nls.builtins.formatting.xmlformat,
         nls.builtins.formatting.tidy,
         nls.builtins.formatting.black,
+        nls.builtins.formatting.isort,
 
         nls.builtins.diagnostics.flake8,
       },
