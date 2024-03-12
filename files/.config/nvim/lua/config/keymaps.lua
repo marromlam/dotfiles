@@ -298,8 +298,8 @@ cmd.cabbrev("options", "vert options")
 -- 	return search("?", "<S-Tab>")
 -- end, { expr = true })
 -- insert path of current file into a command
-cnoremap("%%", "<C-r>=fnameescape(expand('%'))<cr>")
-cnoremap("::", "<C-r>=fnameescape(expand('%:p:h'))<cr>/")
+-- cnoremap("%%", "<C-r>=fnameescape(expand('%'))<cr>")
+-- cnoremap("::", "<C-r>=fnameescape(expand('%:p:h'))<cr>/")
 -----------------------------------------------------------------------------//
 -- Save
 -----------------------------------------------------------------------------//
