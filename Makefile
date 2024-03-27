@@ -3,7 +3,7 @@
 
 
 FC=${HOME}/.dotfiles
-TMUX_SHARE=${FC}/.config/tmux
+TMUX_SHARE=${HOME}/.local/share/tmux
 
 all: brew macos kitty nvim vim tmux fzf-marks private zsh-plugins
 
