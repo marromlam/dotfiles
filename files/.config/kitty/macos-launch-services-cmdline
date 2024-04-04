@@ -1,2 +1,2 @@
---listen-on unix:/tmp/mykitty
---start-as=fullscreen
+--single-instance
+--listen-on unix:/tmp/kitty-{kitty_pid}
