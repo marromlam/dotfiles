@@ -121,3 +121,4 @@ F12::SendInput {Volume_Up}
 #include general.ahk
 #include vcxsrv.ahk
 #include native.ahk
+;#include synergy.ahk

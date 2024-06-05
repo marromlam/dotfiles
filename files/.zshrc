@@ -294,6 +294,17 @@ bindkey '^t' tmux-sessionizer-widget
 
 # bindkey -s '^t' "^u^M"
 
+
+# auto activate environment on .aa-env file
+# eval "$(direnv hook zsh)"
+source $(brew --prefix)/opt/autoenv/activate.sh
+export VMUX_NVIM_SESSION_DIR=~/.cache/nvim_sessions
+export VMUX_EDITOR=nvim
+alias nv=vmux
+
+
+
+
 # }}}
 
 

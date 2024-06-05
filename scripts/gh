@@ -1,3 +1,4 @@
+#!/bin/bash
 # this is a wrapper around gh that sets the correct token
 # depending on the current path
 # this is useful because I have a personal and a work GITHUB_TOKEN§
@@ -11,8 +12,6 @@ if [[ $PWD == $HOME/Projects/work* ]]; then
 else
     source $HOME/.ssh/personal_token
 fi
-
-echo $GITHUB_TOKEN
 
 $HOMEBREW_PREFIX/bin/gh $@
 

@@ -1,0 +1,56 @@
+NERD_FONT_FREE="󱁕 "
+NERD_FONT_MEETING="󰤙"
+
+
+display_popup() {
+	tmux display-popup \
+		-S "fg=#eba0a3" \
+		-w20% \
+		-h36% \
+		-d '#{pane_current_path}' \
+		-T "Pomodoro" \
+		echo -e "\e[31m
+                  ▒▒            
+          ▒▒      ▒▒    ▒▒      
+            ▒▒██▒▒██▒▒▒▒        
+        ████▒▒▒▒▒▒▒▒▓▓▒▒████    
+      ██▒▒▒▒▒▒▒▒▓▓▓▓▒▒▒▒▒▒▒▒██  
+      ██▒▒▒▒▒▒▒▒▒▒▒▒▒▒    ▒▒██  
+    ██▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒██
+    ██▓▓▒▒▒▒ TAKE a ▒▒▒▒▒▒  ▒▒██
+    ██▓▓▒▒▒▒ 10 min BREAK ▒▒▒▒██
+    ██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██
+      ██▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒██  
+      ██▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒██  
+        ████▓▓▓▓▓▓▓▓▓▓▓▓████    
+            ████████████        
+  \e[0m"
+}
+
+
+
+main () {
+  RUN=0
+  # get current time, and if it is xx:50:01, then set RUN=1, else RUN=0
+  if [ $(date +%M) -eq 50 ] && [ $(date +%S) -eq 1 ]; then
+    RUN=1
+  fi
+
+  if [ $RUN -eq 1 ]; then
+    echo $NERD_FONT_FREE " chill"
+    display_popup
+  else
+    echo $NERD_FONT_FREE
+  fi
+
+
+
+
+
+
+
+}
+
+main
+
+# vim: ft=bash
