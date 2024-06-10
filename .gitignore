@@ -130,3 +130,11 @@ node_modules/*
 
 files/.config/inkscape-figures/roots
 
+
+tags
+test.sh
+.luarc.json
+nvim
+
+spell/
+lazy-lock.json
