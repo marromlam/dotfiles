@@ -4,13 +4,13 @@
 
 if [[ "$(uname)" == "Darwin" ]]; then
 	# ls does not work on macos as it uses a BSD version
-	alias ls='exa --icons'
+	alias ls='eza --icons'
 	# alias ll="ls -lrth" # show list of directory
-	alias ll="exa -lr --icons" # show list of directory
+	alias ll="eza -lr --icons" # show list of directory
 else
-	alias ls='exa --icons'
+	alias ls='eza --icons'
 	# alias ls="ls --color=auto"
-	alias ll="exa -lr --icons" # show list of directory
+	alias ll="eza -lr --icons" # show list of directory
 fi
 
 # }}}
