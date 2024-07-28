@@ -1,0 +1,20 @@
+# Launch a command to track the GPS location
+cat /dev/location > /dev/null &
+# Save the Process ID so you can kill it later
+export BACKGROUND_PID=$!
+# Use ( ... ) & to start a subshell in the background
+(
+  # For the numbers 1 to 60, repeat checking for the current file
+  for i in $(seq 1 60); do
+    # If the file still exists
+    if [[ -f ~/.ish-background ]]; then
+      # Then wait for the next minute.
+      sleep 60
+    fi
+  done
+  # After one hour (60 minutes/hour * 60 seconds/minute),
+  # or after the file stop existing. Then kill the process,
+  # that is checking for location.
+  kill $BACKGROUND_PID
+) &
+
