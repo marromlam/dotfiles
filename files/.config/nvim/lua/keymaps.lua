@@ -4,48 +4,20 @@
 -- Commands {{{
 --
 ---Create an nvim command
----@param name string
----@param rhs string | fun(args: CommandArgs)
----@param opts table?
 function mrl.command(name, rhs, opts)
   opts = opts or {}
   vim.api.nvim_create_user_command(name, rhs, opts)
 end
 
 ---Determine if a value of any type is empty
----@param item any
----@return boolean?
 function mrl.falsy(item)
-  if not item then
-    return true
-  end
+  if not item then return true end
   local item_type = type(item)
-  if item_type == "boolean" then
-    return not item
-  end
-  if item_type == "string" then
-    return item == ""
-  end
-  if item_type == "number" then
-    return item <= 0
-  end
-  if item_type == "table" then
-    return vim.tbl_isempty(item)
-  end
+  if item_type == 'boolean' then return not item end
+  if item_type == 'string' then return item == '' end
+  if item_type == 'number' then return item <= 0 end
+  if item_type == 'table' then return vim.tbl_isempty(item) end
   return item ~= nil
-end
-
----Find an item in a list
----@generic T
----@param matcher fun(arg: T):boolean
----@param haystack T[]
----@return T?
-function mrl.find(matcher, haystack)
-  for _, needle in ipairs(haystack) do
-    if matcher(needle) then
-      return needle
-    end
-  end
 end
 
 -- }}}
@@ -57,9 +29,10 @@ mrl.list = { qf = {}, loc = {} }
 ---@param list_type "loclist" | "quickfix"
 ---@return boolean
 local function is_list_open(list_type)
-  return mrl.find(function(win)
-    return not mrl.falsy(win[list_type])
-  end, vim.fn.getwininfo()) ~= nil
+  return mrl.find(
+    function(win) return not mrl.falsy(win[list_type]) end,
+    vim.fn.getwininfo()
+  ) ~= nil
 end
 
 local silence = { mods = { silent = true, emsg_silent = true } }
@@ -68,13 +41,11 @@ local silence = { mods = { silent = true, emsg_silent = true } }
 local function preserve_window(callback, ...)
   local win = vim.api.nvim_get_current_win()
   callback(...)
-  if win ~= vim.api.nvim_get_current_win() then
-    vim.cmd.wincmd("p")
-  end
+  if win ~= vim.api.nvim_get_current_win() then vim.cmd.wincmd('p') end
 end
 
 function mrl.list.qf.toggle()
-  if is_list_open("quickfix") then
+  if is_list_open('quickfix') then
     vim.cmd.cclose(silence)
   elseif #vim.fn.getqflist() > 0 then
     preserve_window(vim.cmd.copen, silence)
@@ -82,7 +53,7 @@ function mrl.list.qf.toggle()
 end
 
 function mrl.list.loc.toggle()
-  if is_list_open("loclist") then
+  if is_list_open('loclist') then
     vim.cmd.lclose(silence)
   elseif #vim.fn.getloclist(0) > 0 then
     preserve_window(vim.cmd.lopen, silence)
@@ -96,21 +67,19 @@ function mrl.list.qf.delete(buf)
   local list = vim.fn.getqflist()
   local line = vim.api.nvim_win_get_cursor(0)[1]
   local mode = vim.api.nvim_get_mode().mode
-  if mode:match("[vV]") then
+  if mode:match('[vV]') then
     local first_line = vim.fn.getpos("'<")[2]
     local last_line = vim.fn.getpos("'>")[2]
     list = mrl.fold(function(accum, item, i)
-      if i < first_line or i > last_line then
-        accum[#accum + 1] = item
-      end
+      if i < first_line or i > last_line then accum[#accum + 1] = item end
       return accum
     end, list)
   else
     table.remove(list, line)
   end
   -- replace items in the current list, do not make a new copy of it; this also preserves the list title
-  vim.fn.setqflist({}, "r", { items = list })
-  vim.fn.setpos(".", { buf, line, 1, 0 }) -- restore current line
+  vim.fn.setqflist({}, 'r', { items = list })
+  vim.fn.setpos('.', { buf, line, 1, 0 }) -- restore current line
 end
 
 -- }}}
@@ -118,171 +87,105 @@ end
 local fn, api, uv, cmd, command, fmt =
   vim.fn, vim.api, vim.loop, vim.cmd, mrl.command, string.format
 
-if not mrl or not mrl.mappings.enable then
-  return
-end
+if not mrl or not mrl.mappings.enable then return end
 
 local fn, api, uv, cmd, fmt = vim.fn, vim.api, vim.loop, vim.cmd, string.format
 
-local recursive_map = function(mode, lhs, rhs, opts)
-  opts = opts or {}
-  opts.remap = true
-  map(mode, lhs, rhs, opts)
-end
-
-local nmap = function(...)
-  recursive_map("n", ...)
-end
-local imap = function(...)
-  recursive_map("i", ...)
-end
-local nnoremap = function(...)
-  vim.keymap.set("n", ...)
-end
-local xnoremap = function(...)
-  vim.keymap.set("x", ...)
-end
-local vnoremap = function(...)
-  vim.keymap.set("v", ...)
-end
-local inoremap = function(...)
-  vim.keymap.set("i", ...)
-end
-local onoremap = function(...)
-  vim.keymap.set("o", ...)
-end
-local cnoremap = function(...)
-  vim.keymap.set("c", ...)
-end
-local tnoremap = function(...)
-  vim.keymap.set("t", ...)
-end
-
--- Paste in visual mode multiple times
-xnoremap("p", "pgvy")
-
--- search visual selection
-vnoremap("//", [[y/<C-R>"<CR>]])
-
 -- Credit: Justinmk
-nnoremap("g>", [[<cmd>set nomore<bar>40messages<bar>set more<CR>]], {
-  desc = "show message history",
+vim.keymap.set('n', 'g>', [[<cmd>set nomore<bar>40messages<bar>set more<CR>]], {
+  desc = 'show message history',
 })
 
--- Evaluates whether there is a fold on the current line if so unfold it else return a normal space
-nnoremap(
-  "<localleader><localleader>",
-  [[@=(foldlevel('.')?'za':"\<Space>")<CR>]],
-  {
-    desc = "toggle fold under cursor",
-  }
-)
+-- Evaluates whether there is a fold on the current line if so unfold it
+-- else return a normal space
+vim.keymap.set('n', '<BS>', [[@=(foldlevel('.')?'za':"\<Space>")<CR>]], {
+  desc = 'toggle fold under cursor',
+})
 -- Refocus folds
-nnoremap("<localleader>z", [[zMzvzz]], { desc = "center viewport" })
--- Make zO recursively open whatever top level fold we're in, no matter where the
--- cursor happens to be.
-nnoremap("zO", [[zCzO]])
+vim.keymap.set('n', '<localleader>z', [[zMzvzz]], { desc = 'center viewport' })
+-- Make zO recursively open whatever top level fold we're in, no matter
+-- where the cursor happens to be.
+vim.keymap.set('n', 'zO', [[zCzO]])
 
 ------------------------------------------------------------------------------
 -- Buffers
 ------------------------------------------------------------------------------
-nnoremap(
-  "<leader>on",
+vim.keymap.set(
+  'n',
+  '<leader>on',
   [[<cmd>w <bar> %bd <bar> e#<CR>]],
-  { desc = "close all other buffers" }
+  { desc = 'close all other buffers' }
 )
-nnoremap(
-  "<localleader><tab>",
+vim.keymap.set(
+  'n',
+  '<localleader><tab>',
   [[:b <Tab>]],
-  { silent = false, desc = "open buffer list" }
+  { silent = false, desc = 'open buffer list' }
 )
------------------------------------------------------------------------------//
--- Capitalize
------------------------------------------------------------------------------//
-nnoremap("U", "gUiw`]", { desc = "capitalize word" })
 
-----------------------------------------------------------------------------------
--- Windows
-----------------------------------------------------------------------------------
-nnoremap("<localleader>wh", "<C-W>t <C-W>K", {
-  desc = "change two horizontally split windows to vertical splits",
+-- Windows and buffer management {{{
+
+vim.keymap.set('n', '<localleader>wh', '<C-W>t <C-W>K', {
+  desc = 'change two horizontally split windows to vertical splits',
 })
-nnoremap("<localleader>wv", "<C-W>t <C-W>H", {
-  desc = "change two vertically split windows to horizontal splits",
+vim.keymap.set('n', '<localleader>wv', '<C-W>t <C-W>H', {
+  desc = 'change two vertically split windows to horizontal splits',
 })
 -- equivalent to gf but opens the window in a vertical split
 -- vim doesn't have a native mapping for this as <C-w>f normally
 -- opens a horizontal split
-nnoremap("<C-w>f", "<C-w>vgf", { desc = "open file in vertical split" })
--- make . work with visually selected lines
-vnoremap(".", ":norm.<CR>")
-nnoremap(
-  "<leader>qw",
-  "<cmd>bd!<CR>",
-  { desc = "Close current buffer (and window)" }
+vim.keymap.set(
+  'n',
+  '<C-w>f',
+  '<C-w>vgf',
+  { desc = 'open file in vertical split' }
 )
+vim.keymap.set(
+  'n',
+  '<leader>qw',
+  '<cmd>bd!<CR>',
+  { desc = 'Close current buffer (and window)' }
+)
+
+-- }}}
+
 -----------------------------------------------------------------------------//
--- Quick find/replace
------------------------------------------------------------------------------//
-nnoremap("<leader>[", [[:%s/\<<C-r>=expand("<cword>")<CR>\>/]], {
+vim.keymap.set('n', '<leader>nf', [[:e <C-R>=expand("%:p:h") . "/" <CR>]], {
   silent = false,
-  desc = "replace word under the cursor(file)",
+  desc = 'Open a new file in the same directory',
 })
-nnoremap("<leader>]", [[:s/\<<C-r>=expand("<cword>")<CR>\>/]], {
+vim.keymap.set('n', '<leader>ns', [[:vsp <C-R>=expand("%:p:h") . "/" <CR>]], {
   silent = false,
-  desc = "replace word under the cursor (line)",
-})
-vnoremap("<leader>[", [["zy:%s/<C-r><C-o>"/]], {
-  silent = false,
-  desc = "replace word under the cursor (visual)",
-})
--- Visual shifting (does not exit Visual mode)
-vnoremap("<", "<gv")
-vnoremap(">", ">gv")
---Remap back tick for jumping to marks more quickly back
-nnoremap("'", "`")
------------------------------------------------------------------------------//
-nnoremap("<leader>nf", [[:e <C-R>=expand("%:p:h") . "/" <CR>]], {
-  silent = false,
-  desc = "Open a new file in the same directory",
-})
-nnoremap("<leader>ns", [[:vsp <C-R>=expand("%:p:h") . "/" <CR>]], {
-  silent = false,
-  desc = "Split to a new file in the same directory",
+  desc = 'Split to a new file in the same directory',
 })
 -----------------------------------------------------------------------------//
 -- Window bindings
 -----------------------------------------------------------------------------//
--- https://vim.fandom.com/wiki/Fast_window_resizing_with_plus/minus_keys
-if fn.bufwinnr(1) then
-  nnoremap("<a-h>", "<C-W><")
-  nnoremap("<a-l>", "<C-W>>")
-end
-----------------------------------------------------------------------------------
 
+----------------------------------------------------------------------------------
 -- Commandline mappings
 ----------------------------------------------------------------------------------
 -- https://github.com/tpope/vim-rsi/blob/master/plugin/rsi.vim
 -- c-a / c-e everywhere - RSI.vim provides these
-cnoremap("<C-n>", "<Down>")
-cnoremap("<C-p>", "<Up>")
--- <C-A> allows you to insert all matches on the command line e.g. bd *.js <c-a>
--- will insert all matching files e.g. :bd a.js b.js c.js
-cnoremap("<c-x><c-a>", "<c-a>")
--- move cursor one character backwards unless at the end of the command line
-cnoremap("<C-f>", function()
-  if fn.getcmdpos() == fn.strlen(fn.getcmdline()) then
-    return "<c-f>"
-  end
-  return "<Right>"
-end, { expr = true })
-cnoremap("<C-b>", "<Left>")
-cnoremap("<C-d>", "<Del>")
--- see :h cmdline-editing
-cnoremap("<Esc>b", [[<S-Left>]])
-cnoremap("<Esc>f", [[<S-Right>]])
+-- cnoremap("<C-n>", "<Down>")
+-- cnoremap("<C-p>", "<Up>")
+-- -- <C-A> allows you to insert all matches on the command line e.g. bd *.js <c-a>
+-- -- will insert all matching files e.g. :bd a.js b.js c.js
+-- cnoremap("<c-x><c-a>", "<c-a>")
+-- -- move cursor one character backwards unless at the end of the command line
+-- cnoremap("<C-f>", function()
+--   if fn.getcmdpos() == fn.strlen(fn.getcmdline()) then
+--     return "<c-f>"
+--   end
+--   return "<Right>"
+-- end, { expr = true })
+-- cnoremap("<C-b>", "<Left>")
+-- cnoremap("<C-d>", "<Del>")
+-- -- see :h cmdline-editing
+-- cnoremap("<Esc>b", [[<S-Left>]])
+-- cnoremap("<Esc>f", [[<S-Right>]])
 
-cmd.cabbrev("options", "vert options")
+cmd.cabbrev('options', 'vert options')
 
 -- smooth searching, allow tabbing between search results similar to using <c-g>
 -- or <c-t> the main difference being tab is easier to hit and remapping those keys
@@ -305,33 +208,34 @@ cmd.cabbrev("options", "vert options")
 -----------------------------------------------------------------------------//
 -- NOTE: this uses write specifically because we need to trigger a filesystem event
 -- even if the file isn't changed so that things like hot reload work
-nnoremap("<c-s>", "<Cmd>silent! write ++p<CR>")
+vim.keymap.set('n', '<c-s>', '<Cmd>silent! write ++p<CR>')
 -- Write and quit all files, ZZ is NOT equivalent to this
-nnoremap("qa", "<cmd>qa<CR>")
+vim.keymap.set('n', 'qa', '<cmd>qa<CR>')
 
 -- Quickfix
-nnoremap("]q", "<cmd>cnext<CR>zz")
-nnoremap("[q", "<cmd>cprev<CR>zz")
-nnoremap("]l", "<cmd>lnext<cr>zz")
-nnoremap("[l", "<cmd>lprev<cr>zz")
+vim.keymap.set('n', ']q', '<cmd>cnext<CR>zz')
+vim.keymap.set('n', '[q', '<cmd>cprev<CR>zz')
+vim.keymap.set('n', ']l', '<cmd>lnext<cr>zz')
+vim.keymap.set('n', '[l', '<cmd>lprev<cr>zz')
 ------------------------------------------------------------------------------
 -- Tab navigation
 ------------------------------------------------------------------------------
-nnoremap("<leader>tn", "<cmd>tabedit %<CR>")
-nnoremap("<leader>tc", "<cmd>tabclose<CR>")
-nnoremap("<leader>to", "<cmd>tabonly<cr>")
-nnoremap("<leader>tm", "<cmd>tabmove<Space>")
-nnoremap("]t", "<cmd>tabprev<CR>")
-nnoremap("[t", "<cmd>tabnext<CR>")
+vim.keymap.set('n', '<leader>tn', '<cmd>tabedit %<CR>')
+vim.keymap.set('n', '<leader>tc', '<cmd>tabclose<CR>')
+vim.keymap.set('n', '<leader>to', '<cmd>tabonly<cr>')
+vim.keymap.set('n', '<leader>tm', '<cmd>tabmove<Space>')
+vim.keymap.set('n', ']t', '<cmd>tabprev<CR>')
+vim.keymap.set('n', '[t', '<cmd>tabnext<CR>')
 -------------------------------------------------------------------------------
 -- ?ie | entire object
 -------------------------------------------------------------------------------
-xnoremap("ie", [[gg0oG$]])
-onoremap("ie", [[<cmd>execute "normal! m`"<Bar>keepjumps normal! ggVG<CR>]])
+vim.keymap.set('x', 'ie', [[gg0oG$]])
+-- onoremap("ie", [[<cmd>execute "normal! m`"<Bar>keepjumps normal! ggVG<CR>]])
 
 -- center cursor
-nmap(
-  "zz",
+vim.keymap.set(
+  'n',
+  'zz',
   [[(winline() == (winheight (0) + 1)/ 2) ?  'zt' : (winline() == 1)? 'zb' : 'zz']],
   { expr = true }
 )
@@ -339,170 +243,216 @@ nmap(
 -----------------------------------------------------------------------------//
 -- Open Common files
 -----------------------------------------------------------------------------//
-nnoremap("<leader>ev", [[<Cmd>edit $MYVIMRC<CR>]], { desc = "open $VIMRC" })
-nnoremap("<leader>ez", "<Cmd>edit $ZDOTDIR/.zshrc<CR>", { desc = "open zshrc" })
-nnoremap("<leader>et", "<Cmd>edit $XDG_CONFIG_HOME/tmux/tmux.conf<CR>", {
-  desc = "open tmux.conf",
-})
--- This line allows the current file to source the vimrc allowing me use bindings as they're added
-nnoremap(
-  "<leader>sv",
-  [[<Cmd>source $MYVIMRC<cr> <bar> :lua vim.notify('Sourced init.vim')<cr>]],
+vim.keymap.set(
+  'n',
+  '<leader>ev',
+  [[<Cmd>edit $MYVIMRC<CR>]],
+  { desc = 'open $VIMRC' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>ez',
+  '<Cmd>edit $ZDOTDIR/.zshrc<CR>',
+  { desc = 'open zshrc' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>et',
+  '<Cmd>edit $XDG_CONFIG_HOME/tmux/tmux.conf<CR>',
   {
-    desc = "source $VIMRC",
+    desc = 'open tmux.conf',
   }
 )
-nnoremap(
-  "<leader>yf",
+-- This line allows the current file to source the vimrc allowing me use bindings as they're added
+vim.keymap.set(
+  'n',
+  '<leader>sv',
+  [[<Cmd>source $MYVIMRC<cr> <bar> :lua vim.notify('Sourced init.vim')<cr>]],
+  {
+    desc = 'source $VIMRC',
+  }
+)
+vim.keymap.set(
+  'n',
+  '<leader>yf',
   ":let @*=expand('%:p')<CR>",
-  { desc = "yank file path into the clipboard" }
+  { desc = 'yank file path into the clipboard' }
 )
 -----------------------------------------------------------------------------//
 -- Quotes
 -----------------------------------------------------------------------------//
-nnoremap(
+vim.keymap.set(
+  'n',
   [[<leader>"]],
   [[ciw"<c-r>""<esc>]],
-  { desc = "surround with double quotes" }
+  { desc = 'surround with double quotes' }
 )
-nnoremap(
-  "<leader>`",
+vim.keymap.set(
+  'n',
+  '<leader>`',
   [[ciw`<c-r>"`<esc>]],
-  { desc = "surround with backticks" }
+  { desc = 'surround with backticks' }
 )
-nnoremap(
+vim.keymap.set(
+  'n',
   "<leader>'",
   [[ciw'<c-r>"'<esc>]],
-  { desc = "surround with single quotes" }
+  { desc = 'surround with single quotes' }
 )
-nnoremap(
-  "<leader>)",
+vim.keymap.set(
+  'n',
+  '<leader>)',
   [[ciw(<c-r>")<esc>]],
-  { desc = "surround with parentheses" }
+  { desc = 'surround with parentheses' }
 )
-nnoremap(
-  "<leader>}",
+vim.keymap.set(
+  'n',
+  '<leader>}',
   [[ciw{<c-r>"}<esc>]],
-  { desc = "surround with curly braces" }
+  { desc = 'surround with curly braces' }
 )
 
 -- gx implements the netrw style url opener
 local function open(path)
   fn.jobstart({ vim.g.open_command, path }, { detach = true })
-  vim.notify(fmt("Opening %s", path))
+  vim.notify(fmt('Opening %s', path))
 end
 
-nnoremap("gx", function()
-  local file = fn.expand("<cfile>")
-  if not file or fn.isdirectory(file) > 0 then
-    return vim.cmd.edit(file)
-  end
+vim.keymap.set('n', 'gx', function()
+  local file = fn.expand('<cfile>')
+  if not file or fn.isdirectory(file) > 0 then return vim.cmd.edit(file) end
 
-  if file:match("http[s]?://") then
-    return open(file)
-  end
+  if file:match('http[s]?://') then return open(file) end
 
   -- consider anything that looks like string/string a github link
-  local link = file:match("[%a%d%-%.%_]*%/[%a%d%-%.%_]*")
-  if link then
-    return open(fmt("https://www.github.com/%s", link))
-  end
+  local link = file:match('[%a%d%-%.%_]*%/[%a%d%-%.%_]*')
+  if link then return open(fmt('https://www.github.com/%s', link)) end
 end)
 
-nnoremap("gf", "<Cmd>e <cfile><CR>")
+vim.keymap.set('n', 'gf', '<Cmd>e <cfile><CR>')
 
 -- quickfix list
-nnoremap("<C-q>", mrl.list.qf.toggle, { desc = "toggle quickfix list" })
-nnoremap("<C-;>", mrl.list.loc.toggle, { desc = "toggle location list" })
+vim.keymap.set(
+  'n',
+  '<C-q>',
+  mrl.list.qf.toggle,
+  { desc = 'toggle quickfix list' }
+)
+vim.keymap.set(
+  'n',
+  '<C-;>',
+  mrl.list.loc.toggle,
+  { desc = 'toggle location list' }
+)
 
 -----------------------------------------------------------------------------//
 -- Completion
 -----------------------------------------------------------------------------//
 -- cycle the completion menu with <TAB>
-inoremap("<tab>", [[pumvisible() ? "\<C-n>" : "\<Tab>"]], { expr = true })
-inoremap("<s-tab>", [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]], { expr = true })
+vim.keymap.set(
+  'i',
+  '<tab>',
+  [[pumvisible() ? "\<C-n>" : "\<Tab>"]],
+  { expr = true }
+)
+vim.keymap.set(
+  'i',
+  '<s-tab>',
+  [[pumvisible() ? "\<C-p>" : "\<S-Tab>"]],
+  { expr = true }
+)
 
 -----------------------------------------------------------------------------//
 -- Commands
 -----------------------------------------------------------------------------//
-command("ToggleBackground", function()
-  vim.o.background = vim.o.background == "dark" and "light" or "dark"
-end)
-
-nnoremap(
-  "<leader>Ob",
-  "<cmd>ToggleBackground<cr>",
-  { desc = "toggle background" }
+command(
+  'ToggleBackground',
+  function() vim.o.background = vim.o.background == 'dark' and 'light' or 'dark' end
 )
-nnoremap("<leader>Ow", function()
+
+vim.keymap.set(
+  'n',
+  '<leader>Ob',
+  '<cmd>ToggleBackground<cr>',
+  { desc = 'toggle background' }
+)
+vim.keymap.set('n', '<leader>Ow', function()
   vim.wo.wrap = not vim.wo.wrap
-  vim.notify("wrap " .. (vim.o.wrap and "on" or "off"))
-end, { desc = "toggle wrap" })
+  vim.notify('wrap ' .. (vim.o.wrap and 'on' or 'off'))
+end, { desc = 'toggle wrap' })
 ------------------------------------------------------------------------------
-command("Todo", [[noautocmd silent! grep! 'TODO\|FIXME\|BUG\|HACK' | copen]])
-command("ReloadModule", function(tbl)
-  require("plenary.reload").reload_module(tbl.args)
-end, {
-  nargs = 1,
-})
+command('Todo', [[noautocmd silent! grep! 'TODO\|FIXME\|BUG\|HACK' | copen]])
+command(
+  'ReloadModule',
+  function(tbl) require('plenary.reload').reload_module(tbl.args) end,
+  {
+    nargs = 1,
+  }
+)
 -- source https://superuser.com/a/540519
 -- write the visual selection to the filename passed in as a command argument then delete the
 -- selection placing into the black hole register
 command(
-  "MoveWrite",
+  'MoveWrite',
   [[<line1>,<line2>write<bang> <args> | <line1>,<line2>delete _]],
   {
     nargs = 1,
     bang = true,
     range = true,
-    complete = "file",
+    complete = 'file',
   }
 )
 command(
-  "MoveAppend",
+  'MoveAppend',
   [[<line1>,<line2>write<bang> >> <args> | <line1>,<line2>delete _]],
   {
     nargs = 1,
     bang = true,
     range = true,
-    complete = "file",
+    complete = 'file',
   }
 )
 
-command("Reverse", "<line1>,<line2>g/^/m<line1>-1", {
-  range = "%",
+command('Reverse', '<line1>,<line2>g/^/m<line1>-1', {
+  range = '%',
   bar = true,
 })
 
-command("Exrc", function()
+command('Exrc', function()
   local cwd = fn.getcwd()
-  local p1, p2 = ("%s/.nvim.lua"):format(cwd), ("%s/.nvimrc"):format(cwd)
+  local p1, p2 = ('%s/.nvim.lua'):format(cwd), ('%s/.nvimrc'):format(cwd)
   local path = uv.fs_stat(p1) and p1 or uv.fs_stat(p2) and p2
   if not path then
-    local _, err = io.open(p1, "w")
+    local _, err = io.open(p1, 'w')
     assert(err == nil, err)
     path = p1
   end
-  if not path then
-    return
-  end
+  if not path then return end
   local ok, err = pcall(vim.cmd.edit, path)
-  if not ok then
-    vim.notify(err, "error", { title = "Exrc Opener" })
-  end
+  if not ok then vim.notify(err, 'error', { title = 'Exrc Opener' }) end
 end)
 
-command("ClearRegisters", function()
+command('ClearRegisters', function()
   local regs =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-"
-  for r in regs:gmatch(".") do
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/-'
+  for r in regs:gmatch('.') do
     fn.setreg(r, {})
   end
 end)
 
-nnoremap("<leader>Tc", "<Cmd>ClearRegisters<CR>", { desc = "clear registers" })
-nnoremap("<leader>Tr", "<Cmd>Reverse<CR>", { desc = "reverse buffer" })
-nnoremap("<C-t>", "<Cmd>Todo<CR>", { desc = "reverse buffer" })
+vim.keymap.set(
+  'n',
+  '<leader>Tc',
+  '<Cmd>ClearRegisters<CR>',
+  { desc = 'clear registers' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>Tr',
+  '<Cmd>Reverse<CR>',
+  { desc = 'reverse buffer' }
+)
+vim.keymap.set('n', '<C-t>', '<Cmd>Todo<CR>', { desc = 'reverse buffer' })
 
 -----------------------------------------------------------------------------//
 -- References
@@ -510,110 +460,106 @@ nnoremap("<C-t>", "<Cmd>Todo<CR>", { desc = "reverse buffer" })
 -- 1.) https://www.reddit.com/r/vim/comments/i2x8xc/i_want_gf_to_create_files_if_they_dont_exist/
 -- 2.) https://github.com/kristijanhusak/neovim-config/blob/5474d932386c3724d2ce02a5963528fe5d5e1015/nvim/lua/partials/mappings.lua#L154
 
-nnoremap("<leader>pp", "<Cmd>Lazy<CR>", { desc = "plugins" })
-nnoremap("<leader>pm", "<Cmd>Mason<CR>", { desc = "mason" })
-nnoremap("<leader>o", "<Cmd>:only<CR>", { desc = "this only buffer" })
+vim.keymap.set('n', '<leader>pp', '<Cmd>Lazy<CR>', { desc = 'Lazy lugins' })
+vim.keymap.set('n', '<leader>pm', '<Cmd>Mason<CR>', { desc = 'Mason util' })
+
+vim.keymap.set(
+  'n',
+  '<leader>o',
+  '<Cmd>:only<CR>',
+  { desc = 'this only buffer' }
+)
 
 -- closing buffers
-nnoremap("<leader>x", "<Cmd>:bd<CR>", { desc = "delete buffer" })
-nnoremap("<leader>X", "<Cmd>:bd!<CR>", { desc = "force delete buffer" })
-nnoremap("<leader>z", "<cmd>%bdelete<CR>", { desc = "Close All Buffers" })
-nnoremap("<leader>Z", "<cmd>%bdelete!<CR>", { desc = "Close All Buffers" })
-nnoremap("<leader>w", ":w<CR>", { desc = "Save" })
-nnoremap("<leader>q", ":q<CR>", { desc = "Quit" })
-nnoremap("<leader>W", "<cmd>w!<CR>", { desc = "Save" })
-nnoremap("<leader>Q", "<cmd>q!<CR>", { desc = "Quit" })
+vim.keymap.set('n', '<leader>x', '<Cmd>:bd<CR>', { desc = 'delete buffer' })
+vim.keymap.set(
+  'n',
+  '<leader>X',
+  '<Cmd>:bd!<CR>',
+  { desc = 'Force delete buffer' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>z',
+  '<cmd>%bdelete<CR>',
+  { desc = 'Close All Buffers' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>Z',
+  '<cmd>%bdelete!<CR>',
+  { desc = 'Force Close All Buffers' }
+)
+vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save' })
+vim.keymap.set('n', '<leader>q', ':q<CR>', { desc = 'Quit' })
+vim.keymap.set('n', '<leader>W', '<cmd>w!<CR>', { desc = 'Save (force)' })
+vim.keymap.set('n', '<leader>Q', '<cmd>q!<CR>', { desc = 'Quit (force)' })
 
 -- naviagate buffers
-vim.keymap.set("n", "<S-l>", ":bnext<CR>", opts)
-vim.keymap.set("n", "<S-h>", ":bprevious<CR>", opts)
-vim.keymap.set("n", "<Tab>", ":bnext<CR>", { desc = "Go to next buffer" })
+vim.keymap.set('n', '<S-l>', ':bnext<CR>', opts)
+vim.keymap.set('n', '<S-h>', ':bprevious<CR>', opts)
+vim.keymap.set('n', '<Tab>', ':bnext<CR>', { desc = 'Go to next buffer' })
 vim.keymap.set(
-  "n",
-  "<S-Tab>",
-  ":bprevious<CR>",
-  { desc = "Go to previous buffer" }
+  'n',
+  '<S-Tab>',
+  ':bprevious<CR>',
+  { desc = 'Go to previous buffer' }
 )
 
 -- creating splits
-nnoremap("<leader>|", "<cmd>vsp<CR>", { desc = "Create vertical split" })
-nnoremap("<leader>-", "<cmd>sp<CR>", { desc = "Create horizontal split" })
+vim.keymap.set(
+  'n',
+  '<leader>|',
+  '<cmd>vsp<CR>',
+  { desc = 'Create vertical split' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>-',
+  '<cmd>sp<CR>',
+  { desc = 'Create horizontal split' }
+)
 
 -- resizing
-nnoremap("<Up>", ":resize -2<CR>", { desc = "resize window up" })
-nnoremap("<Down>", ":resize +2<CR>", { desc = "resize window down" })
-nnoremap("<Left>", ":vertical resize -2<CR>", { desc = "resize window left" })
-nnoremap("<Right>", ":vertical resize +2<CR>", { desc = "resize window right" })
+vim.keymap.set(
+  'n',
+  '<Up>',
+  ':resize -2<CR>',
+  { silent = true, desc = 'resize window up' }
+)
+vim.keymap.set(
+  'n',
+  '<Down>',
+  ':resize +2<CR>',
+  { silent = true, desc = 'resize window down' }
+)
+vim.keymap.set(
+  'n',
+  '<Left>',
+  ':vertical resize -2<CR>',
+  { silent = true, desc = 'resize window left' }
+)
+vim.keymap.set(
+  'n',
+  '<Right>',
+  ':vertical resize +2<CR>',
+  { silent = true, desc = 'resize window right' }
+)
 
 -- toggle quickfix
--- nnoremap("<C-q>", ":call ToggleQFList()<CR>", { desc = "toggle quickfix list" })
+-- vim.keymap.set("n", "<C-q>", ":call ToggleQFList()<CR>", { desc = "toggle quickfix list" })
 
 -- Stay in indent mode
-xnoremap("<", "<gv", { desc = "indent left" })
-xnoremap(">", ">gv", { desc = "indent right" })
-xnoremap("p", '"_dP', { desc = "paste without overwriting clipboard" })
+vim.keymap.set('x', '<', '<gv', { desc = 'indent left' })
+vim.keymap.set('x', '>', '>gv', { desc = 'indent right' })
+vim.keymap.set(
+  'x',
+  'p',
+  '"_dP',
+  { desc = 'paste without overwriting clipboard' }
+)
 
 -- switching buffers
-vim.keymap.set(
-  "n",
-  "<leader>1",
-  "<cmd>BufferLineGoToBuffer 1<cr>",
-  { desc = "Go to buffer 1" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>2",
-  "<cmd>BufferLineGoToBuffer 2<cr>",
-  { desc = "Go to buffer 2" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>3",
-  "<cmd>BufferLineGoToBuffer 3<cr>",
-  { desc = "Go to buffer 3" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>4",
-  "<cmd>BufferLineGoToBuffer 4<cr>",
-  { desc = "Go to buffer 4" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>5",
-  "<cmd>BufferLineGoToBuffer 5<cr>",
-  { desc = "Go to buffer 5" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>6",
-  "<cmd>BufferLineGoToBuffer 6<cr>",
-  { desc = "Go to buffer 6" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>7",
-  "<cmd>BufferLineGoToBuffer 7<cr>",
-  { desc = "Go to buffer 7" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>8",
-  "<cmd>BufferLineGoToBuffer 8<cr>",
-  { desc = "Go to buffer 8" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>9",
-  "<cmd>BufferLineGoToBuffer 9<cr>",
-  { desc = "Go to buffer 9" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>0",
-  "<cmd>BufferLineGoToBuffer 10<cr>",
-  { desc = "Go to buffer 10" }
-)
 
 -- vim.keymap.set("n", "]q", ":cnext<CR>", { noremap = true, silent = true })
 -- vim.keymap.set("n", "[q", ":cprev<CR>", { noremap = true, silent = true })
@@ -732,39 +678,51 @@ vim.keymap.set(
 -- -- -- -- keymap("v", "<", "<gv", opts)
 -- -- -- -- keymap("v", ">", ">gv", opts)
 -- -- -- --
+-- Editingh utils {{{
+
+-- Capitalize word
+vim.keymap.set('n', 'U', 'gUiw`]', { desc = 'capitalize word' })
+
+-- make . work with visually selected lines
+vim.keymap.set('v', '.', ':norm.<CR>')
+
+-- }}}
 
 -- move blocks of lines
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
+vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 -- keymap("x", "<A-j>", ":move '>+1<CR>gv-gv", opts)
 -- keymap("x", "<A-k>", ":move '<-2<CR>gv-gv", opts)
 
--- join lines while keeping same position
-vim.keymap.set("n", "J", "mzJ`z")
+-- join and split lines while keeping same position
+vim.keymap.set('n', 'J', 'mzJ`z')
+vim.cmd([[
+nnoremap S :keeppatterns substitute/\s*\%#\s*/\r/e <bar> normal! ==<CR>
+]])
 
 -- move arround
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', 'n', 'nzzzv')
+vim.keymap.set('n', 'N', 'Nzzzv')
+vim.keymap.set('n', "'", '`')
 
 -- greatest remap ever
 -- vim.keymap.set("x", "<leader>P", [["_dP]])
-vim.keymap.set("v", "p", '"_dP')
 
 -- yank
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
-vim.keymap.set("n", "<leader>Y", [["+Y]])
+vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
+vim.keymap.set('n', '<leader>Y', [["+Y]])
 
-vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
+vim.keymap.set({ 'n', 'v' }, '<leader>d', [["_d]])
 
 -- -- -- vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 
 vim.keymap.set(
-  { "n" },
-  "<leader>lf",
-  "<cmd>Format<CR>",
-  { desc = "lsp-format current buffer" }
+  { 'n' },
+  '<leader>lf',
+  '<cmd>Format<CR>',
+  { desc = 'lsp-format current buffer' }
 )
 
 -- Arrow mappings [OLD] {{{
@@ -776,13 +734,76 @@ vim.keymap.set(
 --
 -- core.noremap({ "n" }, "<C-q>", ":call ToggleQFList()<CR>")
 --
--- -- Stay in indent mode
--- core.noremap({ "v" }, "<", "<gv")
--- core.noremap({ "v" }, ">", ">gv")
+-- Stay in indent mode - TESTED
+vim.keymap.set({ 'v' }, '<', '<gv')
+vim.keymap.set({ 'v' }, '>', '>gv')
+
+-- Paste in visual mode multiple times - TESTED
+vim.keymap.set('v', 'p', '"_dP')
+vim.keymap.set('x', 'p', 'pgvy')
 -- core.noremap({ "v" }, "p", '"_dP')
+--
+--
+-- Some new
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- vim:fdm=marker
+-- Diagnostic keymaps
+vim.keymap.set(
+  'n',
+  '[d',
+  vim.diagnostic.goto_prev,
+  { desc = 'Go to previous [D]iagnostic message' }
+)
+vim.keymap.set(
+  'n',
+  ']d',
+  vim.diagnostic.goto_next,
+  { desc = 'Go to next [D]iagnostic message' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>e',
+  vim.diagnostic.open_float,
+  { desc = 'Show diagnostic [E]rror messages' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>q',
+  vim.diagnostic.setloclist,
+  { desc = 'Open diagnostic [Q]uickfix list' }
+)
 
+-- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
+-- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
+-- is not what someone will guess without a bit more experience.
+--
+-- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
+-- or just use <C-\><C-n> to exit terminal mode
+vim.keymap.set(
+  't',
+  '<Esc><Esc>',
+  '<C-\\><C-n>',
+  { desc = 'Exit terminal mode' }
+)
+
+-- TIP: Disable arrow keys in normal mode
+-- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+-- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+-- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+-- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+
+-- Keybinds to make split navigation easier.
+--  Use CTRL+<hjkl> to switch between windows
+--
+--  See `:help wincmd` for a list of all window commands
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+-- Old maps and unused {{{
+-- search visual selection
+-- vim.keymap.set('v', '//', [[y/<C-R>"<CR>]])
 -- }}}
 
 -- vim: fdm=marker
