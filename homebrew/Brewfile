@@ -39,6 +39,7 @@ brew "tree"                       # show a tree
 brew "wget"                       # like curl
 brew "stow"                       # linking files and folders
 brew "exa"                        # like ls but better
+brew "otree"                      # explore json, yaml and toml
 
 # brew "mosh"                       # similar to ssh
 
