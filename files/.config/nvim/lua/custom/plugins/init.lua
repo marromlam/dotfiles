@@ -11,7 +11,7 @@ function mrl.augroup(name, ...)
   )
   local id = vim.api.nvim_create_augroup(name, { clear = true })
   for _, autocmd in ipairs(commands) do
-    -- validate_autocmd(name, autocmd)
+    --  validate_autocmd(name, autocmd)
     local is_callback = type(autocmd.command) == 'function'
     vim.api.nvim_create_autocmd(autocmd.event, {
       group = name,

@@ -745,7 +745,10 @@ vim.keymap.set('x', 'p', 'pgvy')
 --
 --
 -- Some new
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+vim.keymap.set('n', '<Esc>', function()
+  vim.cmd('nohlsearch')
+  vim.v.hlsearch = false
+end, { desc = 'clean hl' })
 
 -- Diagnostic keymaps
 vim.keymap.set(
