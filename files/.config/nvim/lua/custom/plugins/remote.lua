@@ -1,10 +1,10 @@
 return {
   {
-    "https://codeberg.org/esensar/nvim-dev-container",
-    dependencies = "nvim-treesitter/nvim-treesitter",
-    commit = "462c9c296d65577ee6f0a9f326f5cce9b937eddf",
+    'https://codeberg.org/esensar/nvim-dev-container',
+    dependencies = 'nvim-treesitter/nvim-treesitter',
+    commit = '462c9c296d65577ee6f0a9f326f5cce9b937eddf',
     opts = {},
-    cmd = "DevContainer",
+    cmd = 'DevContainer',
   },
   -- Tmux integraction {{{
   --
