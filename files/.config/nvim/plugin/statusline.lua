@@ -2,6 +2,7 @@
 
 if not mrl or not mrl.ui.statusline.enable then return end
 
+local gruvbox = require('gruvbox')
 -- }}}
 
 mrl.ui.statusline = {}
@@ -73,70 +74,13 @@ local function with_win_id(hl)
 end
 
 local stl_winhl = {
-  filename = { hl = with_win_id('StCustomFilename'), fallback = hls.title },
-  directory = { hl = with_win_id('StCustomDirectory'), fallback = hls.title },
-  parent = { hl = with_win_id('StCustomParentDirectory'), fallback = hls.title },
-  readonly = { hl = with_win_id('StCustomError'), fallback = hls.error },
-  env = { hl = with_win_id('StCustomEnv'), fallback = hls.env },
+  filename = { hl = with_win_id('StCustomFilename'), fallback = 'Search' },
+  -- filename = { hl = with_win_id('StCustomFilename') },
+  directory = { hl = with_win_id('StCustomDirectory') },
+  parent = { hl = with_win_id('StCustomParentDirectory') },
+  readonly = { hl = with_win_id('StCustomError') },
+  env = { hl = with_win_id('StCustomEnv') },
 }
-
-local function colors()
-  --- NOTE: Unicode characters including vim devicons should NOT be highlighted
-  --- as italic or bold, this is because the underlying bold font is not necessarily
-  --- patched with the nerd font characters
-  --- terminal emulators like kitty handle this by fetching nerd fonts elsewhere
-  --- but this is not universal across terminals so should be avoided
-
-  local indicator_color = P.bright_blue
-  local warning_fg = lsp.colors.warn
-
-  local error_color = lsp.colors.error
-  local info_color = lsp.colors.info
-  local normal_fg = highlight.get('Normal', 'fg')
-  local string_fg = highlight.get('String', 'fg')
-  local number_fg = highlight.get('Number', 'fg')
-  local normal_bg = highlight.get('Normal', 'bg')
-
-  local bg_color = highlight.tint(normal_bg, -0.25)
-
-    -- stylua: ignore
-    highlight.all({
-        { [hls.metadata] = { bg = bg_color, inherit = 'Comment' } },
-        { [hls.metadata_prefix] = { bg = bg_color, fg = { from = 'Comment' } } },
-        { [hls.indicator] = { bg = bg_color, fg = indicator_color } },
-        { [hls.modified] = { fg = string_fg, bg = bg_color } },
-        { [hls.git] = { fg = P.light_gray, bg = bg_color } },
-        { [hls.green] = { fg = string_fg, bg = bg_color } },
-        { [hls.blue] = { fg = P.dark_blue, bg = bg_color, bold = true } },
-        { [hls.number] = { fg = number_fg, bg = bg_color } },
-        { [hls.count] = { fg = 'bg', bg = indicator_color, bold = true } },
-        { [hls.client] = { bg = bg_color, fg = normal_fg, bold = true } },
-        { [hls.env] = { bg = bg_color, fg = error_color, italic = true, bold = true } },
-        { [hls.directory] = { bg = bg_color, fg = 'Gray', italic = true } },
-        { [hls.directory_inactive] = { bg = bg_color, italic = true, fg = { from = 'Normal', alter = 0.4 } } },
-        { [hls.parent_directory] = { bg = bg_color, fg = string_fg, bold = true } },
-        { [hls.title] = { bg = bg_color, fg = 'LightGray', bold = true } },
-        { [hls.comment] = { bg = bg_color, inherit = 'Comment' } },
-        { [hls.statusline] = { bg = bg_color } },
-        { [hls.statusline_nc] = { link = 'VertSplit' } },
-        { [hls.info] = { fg = info_color, bg = bg_color, bold = true } },
-        { [hls.warn] = { fg = warning_fg, bg = bg_color } },
-        { [hls.error] = { fg = error_color, bg = bg_color } },
-        { [hls.filename] = { bg = bg_color, fg = 'LightGray', bold = true } },
-        { [hls.filename_inactive] = { inherit = 'Comment', bg = bg_color, bold = true } },
-        { [hls.mode_normal] = { bg = bg_color, fg = P.light_gray, bold = true } },
-        { [hls.mode_insert] = { bg = bg_color, fg = P.dark_blue, bold = true } },
-        { [hls.mode_visual] = { bg = bg_color, fg = P.magenta, bold = true } },
-        { [hls.mode_replace] = { bg = bg_color, fg = P.dark_red, bold = true } },
-        { [hls.mode_command] = { bg = bg_color, fg = P.light_yellow, bold = true } },
-        { [hls.mode_select] = { bg = bg_color, fg = P.teal, bold = true } },
-        { [hls.hydra_red] = { inherit = 'HydraRed', reverse = true } },
-        { [hls.hydra_blue] = { inherit = 'HydraBlue', reverse = true } },
-        { [hls.hydra_amaranth] = { inherit = 'HydraAmaranth', reverse = true } },
-        { [hls.hydra_teal] = { inherit = 'HydraTeal', reverse = true } },
-        { [hls.hydra_pink] = { inherit = 'HydraPink', reverse = true } },
-    })
-end
 
 local identifiers = {
   buftypes = {
@@ -207,8 +151,6 @@ local identifiers = {
   }),
 }
 
-local function get_ft_icon_hl_name(hl) return hl .. hls.statusline end
-
 --- @param buf number
 --- @param opts { default: boolean }
 --- @return string, string?
@@ -260,7 +202,7 @@ local set_filetype_icon_highlights, reset_filetype_icon_highlights = (function()
     for _, data in pairs(hl_cache) do
       highlight.set(
         data.name,
-        { fg = data.hl, bg = mrl.get_hi('StatusLine').fg }
+        { fg = data.hl, bg = mrl.get_hi('Statusline').fg }
       )
     end
   end
@@ -364,23 +306,21 @@ end
 ---@param ctx StatuslineContext
 ---@param minimal boolean
 ---@return {file: ComponentOpts, parent: ComponentOpts, dir: ComponentOpts, env: ComponentOpts}
+---
 local function stl_file(ctx, minimal)
   -- highlight the filename components separately
-  local filename_hl = ctx.winhl and stl_winhl.filename.hl(ctx.win)
-    or (minimal and hls.filename_inactive or 'StatuslineFilename')
+  local filename_hl = 'StatuslineFilename'
 
-  local directory_hl = ctx.winhl and stl_winhl.directory.hl(ctx.win)
-    or (minimal and hls.directory_inactive or 'StatuslineDirectory')
+  local directory_hl = 'StatuslineDirectory'
   -- parent_directory
-  local parent_hl = ctx.winhl and stl_winhl.parent.hl(ctx.win)
-    or (minimal and directory_hl or 'StatuslineParentDirectory')
+  local parent_hl = 'StatuslineParentDirectory'
 
-  local env_hl = ctx.winhl and stl_winhl.env.hl(ctx.win)
-    or (minimal and directory_hl or 'StatuslineEnv')
+  local env_hl = 'StatuslineEnv'
 
   local ft_icon, icon_highlight = filetype(ctx)
-  local ft_hl = icon_highlight and get_ft_icon_hl_name(icon_highlight)
-    or hls.comment
+  -- local ft_hl = icon_highlight and get_ft_icon_hl_name(icon_highlight)
+  --   or hls.comment
+  local ft_hl = 'StatuslineRed'
 
   local file_opts = { {}, before = '', after = ' ', priority = 0 }
   local parent_opts = { {}, before = '', after = '', priority = 2 }
@@ -440,6 +380,7 @@ local function search_count()
   local ok, result = pcall(fn.searchcount, { recompute = 0 })
   if not ok then return '' end
   if vim.tbl_isempty(result) then return '' end
+  -- if result.current == 0 then return '' end
   if result.incomplete == 1 then -- timed out
     return ' ?/?? '
   elseif result.incomplete == 2 then -- max count exceeded
@@ -471,9 +412,7 @@ local function stl_lsp_clients(ctx)
   if not state.lsp_clients_visible then
     return { { name = fmt('%d attached', #clients), priority = 7 } }
   end
-  if falsy(clients) then
-    return { { name = 'No LSP clients available', priority = 7 } }
-  end
+  if falsy(clients) then return { { name = 'No LSP', priority = 7 } } end
   table.sort(clients, function(a, b)
     if a.name == 'null-ls' then return false end
     if b.name == 'null-ls' then return true end
@@ -616,7 +555,7 @@ function mrl.ui.statusline.render()
   -- Fist character {{{
   local l1 = section:new({
     -- { { icons.misc.block, hls.indicator } },
-    { { '', 'StatusLine' } },
+    { { '', 'Statusline' } },
     cond = not plain,
     before = '',
     after = '',
@@ -627,8 +566,7 @@ function mrl.ui.statusline.render()
   -- Filename {{{
   ----------------------------------------------------------------------------//
   local path = stl_file(ctx, plain)
-  local readonly_hl = ctx.winhl and stl_winhl.readonly.hl(ctx.win)
-    or stl_winhl.readonly.fallback
+  local readonly_hl = 'StCustomError'
   local readonly_component =
     { { { is_readonly(ctx), readonly_hl } }, priority = 1 }
   ----------------------------------------------------------------------------//
@@ -690,11 +628,12 @@ function mrl.ui.statusline.render()
   table.insert(lsp_clients[1][1], 1, { '  ', hls.metadata })
   lsp_clients[1].id = LSP_COMPONENT_ID -- the unique id of the component
   lsp_clients[1].click = 'v:lua.mrl.ui.statusline.lsp_client_click'
+
   -----------------------------------------------------------------------------//
   -- Left section
   -----------------------------------------------------------------------------//
   local l2 = section:new(
-    { { { file_modified, hls.modified } }, cond = ctx.modified, priority = 1 },
+    { { { file_modified, 'Statusline' } }, cond = ctx.modified, priority = 1 },
     --
     readonly_component,
     --
@@ -757,6 +696,9 @@ function mrl.ui.statusline.render()
   -- Right section
   -----------------------------------------------------------------------------//
   local r1 = section:new(
+    -----------------------------------------------------------------------------//
+    -- updates {{{
+    -----------------------------------------------------------------------------//
     {
       {
         { 'updates:', hls.comment },
@@ -766,10 +708,14 @@ function mrl.ui.statusline.render()
       priority = 3,
       cond = has_pending_updates,
     },
+    -- }}}
+    -----------------------------------------------------------------------------
     -----------------------------------------------------------------------------//
-    -- LSP Clients
+    -- LSP Clients {{{
     -----------------------------------------------------------------------------//
     unpack(lsp_clients)
+    -- }}}
+    -----------------------------------------------------------------------------
   )
   local r2 = section:new(
     {
@@ -777,28 +723,32 @@ function mrl.ui.statusline.render()
       priority = 4,
       cond = debugger(),
     },
-    -----------------------------------------------------------------------------//
-    --  Git status
-    -----------------------------------------------------------------------------//
+    -----------------------------------------------------------------------------
+    --  Git status {{{
+    -----------------------------------------------------------------------------
     {
       {
-        { icons.git.branch, 'StatuslineBranch' },
-        { space },
-        { status.head, hls.blue },
+        { icons.git.branch, 'StBranch' },
+        { space, 'StBranch' },
+        { status.head, 'StBranch' },
       },
       priority = 1,
       cond = not falsy(status.head),
     },
     {
-      { { icons.git.mod, hls.warn }, { space }, { status.changed, hls.title } },
+      {
+        { icons.git.mod, 'StatuslineGitSignsAdd' },
+        { space, 'StatuslineGitSignsAdd' },
+        { status.changed, 'StatuslineGitSignsAdd' },
+      },
       priority = 3,
       cond = not falsy(status.changed),
     },
     {
       {
         { icons.git.remove, 'StatuslineGitSignsRemove' },
-        { space },
-        { status.removed, hls.title },
+        { space, 'StatuslineGitSignsRemove' },
+        { status.removed, 'StatuslineGitSignsRemove' },
       },
       priority = 3,
       cond = not falsy(status.removed),
@@ -824,6 +774,9 @@ function mrl.ui.statusline.render()
       cond = behind,
       priority = 5,
     },
+    -- }}}
+    ----------------------------------------------------------------------------------------------
+    ---
     -- Current line number/total line number
     {
       {
