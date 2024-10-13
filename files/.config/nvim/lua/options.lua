@@ -14,9 +14,9 @@ vim.opt.shortmess = {
 -- }}}
 
 -- Timings {{{
-vim.opt.updatetime = 200
+vim.opt.updatetime = 500
 vim.opt.timeout = true
-vim.opt.timeoutlen = 200
+vim.opt.timeoutlen = 500
 -- }}}
 
 -- Window splitting and buffers {{{
@@ -26,7 +26,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.eadirection = 'hor'
 -- exclude usetab pde we do not want to jump to buffers in already open tabs
--- do not use split or vsplit to ensure we don't open any new windows
+--- do not use split or vsplit to ensure we don't open any new windows
 vim.opt.switchbuf = 'useopen,uselast'
 vim.opt.fillchars = {
   eob = ' ', -- suppress ~ at EndOfBuffer
@@ -40,6 +40,7 @@ vim.opt.fillchars = {
 
 vim.opt.nu = true
 vim.opt.relativenumber = true
+
 -- }}}
 
 -- Diff {{{
@@ -59,6 +60,7 @@ vim.opt.diffopt = vim.opt.diffopt
 -- }}}
 
 -- Format Options {{{
+
 vim.opt.formatoptions = {
   ['1'] = true,
   ['2'] = true, -- Use indent from 2nd line of a paragraph
@@ -75,6 +77,8 @@ vim.opt.formatoptions = {
   v = true,
 }
 
+-- }}}
+
 -- Folds {{{
 -- unfortunately folding in (n)vim is a mess, if you set the fold level to start
 -- at X then it will auto fold anything at that level, all good so far. If you then
@@ -82,8 +86,6 @@ vim.opt.formatoptions = {
 -- recompute the fold which when using nvim-ufo means it will be closed again...
 
 vim.opt.foldlevelstart = 999
-
--- }}}
 
 -- Grepprg
 vim.opt.grepprg = [[rg --glob "!.git" --no-heading --vimgrep --follow $*]]
@@ -149,7 +151,7 @@ vim.opt.cursorlineopt = { 'both' }
 -- vim.opt.cursorline = true
 
 -- Title
-vim.opt.titleold = vim.fn.fnamemodify(vim.loop.os_getenv('SHELL'), ':t')
+-- vim.opt.titleold = vim.fn.fnamemodify(vim.loop.os_getenv('SHELL'), ':t')
 vim.opt.title = true
 vim.opt.titlelen = 70
 
@@ -185,12 +187,20 @@ vim.opt.scrolloff = 9
 vim.opt.sidescrolloff = 10
 vim.opt.sidescroll = 1
 -----------------------------------------------------------------------------//
--- Spelling {{{1
------------------------------------------------------------------------------//
+
+-- }}}
+
+-------------------------------------------------------------------------------
+-- Spelling {{{
+-------------------------------------------------------------------------------
+
 vim.opt.spellsuggest:prepend({ 12 })
 vim.opt.spelloptions:append({ 'camel', 'noplainbuffer' })
 vim.opt.spellcapcheck = '' -- don't check for capital letters at start of sentence
------------------------------------------------------------------------------//
+
+-- }}}
+-------------------------------------------------------------------------------
+
 -- Mouse {{{1
 -----------------------------------------------------------------------------//
 vim.opt.mouse = 'a'
