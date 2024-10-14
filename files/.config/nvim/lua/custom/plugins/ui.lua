@@ -15,13 +15,11 @@ return {
 
   {
     'Bekaboo/dropbar.nvim',
-    event = 'VeryLazy',
+    event = { 'BufReadPre', 'BufNewFile' },
     keys = {
       {
         '<leader>wp',
-        function()
-          require('dropbar.api').pick()
-        end,
+        function() require('dropbar.api').pick() end,
         desc = 'winbar: pick',
       },
     },
@@ -61,9 +59,7 @@ return {
         end
 
         if symbol.definition then
-          if #res > 0 then
-            table.insert(res, { ' ', 'NonText' })
-          end
+          if #res > 0 then table.insert(res, { ' ', 'NonText' }) end
           ins(res, round_start)
           ins(res, { '󰳽 ', 'SymbolUsageDef' })
           ins(res, { symbol.definition .. ' defs', 'SymbolUsageContent' })
@@ -71,9 +67,7 @@ return {
         end
 
         if symbol.implementation then
-          if #res > 0 then
-            table.insert(res, { ' ', 'NonText' })
-          end
+          if #res > 0 then table.insert(res, { ' ', 'NonText' }) end
           ins(res, round_start)
           ins(res, { '󰡱 ', 'SymbolUsageImpl' })
           ins(res, { symbol.implementation .. ' impls', 'SymbolUsageContent' })
@@ -121,8 +115,6 @@ return {
   {
     'goolord/alpha-nvim',
     event = 'VimEnter',
-    config = function()
-      require('custom.config.alpha').config()
-    end,
+    config = function() require('custom.config.alpha').config() end,
   },
 }

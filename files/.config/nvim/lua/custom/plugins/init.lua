@@ -28,7 +28,17 @@ function mrl.augroup(name, ...)
 end
 
 return {
-
+  {
+    'jghauser/fold-cycle.nvim',
+    opts = {},
+    keys = {
+      {
+        '<BS>',
+        function() require('fold-cycle').open() end,
+        desc = 'fold-cycle: toggle',
+      },
+    },
+  },
   -- {
   --   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   --   event = { 'BufNewFile', 'BufReadPre' },

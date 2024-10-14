@@ -35,7 +35,8 @@ require('lazy').setup({
   },
   install = {
     missing = true,
-    colorscheme = { 'gruvbox' },
+    -- colorscheme = { 'gruvbox' },
+    colorscheme = { 'horizon' },
   },
   browser = 'brave',
   diff = {
