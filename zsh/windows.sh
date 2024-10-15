@@ -33,9 +33,10 @@ get-vcxsrv-display() {
 	# Create .vcxsrv-display file
 	rm -rf $HOME/.vcxsrv
 	echo "${IP4_ADDRESS}" >$HOME/.vcxsrv
-	dos2unix $HOME/.vcxsrv >/dev/null 2>&1
-	sed -i 's/:0//g' ~/.vcxsrv
-	echo "$(cat $HOME/.vcxsrv):0" >$HOME/.vcxsrv
+	dos2unix $HOME/.vcxsrv &>/dev/null
+	sed -i 's/$/:0/g' ~/.vcxsrv
+	# echo ":0" >>$HOME/.vcxsrv
+	dos2unix $HOME/.vcxsrv &>/dev/null
 }
 
 sync-windows-config() {
