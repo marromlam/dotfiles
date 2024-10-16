@@ -6,6 +6,7 @@ return {
     disable = false,
     ft = { 'markdown', 'rst' },
   },
+  { '3rd/image.nvim', ft = { 'markdown', 'neorg', 'org' }, opts = {} },
 
   -- syntax highlighting for log files
   {

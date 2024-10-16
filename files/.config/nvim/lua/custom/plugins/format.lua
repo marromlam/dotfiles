@@ -7,7 +7,7 @@ return {
       {
         '<leader>lf',
         function()
-          require('conform').format { async = true, lsp_fallback = true }
+          require('conform').format({ async = true, lsp_fallback = true })
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -39,7 +39,7 @@ return {
         graphql = { 'prettier' },
         liquid = { 'prettier' },
         lua = { 'stylua' },
-        python = { 'isort', 'black', 'mypy' },
+        python = { 'isort', 'black' },
         xml = { 'xmlformat' },
       },
     },
