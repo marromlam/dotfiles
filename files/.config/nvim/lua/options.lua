@@ -11,6 +11,7 @@ vim.opt.shortmess = {
   c = true,
   W = true, -- Don't show [w] or written when writing
 }
+vim.o.background = 'dark' -- or "light"
 -- }}}
 
 -- Timings {{{

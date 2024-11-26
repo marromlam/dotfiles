@@ -35,8 +35,8 @@ require('lazy').setup({
   },
   install = {
     missing = true,
-    -- colorscheme = { 'gruvbox' },
-    colorscheme = { 'horizon' },
+    colorscheme = { 'gruvbox' },
+    -- colorscheme = { 'horizon' },
   },
   browser = 'brave',
   diff = {
@@ -73,7 +73,7 @@ require('lazy').setup({
   },
 
   ui = {
-    border = 'solid',
+    border = 'rounded',
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
     icons = {

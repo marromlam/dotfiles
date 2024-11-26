@@ -29,14 +29,14 @@ function M.config()
   end
 
   local color_list = {
-    '#1C506B',
-    '#1D5D68',
-    '#1E6965',
-    '#1F7562',
-    '#21825F',
-    '#ff8E5C',
-    '#239B59',
-    '#24A755',
+    '#333333',
+    '#323232',
+    '#333333',
+    '#333333',
+    '#333333',
+    '#333333',
+    '#333333',
+    '#222222',
   }
   -- loop over the color list and set the colors
   for i, color in ipairs(color_list) do
@@ -108,9 +108,9 @@ function M.config()
   ---@return table
 
   dashboard.section.buttons.val = {
-    button('Type', 'p', ' Pick a session', '<Cmd>ListSessions<CR>'),
+    button('Title', 'p', '  Pick a session', '<Cmd>ListSessions<CR>'),
     button('Title', 'f', '  Find file', ':Telescope find_files<CR>'),
-    button('ErrorMsg', 'q', '  Quit NVIM', ':qa<CR>'),
+    button('Title', 'q', '  Quit', ':qa<CR>'),
   }
 
   dashboard.section.footer.val = require 'alpha.fortune'

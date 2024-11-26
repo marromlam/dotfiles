@@ -86,6 +86,7 @@ mrl.ui.icons = {
     history = '󰄉',
     comment = '󰅺',
     robot = '󰚩',
+    copilot= '',
     lightbulb = '󰌵',
     search = '󰍉',
     code = '',
