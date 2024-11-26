@@ -15,6 +15,9 @@ return {
         lua = { 'string' }, -- don't add pairs in lua string treesitter nodes
         javascript = { 'template_string' }, -- don't add pairs in javscript template_string treesitter nodes
         java = false, -- don't check treesitter on java
+        fast_wrap = { map = '<c-e>' },
+        disable_filetype = { 'neo-tree-popup' },
+        close_triple_quotes = true,
       },
     }
 

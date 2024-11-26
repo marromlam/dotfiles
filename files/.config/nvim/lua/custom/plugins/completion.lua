@@ -41,6 +41,8 @@ return {
       'onsails/lspkind.nvim', -- vs-code like pictograms
       -- { 'hrsh7th/cmp-emoji' },
       -- {'petertriho/cmp-git'},
+      { 'petertriho/cmp-git', opts = { filetypes = { 'gitcommit', 'NeogitCommitMessage' } } },
+      { 'abecodes/tabout.nvim', opts = { ignore_beginning = false, completion = false } },
     },
     config = function()
       -- See `:help cmp`

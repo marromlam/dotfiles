@@ -6,7 +6,7 @@ return {
     disable = false,
     ft = { 'markdown', 'rst' },
   },
-  { '3rd/image.nvim', ft = { 'markdown', 'neorg', 'org' }, opts = {} },
+  -- { '3rd/image.nvim', ft = { 'markdown', 'neorg', 'org' }, opts = {} },
 
   -- syntax highlighting for log files
   {
@@ -55,6 +55,13 @@ return {
   {
     'chrisbra/csv.vim',
     ft = 'csv',
+  },
+
+  {
+    'lifepillar/pgsql.vim',
+    lazy = true,
+    disable = true,
+    cond = false
   },
 }
 
