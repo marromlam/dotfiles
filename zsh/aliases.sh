@@ -37,6 +37,13 @@ alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
 
+
+# funny aliases
+alias :q='exit'
+alias :w='echo "not in vim :)"'
+alias cal='cal -m'
+alias curl='curl -sJL#'
+
 # This allow using neovim remote when nvim is called from inside a running vim instance
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
 	alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'

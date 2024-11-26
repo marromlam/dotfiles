@@ -16,6 +16,7 @@ export TEXINPUTS=".:~/beamer-compostela:"
 # System paths
 SYS_PATHS=(
 	"$HOME/.dotfiles/scripts" # Personal scripts
+	"$HOME/.local/share/nvim/mason/bin"  # nvim mason binaries
 	"$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin"
 	"$HOMEBREW_PREFIX/sbin" # Brew scripts
 	"$HOMEBREW_PREFIX/bin"  # Brew scripts
