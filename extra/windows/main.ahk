@@ -120,5 +120,7 @@ F12::SendInput {Volume_Up}
 #include desktop_manager.ahk
 #include general.ahk
 #include vcxsrv.ahk
+#include wterminal.ahk
 #include native.ahk
+;#include move_windows.ahk
 ;#include synergy.ahk

@@ -2,7 +2,6 @@
 
 if not mrl or not mrl.ui.statusline.enable then return end
 
-local gruvbox = require('gruvbox')
 -- }}}
 
 mrl.ui.statusline = {}

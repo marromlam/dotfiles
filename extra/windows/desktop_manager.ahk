@@ -86,16 +86,70 @@ RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
 
 ; switch to desktop 1-9 {{{
 
-#1::GoToDesktopNumber(0)
+OpenExplorer() {
+    SetTitleMatchMode 2
+    if (!WinExist("ahk_class CabinetWClass")) {
+        Run explorer.exe
+    }
+    WinActivate, CabinetWClass
+    ; WinGetPos, X, Y, Width, Height, ahk_class CabinetWClass
+    Sleep 300
+    WinMove, A,, 100, 100, 650, 698
+    ; WinMove, A, , %X%, %Y%, %Width%, %Height%
+    GoToDesktopNumber(0)
+}
+
+OpenFirefox() {
+    SetTitleMatchMode 2
+    if (!WinExist("ahk_class MozillaWindowClass")) {
+        Run firefox.exe
+    }
+    WinActivate, MozillaWindowClass
+    WinGetPos, X, Y, Width, Height, ahk_class MozillaWindowClass
+    Sleep 300
+    ; WinMove, A,, 0, 0, 650, 698
+    WinMove, A, , %X%, %Y%, %Width%, %Height%
+    GoToDesktopNumber(2)
+}
+
+OpenTeams() {
+    SetTitleMatchMode 2
+    if (!WinExist("ahk_class TeamsWebView")) {
+            Run ms-teams.exe
+    }
+    WinActivate, TeamsWebView
+    WinGetPos, X, Y, Width, Height, ahk_class TeamsWebView
+    Sleep 300
+    ; WinMove, A,, 0, 0, 650, 698
+    WinMove, A, , %X%, %Y%, %Width%, %Height%
+    GoToDesktopNumber(3)
+}
+
+OpenOutlook() {
+    SetTitleMatchMode 2
+    if (!WinExist("ahk_exe olk.exe")) {
+            Run olk.exe
+    }
+    WinActivate, olk.exe 
+    ; WinGetPos, X, Y, Width, Height, ahk_exe olk.exe
+    Sleep 300
+    WinMove, A,, 0, 0, 650, 698
+    ; WinMove, A, , %X%, %Y%, %Width%, %Height%
+    WinMaximize, A
+    GoToDesktopNumber(9)
+}
+
+
+#1::OpenExplorer()
 #2::GoToDesktopNumber(1)
-#3::GoToDesktopNumber(2)
-#4::GoToDesktopNumber(3)
+#3::OpenFirefox()
+#4::OpenTeams()
 #5::GoToDesktopNumber(4)
 #6::GoToDesktopNumber(5)
 #7::GoToDesktopNumber(6)
 #8::GoToDesktopNumber(7)
 #9::GoToDesktopNumber(8)
-#0::GoToDesktopNumber(9)
+#0::OpenOutlook()
 
 ; }}}
 
