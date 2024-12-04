@@ -1,0 +1,12 @@
+#!/bin/bash
+# NUMFMT="󰎡󰎤󰎧󰎪󰎭󰎱󰎳󰎶󰎹󰎼"
+
+NUMFMT="🄌➊➋➌➍➎➏➐➑➒➓"
+# NUMFMT="🄌❶➋➌➍➎➏➐➑➒➓"
+# NUMFMT="0123456789"
+# NUMFMT="❶➋➌➍➎➏➐➑➒➓"
+# set-window-option -g windocc-status-style "italics"
+# instead of #I, use the formatted format_number,
+# format_number(#I, format_fsquare)
+ID=$1
+echo "${NUMFMT:$ID:1}"
