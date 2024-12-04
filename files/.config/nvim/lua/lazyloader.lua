@@ -37,6 +37,7 @@ require('lazy').setup({
     missing = true,
     colorscheme = { 'gruvbox' },
     -- colorscheme = { 'horizon' },
+    -- colorscheme = { 'rose-pine' },
   },
   browser = 'brave',
   diff = {

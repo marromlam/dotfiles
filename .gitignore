@@ -137,3 +137,9 @@ test.sh
 
 spell/
 lazy-lock.json
+
+
+files/.config/chromium/
+files/.config/google-chrome-for-testing/
+files/.config/google-chrome/
+files/.config/libreoffice/
