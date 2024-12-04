@@ -234,5 +234,25 @@ select_partition() {
 }
 
 # }}}
+#
+#
+
+
+# Docker {{{
+
+dcu(){
+    docker-service
+    docker compose up -d
+}
+
+dcd(){
+    docker compose down
+}
+
+# }}}
+
+
+
+
 
 # vim:foldmethod=marker et
