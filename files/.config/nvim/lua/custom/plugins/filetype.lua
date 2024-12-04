@@ -15,6 +15,11 @@ return {
     ft = 'log',
   },
 
+  {
+    'raivivek/vim-snakemake',
+    lazy=false,
+  },
+
   -- syntax highlighting for kitty conf file
   {
     'fladson/vim-kitty',
