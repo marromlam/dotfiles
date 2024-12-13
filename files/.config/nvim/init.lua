@@ -59,7 +59,7 @@ require('tools')
 -- require('autocommands')
 require('custom.globals')
 require('options')
--- require('highlight')
+require('highlight')
 require('custom.ui')
 require('custom.strings')
 require('lazyloader')
@@ -82,7 +82,7 @@ vim.keymap.set(
 --------------------------------------------------------------------------------
 
 vim.o.background = 'dark' -- or "light"
--- vim.cmd([[colorscheme gruvbox]])
+vim.cmd([[colorscheme gruvbox]])
 -- vim.cmd([[colorscheme horizon]])
 -- vim.cmd([[colorscheme rose-pine]])
 -- vim.cmd([[colorscheme github_dark]])

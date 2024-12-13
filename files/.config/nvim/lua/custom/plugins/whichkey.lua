@@ -1,23 +1,51 @@
-return { -- Useful plugin to show you pending keybinds.
+return {
   'folke/which-key.nvim',
-  -- event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-  -- keys = { '<Esc>' },
-  config = function() -- This is the function that runs, AFTER loading
-    require('which-key').setup()
-
-    -- Document existing key chains
-    require('which-key').register({
-      ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-      ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-      ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-      ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-      ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-      ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-      ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+  event = 'VeryLazy',
+  cond = false,
+  disable = true,
+  tag = 'v3.9.0',
+  config = function()
+    local wk = require('which-key')
+    wk.setup({
+      -- plugins = { spelling = { enabled = true } },
+      window = { border = mrl.ui.current.border },
+      layout = { align = 'center' },
     })
-    -- visual mode
-    require('which-key').register({
-      ['<leader>h'] = { 'Git [H]unk' },
-    }, { mode = 'v' })
+
+    -- wk.add({
+    --   [']'] = { name = '+next' },
+    --   ['['] = { name = '+prev' },
+    --   g = {
+    --     c = { name = '+comment' },
+    --     b = { name = '+bufferline' },
+    --   },
+    --   ['<leader>'] = {
+    --     a = { name = '+projectionist' },
+    --     c = { name = '+code-action' },
+    --     f = { name = '+picker' },
+    --     h = { name = '+git-action' },
+    --     n = { name = '+new' },
+    --     j = { name = '+jump' },
+    --     p = { name = '+packages' },
+    --     q = { name = '+quit' },
+    --     l = { name = '+list' },
+    --     i = { name = '+iswap' },
+    --     e = { name = '+edit' },
+    --     r = { name = '+lsp-refactor' },
+    --     o = { name = '+only' },
+    --     t = { name = '+tab' },
+    --     s = { name = '+source/swap' },
+    --     y = { name = '+yank' },
+    --     O = { name = '+options' },
+    --   },
+    --   ['<localleader>'] = {
+    --     name = 'local leader',
+    --     d = { name = '+dap' },
+    --     g = { name = '+git' },
+    --     o = { name = '+neorg' },
+    --     t = { name = '+neotest' },
+    --     w = { name = '+window' },
+    --   },
+    -- })
   end,
 }

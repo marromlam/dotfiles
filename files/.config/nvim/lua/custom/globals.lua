@@ -360,16 +360,17 @@ function mrl.p_table(map)
   })
 end
 
-------------------------------------------------------------------------------------------------------------------------
---  Lazy Requires
-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+--  Lazy Requires {{{
+-------------------------------------------------------------------------------
+-- This code comes from TJ the Great:
 --- source: https://github.com/tjdevries/lazy-require.nvim
 
 --- Require on index.
 ---
 --- Will only require the module after the first index of a module.
 --- Only works for modules that export a table.
-function mrl.reqidx(require_path)
+function mrl.require_for_later_index(require_path)
   return setmetatable({}, {
     __index = function(_, key) return require(require_path)[key] end,
     __newindex = function(_, key, value) require(require_path)[key] = value end,
@@ -393,10 +394,15 @@ end
 --- ```
 ---@param require_path string
 ---@return table<string, fun(...): any>
-function mrl.reqcall(require_path)
+function mrl.require_for_later_call(require_path)
   return setmetatable({}, {
     __index = function(_, k)
       return function(...) return require(require_path)[k](...) end
     end,
   })
 end
+
+-- }}}
+-------------------------------------------------------------------------------
+
+-- vim: fdm=marker

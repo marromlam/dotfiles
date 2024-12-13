@@ -1,6 +1,4 @@
 # zsh shell config file
-#
-#
 
 
 # Eval Homebrew {{{
@@ -38,8 +36,8 @@ export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 # }}}
 
 # source basuc functions
-source $HOME/.dotfiles/zsh/ufunctions.sh
-source $HOME/.dotfiles/zsh/zshenv
+source $HOME/.config/zsh/ufunctions.sh
+source $HOME/.config/zsh/zshenv
 
 
 # get current environment name {{{
@@ -89,7 +87,8 @@ compinit
 # These should be source *BEFORE* setting up hooks
 
 # zsh suggestions
-source $HOME/.dotfiles/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.config/zsh/plugins/alias-tips/alias-tips.plugin.zsh
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=241'
 # ZSH_AUTOSUGGEST_USE_ASYNC=1
 CASE_SENSITIVE="false"
@@ -101,7 +100,7 @@ zstyle ':completion:*:default' list-colors "${(s.:.)ls_colors}"
 zstyle ':completion:*' menu yes select
 
 # syntax highlighting
-source $HOME/.dotfiles/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ## 
 ## # source $HOMEBREW_PREFIX/share/zsh-completions/zsh-completions.zsh
 ## 
@@ -188,12 +187,12 @@ setopt AUTOPARAMSLASH # tab completing directory appends a slash
 
 case `uname` in
   Darwin)
-    source "$HOME/.dotfiles/zsh/macos.sh"
-    source "$HOME/.dotfiles/zsh/prompt.sh"
+    source "$HOME/.config/zsh/macos.sh"
+    source "$HOME/.config/zsh/prompt.sh"
     ;;
   Linux)
-    source "$HOME/.dotfiles/zsh/linux.sh"
-    source "$HOME/.dotfiles/zsh/prompt.sh"
+    source "$HOME/.config/zsh/linux.sh"
+    source "$HOME/.config/zsh/prompt.sh"
     [[ ! -f /etc/resolv.conf ]] && echo nameserver 8.8.8.8 | sudo tee /etc/resolv.conf
     # source "$HOME/.dotfiles/zsh/prompt-basic.sh"
     # source "$HOME/.dotfiles/zsh/prompt2.sh"
@@ -211,20 +210,40 @@ fi
 
 # fuzzy finder configuration {{{
 
-# export FZF_DEFAULT_OPTS='--height 40% --border --preview="cat {}" --preview-window=right:60%:wrap'
+export FZF_DEFAULT_OPTS='
+--bind ctrl-a:select-all,ctrl-d:deselect-all,tab:toggle+down,shift-tab:toggle+up
+--height 50%
+'
+# --color header:italic
+# --pointer '❯'
+# '
 
-#export FZF_PREVIEW_COMMAND='bat {}'
-#export FZF_DEFAULT_OPTS="
-#  --color=dark
-#  --color=fg:-1,bg:-1,hl:#5fff87,fg+:-1,bg+:-1,hl+:#ffaf5f
-#  --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
-#  --bind ctrl-a:select-all,ctrl-d:deselect-all,tab:toggle+up,shift-tab:toggle+down
-#"
-# Fzf completions
-#source "/usr/local/opt/fzf/shell/completion.bash"
-#source "/usr/local/opt/fzf/shell/key-bindings.bash"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --color=fg:-1,fg+:3,bg:-1,bg+:0
+  --color=hl:5,hl+:5,info:4,marker:6
+  --color=prompt:4,spinner:6,pointer:3,header:1
+  --color=gutter:-1,border:-1,label:0,query:#d9d9d9
+  --preview-window="border-sharp"
+  --prompt="󰍉 "
+  --marker="◆"
+  --pointer="▸"
+  --separator=""
+  --scrollbar="🮉"
+  --layout="reverse-list"
+  --info="right"'
 
+
+
+
+
+
+# --color=fg:-1,bg:-1,hl:#5fff87,fg+:-1,bg+:-1,hl+:#ffaf5f
+# --border
+# --preview="bat {}"
+# --color=dark
+# --color=info:#af87ff,prompt:#5fff87,pointer:#ff87d7,marker:#ff87d7,spinner:#ff87d7
+# --preview-window=right:60%:wrap
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh  # fzf-completions
 
 # }}}
 
@@ -276,12 +295,14 @@ bindkey '^g' rgfzf-widget
 # finishing {{{
 
 # source my aliases
-source $DOTFILES/zsh/aliases.sh
+source $HOME/.config/zsh/aliases.sh
 
 # common settings for bash and zsh
-source $HOME/.dotfiles/zsh/common.sh
-source $HOME/.dotfiles/zsh/conda.sh
-source $HOME/.dotfiles/zsh/tmux_aliases.sh
+source $HOME/.config/zsh/common.sh
+source $HOME/.config/zsh/conda.sh
+source $HOME/.config/zsh/tmux_aliases.sh
+source $HOME/.config/zsh/scripts/fzf.sh
+source $HOME/.config/zsh/scripts/docker.sh
 # source $HOME/.dotfiles/zsh/nvims.sh
 
 # source local config file, if exists
@@ -298,9 +319,6 @@ bindkey '^t' tmux-sessionizer-widget
 # auto activate environment on .aa-env file
 # eval "$(direnv hook zsh)"
 # source $(brew --prefix)/opt/autoenv/activate.sh
-export VMUX_NVIM_SESSION_DIR=~/.cache/nvim_sessions
-export VMUX_EDITOR=nvim
-alias nv=vmux
 
 
 

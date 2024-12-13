@@ -210,6 +210,51 @@ function cs-ssh() {
 	fi
 }
 
+
+## TODO:# The bash function is for list all github CODESPACES
+## TODO:cs-list() {
+## TODO:	# get the codespaces
+## TODO:	gh codespace list | awk '{print $1}'
+## TODO:}
+## TODO:
+## TODO:# The bash function is for ssh into a github CODESPACES
+## TODO:# It first checks if the codespace was bootstrapped
+## TODO:# If not, then it runs the bootstrap script
+## TODO:cs-ssh() {
+## TODO:	# get the codespaces
+## TODO:	if [ $# -lt 1 ]; then
+## TODO:		CODESPACE=$(gh codespace list | awk '{print $1}' | fzf)
+## TODO:	else
+## TODO:		CODESPACE=$1
+## TODO:	fi
+## TODO:	# fist check if the codespace was bootstraped
+## TODO:	BOOTSTRAPPED=$(gh codespace ssh -c $CODESPACE "[[ -f ~/.bootstrapped ]] && echo 'true' || echo 'false'")
+## TODO:	# if not bootstrapped, then run the scripts
+## TODO:	if [[ "$BOOTSTRAPPED" == "false" ]]; then
+## TODO:		echo "run bootstrap script"
+## TODO:	fi
+## TODO:	gh codespace ssh -c $CODESPACE
+## TODO:}
+## TODO:
+## TODO:# The bash function runs a command in a github CODESPACES
+## TODO:# It first checks if the codespace was bootstrapped
+## TODO:# Args:
+## TODO:#   1: the codespace
+## TODO:#   2: the command
+## TODO:cs-run() {
+## TODO:	# if length of args is less than 2, then get CODESPACE from fzf
+## TODO:	if [ $# -lt 2 ]; then
+## TODO:		CODESPACE=$(gh codespace list | awk '{print $1}' | fzf)
+## TODO:		gh codespace ssh -c $CODESPACE -- $1
+## TODO:	else
+## TODO:		gh codespace ssh -c $1 -- $2
+## TODO:	fi
+## TODO:
+## TODO:}
+
+
+
+
 #
 # }}}
 #
@@ -252,7 +297,19 @@ dcd(){
 # }}}
 
 
+repo() {
+    # This will list up to 2 depth of given directory. Add/remove '*/' to your preferences.
+    # The path should be absolute path.
+    # Note that too many depth will slow-down the script, less depth will show fewer results.
+    local srchDir=/Users/marcos/Projects/*/*/
+
+    # if any arguments arn't given, just list up everything else use search query
+    [ "$1" = false ] && cd "$(ls -d $srchDir | fzf)" || local qTerm="${@}"; cd "$(ls -d $srchDir | fzf -q "$qTerm")"
+}
 
 
 
-# vim:foldmethod=marker et
+
+
+
+# vim: fdm=marker et

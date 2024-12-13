@@ -64,5 +64,5 @@ export PYTHONSTARTUP=$HOME/.config/python/pythonrc.py
 
 # # Ripgrep configuration file
 # export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/rc
-source ~/.dotfiles/zsh/ufunctions.sh
-source ~/.dotfiles/zsh/common.sh
+source ~/.config/zsh/ufunctions.sh
+source ~/.config/zsh/common.sh

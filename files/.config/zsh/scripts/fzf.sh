@@ -1,7 +1,8 @@
 #!/bin/sh
-#=============================================================================================================
-#                           FUNCTIONS
-#=============================================================================================================
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+
 # tm with no sessions open it will create a session called "new".
 # tm irc it will attach to the irc session (if it exists), else it will create it.
 # tm with one session open, it will attach to that session.
@@ -33,7 +34,7 @@ fshow() {
   fzf --ansi --no-sort --reverse --tiebreak=index --bind=ctrl-s:toggle-sort \
     --bind "ctrl-m:execute:
   (grep -o '[a-f0-9]\{7\}' | head -1 |
-  xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+  xargs -I % sh -c 'git show --color=always % | bat -R') << 'FZF-EOF'
   {}
   FZF-EOF"
 }

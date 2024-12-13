@@ -1,3 +1,4 @@
 --style="changes,numbers"
 --color=always
 --italic-text=always
+--theme="Gruvbox Dark"

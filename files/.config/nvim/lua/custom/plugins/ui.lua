@@ -27,15 +27,19 @@ return {
 
   {
     'uga-rosa/ccc.nvim',
-    ft = {
-      'lua',
-      'vim',
-      'typescript',
-      'typescriptreact',
-      'javascriptreact',
-      'svelte',
-    },
-    cmd = { 'CccHighlighterToggle' },
+    cmd = { 'CccPick' },
+    tag = 'v2.0.3',
+    opts = function()
+      local ccc = require('ccc')
+      local p = ccc.picker
+      ccc.setup({
+        -- win_opts = { border = mrl.ui.border },
+        highlighter = {
+          auto_enable = false,
+          excludes = { 'dart', 'lazy', 'orgagenda', 'org', 'NeogitStatus', 'toggleterm' },
+        },
+      })
+    end,
   },
 
   {

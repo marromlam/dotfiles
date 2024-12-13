@@ -2,7 +2,8 @@ return {
   { -- Autoformat
     'stevearc/conform.nvim',
     -- lazy = false,
-    event = { 'BufReadPre', 'BufNewFile' },
+    event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
+    cmd = { 'ConformInfo' },
     keys = {
       {
         '<leader>lf',
@@ -39,11 +40,41 @@ return {
         graphql = { 'prettier' },
         liquid = { 'prettier' },
         lua = { 'stylua' },
-        python = { 'isort', 'black' },
+        python = { 'isort', 'black', 'mypy', 'flake8' },
         xml = { 'xmlformat' },
+      },
+      -- Set default options
+      default_format_opts = {
+        lsp_format = 'fallback',
+      },
+      -- Set up format-on-save
+      format_on_save = { timeout_ms = 500 },
+      -- Customize formatters
+      formatters = {
+        shfmt = {
+          prepend_args = { '-i', '2' },
+        },
       },
     },
     config = function()
+      vim.api.nvim_create_user_command('Format', function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line =
+            vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ['end'] = { args.line2, end_line:len() },
+          }
+        end
+        require('conform').format({
+          async = true,
+          lsp_format = 'fallback',
+          range = range,
+        })
+      end, { range = true })
+
+
       vim.api.nvim_create_user_command('FormatDisable', function(args)
         if args.bang then
           -- FormatDisable! will disable formatting just for this buffer

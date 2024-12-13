@@ -260,7 +260,7 @@ vim.keymap.set(
   '<leader>et',
   '<Cmd>edit $XDG_CONFIG_HOME/tmux/tmux.conf<CR>',
   {
-    desc = 'open tmux.conf',
+    desc = 'Edit tmux.conf',
   }
 )
 -- This line allows the current file to source the vimrc allowing me use bindings as they're added
@@ -465,16 +465,16 @@ vim.keymap.set('n', '<leader>pm', '<Cmd>Mason<CR>', { desc = 'Mason util' })
 
 vim.keymap.set(
   'n',
-  '<leader>o',
+  '<leader>bo',
   '<Cmd>:only<CR>',
-  { desc = 'this only buffer' }
+  { desc = 'Show this [B]uffer [O]nly' }
 )
 
 -- closing buffers
-vim.keymap.set('n', '<leader>x', '<Cmd>:bd<CR>', { desc = 'delete buffer' })
+-- vim.keymap.set('n', '<leader>bd', '<Cmd>:bd<CR>', { desc = 'delete buffer' })
 vim.keymap.set(
   'n',
-  '<leader>X',
+  '<leader>bD',
   '<Cmd>:bd!<CR>',
   { desc = 'Force delete buffer' }
 )
@@ -765,9 +765,9 @@ vim.keymap.set(
 )
 vim.keymap.set(
   'n',
-  '<leader>e',
+  '<leader>se',
   vim.diagnostic.open_float,
-  { desc = 'Show diagnostic [E]rror messages' }
+  { desc = '[S]how diagnostic [E]rror messages' }
 )
 vim.keymap.set(
   'n',

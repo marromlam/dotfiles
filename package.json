@@ -1,7 +1,0 @@
-{
-  "name": "my_config",
-  "version": "1.0.0",
-  "dependencies": {
-    "bibtex-tidy": "^1.0.0"
-  }
-}

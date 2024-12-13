@@ -37,6 +37,7 @@ mrl.ui.icons = {
     right_block = '🮉',
     -- right_block = "▕",
     light_shade_block = '░',
+    right_chubby_block = '▓',
   },
   lsp = {
     error = '', -- '✗'
@@ -109,6 +110,7 @@ mrl.ui.icons = {
     calendar = '',
     -- block = "▌",
     block = '▏',
+    clippy = '',
   },
 }
 mrl.ui.lsp = {
@@ -215,6 +217,7 @@ local buftypes = {
   ['nowrite'] = presets.tool_panel,
   ['acwrite'] = presets.tool_panel,
   ['terminal'] = presets.tool_panel,
+  ['.*fugitive.*'] = presets.tool_panel,
 }
 
 --- When searching through the filetypes table if a match can't be found then search
@@ -242,7 +245,7 @@ local filetypes = mrl.p_table({
   ['toggleterm'] = presets.tool_panel:with({ winbar = 'ignore' }),
   ['neotest.*'] = presets.tool_panel,
   ['^Neogit.*'] = presets.tool_panel,
-  ['fugitive.*'] = presets.tool_panel,
+  ['.*fugitive.*'] = presets.tool_panel,
   ['query'] = presets.tool_panel,
   ['DiffviewFiles'] = presets.tool_panel,
   ['DiffviewFileHistory'] = presets.tool_panel,

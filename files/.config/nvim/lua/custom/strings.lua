@@ -1,12 +1,7 @@
-----------------------------------------------------------------------------------------------------
 --  FORMAT STRINGS
-----------------------------------------------------------------------------------------------------
--- This is essentially a small library (for me) for working with vim format strings for things
--- like the tabline, statusline, winbar and statuscolumn. Since there are so many things that work
--- this way one small library to create these strings is useful.
 
 local api, L = vim.api, vim.log.levels
-local strwidth, fmt, falsy = api.nvim_strwidth, string.format, mrl.falsy
+local fmt, falsy = string.format, mrl.falsy
 
 ---@alias StringComponent {component: string, length: integer, priority: integer}
 
@@ -15,9 +10,10 @@ local M = {}
 local CLICK_END = "%X"
 local padding = " "
 
-----------------------------------------------------------------------------------------------------
--- COMPONENTS
-----------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Components {{{
+--------------------------------------------------------------------------------
 
 ---@return StringComponent
 local function separator()
@@ -59,8 +55,8 @@ end
 --- @param str string
 --- @param max_size integer
 --- @return string
-local function truncate_str(str, max_size)
-    if not max_size or strwidth(str) < max_size then
+local function truncate_string(str, max_size)
+    if not max_size or vim.api.nvim_strwidth(str) < max_size then
         return str
     end
     local match, count = str:gsub("(['\"]).*%1", "%1…%1")
@@ -82,7 +78,7 @@ local function chunks_to_string(chunks)
                 text = tostring(text)
             end
             if item.max_size then
-                text = truncate_str(text, item.max_size)
+                text = truncate_string(text, item.max_size)
             end
             text = text:gsub("%%", "%%%1")
             table.insert(
@@ -129,7 +125,7 @@ local function component(opts)
     local before, after = opts.before or "", opts.after or padding
 
     local item_str = chunks_to_string(item)
-    if strwidth(item_str) == 0 then
+    if vim.api.nvim_strwidth(item_str) == 0 then
         return
     end
 
@@ -146,9 +142,13 @@ local function component(opts)
     }
 end
 
-----------------------------------------------------------------------------------------------------
--- RENDER
-----------------------------------------------------------------------------------------------------
+-- }}}
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- statusline render utils {{{
+-------------------------------------------------------------------------------
 local function sum_lengths(list)
     return mrl.fold(function(acc, item)
         return acc + (item.length or 0)
@@ -156,15 +156,18 @@ local function sum_lengths(list)
 end
 
 local function is_lowest(item, lowest)
-    -- if there hasn't been a lowest selected so far, then the item is the lowest
+    -- if there hasn't been a lowest selected so far, then the item is the
+    -- lowest
     if not lowest or not lowest.length then
         return true
     end
-    -- if the item doesn't have a priority or a length, it is likely a special character so should never be the lowest
+    -- if the item doesn't have a priority or a length, it is likely a special
+    -- character so should never be the lowest
     if not item.priority or not item.length then
         return false
     end
-    -- if the item has the same priority as the lowest, then if the item has a greater length it should become the lowest
+    -- if the item has the same priority as the lowest, then if the item has a
+    -- greater length it should become the lowest
     if item.priority == lowest.priority then
         return item.length > lowest.length
     end
@@ -173,8 +176,8 @@ end
 
 --- Take the lowest priority items out of the statusline if we don't have
 --- space for them.
---- TODO: currently this doesn't account for if an item that has a lower priority
---- could be fit in instead
+--- TODO: currently this doesn't account for if an item that has a lower
+--- priority could be fit in instead
 --- @param statusline table
 --- @param space number
 --- @param length number
@@ -253,4 +256,10 @@ end
 
 M.section = section
 
+-- }}}
+--------------------------------------------------------------------------------
+
+
 return M
+
+-- vim:fdm=marker

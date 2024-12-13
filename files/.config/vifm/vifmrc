@@ -51,6 +51,7 @@ source $HOME/.config/vifm/filetype.vifm
 
 "
 colorscheme custom1
+" colorscheme material
 
 
 " vim: set ft=vim

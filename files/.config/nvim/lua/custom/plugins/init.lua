@@ -220,7 +220,7 @@ return {
       {
         '<leader>u',
         vim.cmd.UndotreeToggle,
-        'Toggle undotree',
+        'Toggle [u]ndotree',
       },
     },
   },

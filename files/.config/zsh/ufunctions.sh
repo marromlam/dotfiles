@@ -11,10 +11,6 @@ function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4
 # https://www.topbug.net/blog/2016/10/11/speed-test-check-the-existence-of-a-command-in-bash-and-zsh/
 exists() { (( $+commands[$1] )); }
 
-function vibora() {
-  source $HOME/conda3/bin/activate
-  conda activate $1
-}
 
 function get_machine() {
   unameOut="$(uname -s)"
@@ -33,7 +29,7 @@ function get_machine() {
 # these functions are from old times when I was not a vimmer :')
 # I do not have Atom anymore, but just in case I will keep them
 
-# open a port where jupyter can run kernels
+# open a port where jupyter can run kernels
 launch_jupyter(){
   jupyter notebook --no-browser --port=8$1 &
 }
