@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Securely wipe a disk named "Untitled"
+
+# Find the disk identifier for "Untitled"
+disk=$(diskutil list | grep "Untitled" | awk '{print $NF}')
+
+if [ -z "$disk" ]; then
+    echo "Error: Disk named 'Untitled' not found."
+    exit 1
+fi
+
+# Confirm the operation
+echo "Disk identifier for 'Untitled' is $disk."
+read -p "Are you sure you want to securely wipe this disk? This cannot be undone. (yes/no): " confirm
+
+if [[ "$confirm" != "yes" ]]; then
+    echo "Operation canceled."
+    exit 0
+fi
+
+# Unmount the disk
+echo "Unmounting the disk..."
+diskutil unmountDisk /dev/$disk || { echo "Failed to unmount disk. Exiting."; exit 1; }
+
+# Overwrite the disk with zeros
+echo "Writing zeros to the disk. This may take a while..."
+sudo dd if=/dev/zero of=/dev/$disk bs=1m || { echo "Failed to write zeros. Exiting."; exit 1; }
+
+# Overwrite the disk with random data
+echo "Writing random data to the disk. This may take a while..."
+sudo dd if=/dev/urandom of=/dev/$disk bs=1m || { echo "Failed to write random data. Exiting."; exit 1; }
+
+# Reinitialize the disk
+echo "Reinitializing the disk..."
+diskutil partitionDisk /dev/$disk GPT JHFS+ "Macintosh HD" 0b || { echo "Failed to reinitialize disk. Exiting."; exit 1; }
+
+echo "Disk 'Untitled' has been securely wiped and reinitialized successfully."
+
+
+# vim: set ft=bash

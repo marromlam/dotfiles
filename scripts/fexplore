@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Store the STDOUT of fzf in a variable
+selection=$(find . -type d | fzf --multi --height=80% --border=sharp \
+--preview='tree -C {}' --preview-window='45%,border-sharp' \
+--prompt='􀈖  ' \
+--bind='del:execute(rm -ri {+})' \
+--bind='ctrl-p:toggle-preview' \
+--bind='ctrl-d:change-prompt(􀈖  )' \
+--bind='ctrl-d:+reload(find . -type d)' \
+--bind='ctrl-d:+change-preview(tree -C {})' \
+--bind='ctrl-d:+refresh-preview' \
+--bind='ctrl-f:change-prompt(􀉀  )' \
+--bind='ctrl-f:+reload(find . -type f)' \
+--bind='ctrl-f:+change-preview(bat {})' \
+--bind='ctrl-f:+refresh-preview' \
+--bind='ctrl-a:select-all' \
+--bind='ctrl-x:deselect-all' \
+--header '
+CTRL-D 􀈖  | CTRL-F 􀉀 | CTRL-A to select all | CTRL-X to deselect all
+ENTER 􀈊 | DEL 􀈔 | CTRL-P 􀛿 |
+'
+)
+# if no selection, exit
+if [ -z "$selection" ]; then
+    exit
+fi
+
+
+# Determine what to do depending on the selection
+if [ -d "$selection" ]; then
+    cd "$selection" || exit
+else
+    eval "$EDITOR $selection"
+fi
+
+
+# vim: ft=bash

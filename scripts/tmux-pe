@@ -1,0 +1,3 @@
+nvim $(tmux capture-pane -pS -1000000 | pe | fzf -m)
+
+# vim: ft=bash
