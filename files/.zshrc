@@ -230,7 +230,7 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --separator=""
   --scrollbar="🮉"
   --layout="reverse-list"
-  --info="right"'
+  --info="inline"'
 
 
 
