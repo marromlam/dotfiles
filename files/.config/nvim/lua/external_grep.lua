@@ -30,7 +30,7 @@ end
 
 vim.keymap.set(
   'n',
-  '<leader>fs',
+  '<leader>fS',
   mrl.external_grep,
   { desc = 'Ripgrep to QuickFix' }
 )

@@ -39,8 +39,8 @@ vim.opt.fillchars = {
   foldsep = ' ',
 }
 
-vim.opt.nu = true
-vim.opt.relativenumber = true
+vim.opt.nu = false
+vim.opt.relativenumber = false
 
 -- }}}
 
@@ -120,7 +120,7 @@ vim.opt.wrap = false
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
-vim.opt.wrapmargin = 4
+vim.opt.wrapmargin = 8
 vim.opt.textwidth = 80
 vim.opt.autoindent = true
 vim.opt.shiftround = true

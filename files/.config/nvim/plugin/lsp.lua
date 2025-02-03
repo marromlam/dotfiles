@@ -39,8 +39,8 @@ diagnostic.config({
     end,
   },
   float = {
-    max_width = max_width,
-    max_height = max_height,
+    -- max_width = max_width,
+    -- max_height = max_height,
     border = border,
     title = { { '  ', 'DiagnosticFloatTitleIcon' }, { 'Problems  ', 'DiagnosticFloatTitle' } },
     focusable = true,

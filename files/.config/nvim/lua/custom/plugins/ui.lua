@@ -16,6 +16,8 @@ return {
   {
     'Bekaboo/dropbar.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
+    -- cond = false,
+    -- disable = true,
     keys = {
       {
         '<leader>wp',

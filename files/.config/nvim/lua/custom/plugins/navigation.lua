@@ -1,9 +1,9 @@
 return {
 
-  -- {
-  --   'tpope/vim-vinegar',
-  --   keys = { '-' },
-  -- },
+  {
+    'tpope/vim-vinegar',
+    keys = { '-' },
+  },
 
   {
     'ThePrimeagen/harpoon',

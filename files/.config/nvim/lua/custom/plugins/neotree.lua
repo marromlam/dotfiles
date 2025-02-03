@@ -10,8 +10,11 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
     cmd = { 'Neotree' },
-    keys = { { '<C-N>', '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' },
-      { '-',     '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' } },
+    cond = false, disable = true,
+    keys = { 
+      { '<C-N>', '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' },
+      -- { '-',     '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' }
+    },
     init = function()
       autocmd('BufEnter', {
         desc = 'Load NeoTree if entering a directory',
@@ -82,7 +85,7 @@ return {
           },
         },
         filesystem = {
-          hijack_netrw_behavior = 'open_current',
+          -- hijack_netrw_behavior = 'open_current',
           use_libuv_file_watcher = true,
           group_empty_dirs = false,
           follow_current_file = {

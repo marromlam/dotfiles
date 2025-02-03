@@ -63,7 +63,7 @@ require('highlight')
 require('custom.ui')
 require('custom.strings')
 require('lazyloader')
-require('custom.ui')
+-- require('custom.ui')
 require('external_grep')
 
 vim.keymap.set(
@@ -98,6 +98,8 @@ au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost 
 vim.cmd([[
 autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
 autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
+" let &colorcolumn = join(range(81,999), ',')
+set colorcolumn=81
 ]])
 
 

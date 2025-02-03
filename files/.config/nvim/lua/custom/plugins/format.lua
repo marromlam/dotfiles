@@ -22,7 +22,7 @@ return {
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true, xml = true }
         return {
-          timeout_ms = 1500,
+          timeout_ms = 5000,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
@@ -48,7 +48,7 @@ return {
         lsp_format = 'fallback',
       },
       -- Set up format-on-save
-      format_on_save = { timeout_ms = 500 },
+      -- format_on_save = { timeout_ms = 500 },
       -- Customize formatters
       formatters = {
         shfmt = {

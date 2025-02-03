@@ -21,17 +21,16 @@ local function general_overrides()
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, -1.5 * dim_factor)
   highlight.all({
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- Native
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { VertSplit = { fg = { from = 'Comment' } } },
     { StatusLine = { fg = bg_color, bg = { from = 'Comment' } } },
     -- { PanelSt = { link = 'StatusLine' } },
-    --
+    -- Neotree
     { NeoTreeNormal = { bg = bg_color, fg = { from = 'Normal' } } },
     { NeoTreeNormalNC = { bg = bg_color, fg = { from = 'Normal' } } },
     { NeoTreeCursorLine = { bg = bg_color2 }},
-
     { NeoTreeWinSeparator = { fg = { from = 'Normal', attr = 'bg' } } },
     { NeoTreeWinSeparatorNC = { fg = { from = 'Normal', attr = 'bg' } } },
     -- { NeoTreeCursorLine = { link = 'Visual' } },
@@ -39,12 +38,11 @@ local function general_overrides()
     { NeoTreeStatusLine = { link = 'PanelSt' } },
     { NeoTreeTabActive = { bg = bg_color, bold = true } },
     { NeoTreeTabInactive = { bg = bg_color, fg = { from = 'Comment' } } },
-
     { NeoTreeTabSeparatorActive = { inherit = 'PanelBackground', fg = { from = 'Comment' } } },
     { NeoTreeDirectoryIcon = { link = 'WarningMsg' } },
     { NeoTreeTabSeparatorActive = { bg=bg_color, fg=bg_color }},
     { NeoTreeTabSeparatorInactive = { bg=bg_color, fg=bg_color }},
-    --
+    -- Search count
     { StSearchCount = { fg = "#333333", bg = "#dddddd" } },
     { StSeparator = { fg = "#00aaff", bg = bg_color } },
     { StModified = { fg = "#ffaaff", bg = bg_color } },
@@ -55,31 +53,31 @@ local function general_overrides()
     { iCursor = { bg = P.dark_blue } },
     { PmenuSbar = { link = 'Normal' } },
     { Folded = { fg = { from = 'Normal' }, bg = { from = 'Normal', alter = is_dark and 0.3 or 0.1 } } },
-    --------------------------------------------//
+    ---------------------------------------------------------------------------
     -- Floats
-    ---------------------------------------------//
+    ---------------------------------------------------------------------------
     { NormalFloat = { bg = { from = 'Normal', alter = -0.15 } } },
     { FloatBorder = { bg = { from = 'NormalFloat' }, fg = { from = 'Comment' } } },
     { FloatTitle = { bold = true, fg = 'white', bg = { from = 'FloatBorder', attr = 'fg' } } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- Created highlights
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { Dim = { fg = { from = 'Normal', attr = 'bg', alter = dim_factor } } },
     { PickerBorder = { link = 'Normal' } },
     { UnderlinedTitle = { bold = true, underline = true } },
     { StatusColSep = { link = 'Dim' } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { CodeBlock = { bg = { from = 'Normal', alter = 0.3 } } },
     { markdownCode = { link = 'CodeBlock' } },
     { markdownCodeBlock = { link = 'CodeBlock' } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     --  Spell
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { SpellBad = { undercurl = true, bg = 'NONE', fg = 'NONE', sp = 'green' } },
     { SpellRare = { undercurl = true } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- Diff
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- { DiffAdd = { bg = '#26332c', fg = 'NONE', underline = false } },
     -- { DiffDelete = { bg = '#572E33', fg = '#5c6370', underline = false } },
     -- { DiffChange = { bg = '#273842', fg = 'NONE', underline = false } },
@@ -97,9 +95,9 @@ local function general_overrides()
     { diffIsA = { link = 'WarningMsg' } },
     { diffNoEOL = { link = 'WarningMsg' } },
     { diffOnly = { link = 'WarningMsg' } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- colorscheme overrides
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { Type = { italic = true, bold = true } },
     { Include = { italic = true, bold = false } },
     { QuickFixLine = { inherit = 'CursorLine', fg = 'NONE', italic = true } },
@@ -108,9 +106,9 @@ local function general_overrides()
     -- if either are specified this can lead to issues when a winhighlight is set
     { SignColumn = { bg = 'NONE' } },
     { EndOfBuffer = { bg = 'NONE' } },
-    ------------------------------------------------------------------------------//
+    ----------------------------------------------------------------------------
     --  Semantic tokens
-    ------------------------------------------------------------------------------//
+    ----------------------------------------------------------------------------
     { ['@lsp.type.variable'] = { clear = true } },
     { ['@lsp.type.parameter'] = { italic = true, fg = { from = 'Normal' } } },
     { ['@lsp.typemod.method'] = { link = '@method' } },
@@ -124,9 +122,9 @@ local function general_overrides()
     { ['@lsp.typemod.keyword.injected'] = { link = '@keyword' } },
     { ['@lsp.typemod.string.injected'] = { link = '@string' } },
     { ['@lsp.typemod.variable.injected'] = { link = '@variable' } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- Treesitter
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { ['@keyword.return'] = { italic = true, fg = { from = 'Keyword' } } },
     { ['@type.qualifier'] = { inherit = '@keyword', italic = true } },
     { ['@variable'] = { clear = true } },
@@ -135,9 +133,9 @@ local function general_overrides()
     { ['@text.diff.add'] = { link = 'DiffAdd' } },
     { ['@text.diff.delete'] = { link = 'DiffDelete' } },
     { ['@text.title.markdown'] = { underdouble = true } },
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     -- LSP
-    -----------------------------------------------------------------------------//
+    ---------------------------------------------------------------------------
     { LspReferenceWrite = { inherit = 'LspReferenceText', bold = true, italic = true, underline = true } },
     { LspSignatureActiveParameter = { link = 'Visual' } },
     -- Sign column line
@@ -156,13 +154,71 @@ local function general_overrides()
     --- Diagnostic Signa
     ---------------------------------------------------------------------------
     -- {DiagnosticSignWarnLine = { bg = mrl.get_hi('SignColumn').bg, fg = mrl.get_hi('GitSignsDelete').fg }},
-    { DiagnosticSignWarn = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('DiagnosticWarn').fg } },
+    -- { DiagnosticSignWarn = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('DiagnosticWarn').fg } },
     -- {DiagnosticSignErrorLine = { bg = mrl.get_hi('SignColumn').bg }},
-    { DiagnosticSignError = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('GitSignsDelete').fg } },
+    -- { DiagnosticSignError = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('GitSignsDelete').fg } },
     -- {DiagnosticSignHintLine = { bg = mrl.get_hi('SignColumn').bg }},
-    { DiagnosticSignHint = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
+    -- { DiagnosticSignHint = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
     -- {DiagnosticSignInfoLine = { bg = mrl.get_hi('SignColumn').bg }},
-    { DiagnosticSignInfo = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
+    -- { DiagnosticSignInfo = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
+    ---------------------------------------------------------------------------
+    -- FzfLua {{{
+    ---------------------------------------------------------------------------
+    -- FzfLuaNormal	Normal	hls.normal	Main win fg/bg
+    { FzfLuaNormal = { bg = { from = 'Normal', attr = 'bg' }, fg = { from = 'Normal', attr = 'fg' }}},
+    -- FzfLuaBorder	Normal	hls.border	Main win border
+    -- FzfLuaTitle	FzfLuaNormal	hls.title	Main win title
+    -- FzfLuaBackdrop	*bg=Black	hls.backdrop	Backdrop color
+    -- FzfLuaPreviewNormal	FzfLuaNormal	hls.preview_normal	Builtin preview fg/bg
+    -- FzfLuaPreviewBorder	FzfLuaBorder	hls.preview_border	Builtin preview border
+    -- FzfLuaPreviewTitle	FzfLuaTitle	hls.preview_title	Builtin preview title
+    -- { FzfLuaCursor = { bg = "#ff00ff", fg = "#00ff00"} },
+    -- { FzfLuaCursor = { bg =  "#ff00ff" , fg = { from = 'Normal', attr = 'fg' }}},
+    -- { FzfLuaCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
+    -- FzfLuaCursor	Cursor	hls.cursor	Builtin preview Cursor
+    -- FzfLuaCursorLine	CursorLine	hls.cursorline	Builtin preview Cursorline
+    -- FzfLuaCursorLineNr	CursorLineNr	hls.cursorlinenr	Builtin preview CursorLineNr
+    -- FzfLuaSearch	IncSearch	hls.search	Builtin preview search matches
+    -- FzfLuaScrollBorderEmpty	FzfLuaBorder	hls.scrollborder_e	Builtin preview border scroll empty
+    -- FzfLuaScrollBorderFull	FzfLuaBorder	hls.scrollborder_f	Builtin preview border scroll full
+    -- FzfLuaScrollFloatEmpty	PmenuSbar	hls.scrollfloat_e	Builtin preview float scroll empty
+    -- FzfLuaScrollFloatFull	PmenuThumb	hls.scrollfloat_f	Builtin preview float scroll full
+    -- FzfLuaHelpNormal	FzfLuaNormal	hls.help_normal	Help win fg/bg
+    -- FzfLuaHelpBorder	FzfLuaBorder	hls.help_border	Help win border
+    -- FzfLuaHeaderBind	*BlanchedAlmond	hls.header_bind	Header keybind
+    -- FzfLuaHeaderText	*Brown1	hls.header_text	Header text
+    -- FzfLuaPathColNr	*CadetBlue1	hls.path_colnr	Path col nr (lines,qf,lsp,diag)
+    -- FzfLuaPathLineNr	*LightGreen	hls.path_linenr	Path line nr (lines,qf,lsp,diag)
+    -- FzfLuaBufName	*LightMagenta	hls.buf_name	Buffer name (lines)
+    -- FzfLuaBufNr	*BlanchedAlmond	hls.buf_nr	Buffer number (all buffers)
+    -- FzfLuaBufFlagCur	*Brown1	hls.buf_flag_cur	Buffer line (buffers)
+    -- FzfLuaBufFlagAlt	*CadetBlue1	hls.buf_flag_alt	Buffer line (buffers)
+    -- FzfLuaTabTitle	*LightSkyBlue1	hls.tab_title	Tab title (tabs)
+    -- FzfLuaTabMarker	*BlanchedAlmond	hls.tab_marker	Tab marker (tabs)
+    -- FzfLuaDirIcon	Directory	hls.dir_icon	Paths directory icon
+    -- FzfLuaDirPart	Comment	hls.dir_part	Path formatters directory hl group
+    -- FzfLuaFilePart	@none	hls.file_part	Path formatters file hl group
+    -- FzfLuaLiveSym	*Brown1	hls.live_sym	LSP live symbols query match
+    { FzfLuaFzfNormal = { bg = "#ffff00", fg = "#00ff00"} },
+    -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
+    -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
+    { ['@fzf.normal'] = { bg = "#ff0000", fg = "#00ff00"} },
+    -- FzfLuaFzfNormal	FzfLuaNormal	fzf.normal	fzf's fg|bg
+    -- FzfLuaFzfCursorLine	FzfLuaCursorLine	fzf.cursorline	fzf's fg+|bg+
+    -- FzfLuaFzfMatch	Special	fzf.match	fzf's hl+
+    -- FzfLuaFzfBorder	FzfLuaBorder	fzf.border	fzf's border
+    -- FzfLuaFzfScrollbar	FzfLuaFzfBorder	fzf.scrollbar	fzf's scrollbar
+    -- FzfLuaFzfSeparator	FzfLuaFzfBorder	fzf.separator	fzf's separator
+    -- FzfLuaFzfGutter	FzfLuaNormal	fzf.gutter	fzf's gutter (hl bg is used)
+    -- FzfLuaFzfHeader	FzfLuaTitle	fzf.header	fzf's header
+    -- FzfLuaFzfInfo	NonText	fzf.info	fzf's info
+    -- FzfLuaFzfPointer	Special	fzf.pointer	fzf's pointer
+    -- FzfLuaFzfMarker	FzfLuaFzfPointer	fzf.marker	fzf's marker
+    -- FzfLuaFzfSpinner	FzfLuaFzfPointer	fzf.spinner	fzf's spinner
+    -- FzfLuaFzfPrompt	Special	fzf.prompt	fzf's prompt
+    -- FzfLuaFzfQuery	FzfLuaNormal	fzf.query	fzf's header
+    -- }}}
+    ---------------------------------------------------------------------------
   })
 end
 
