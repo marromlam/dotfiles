@@ -108,8 +108,10 @@ function set-prompt() {
   # Top right:    Time
   # Bottom left:  ➜
   # Bottom right: empty
-  local dots_prompt_icon="%F{green}▸ %f"
-  local dots_prompt_failure_icon="%F{red}▸ %f"
+  # local dots_prompt_icon="%F{green}▸ %f"
+  # local dots_prompt_failure_icon="%F{red}▸ %f"
+  local dots_prompt_icon="%F{green}; %f"
+  local dots_prompt_failure_icon="%F{red}; %f"
   local execution_time="%F{yellow}%{$__DOTS[ITALIC_ON]%}${cmd_exec_time}%{$__DOTS[ITALIC_OFF]%}%f "
 
   # local current_eviron="%F{red}% ⏣ ◣♯⚕i⚯ 🮤 	🭑  	🭔 ⚎ ⚈ ♨ ♞ 🬅 🬖 ❖ $(get_env)"
