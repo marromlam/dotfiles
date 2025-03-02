@@ -17,7 +17,7 @@ return {
 
   {
     'raivivek/vim-snakemake',
-    lazy=false,
+    lazy = false,
   },
 
   -- syntax highlighting for kitty conf file
@@ -66,7 +66,24 @@ return {
     'lifepillar/pgsql.vim',
     lazy = true,
     disable = true,
-    cond = false
+    cond = false,
+  },
+  {
+    'ledger/vim-ledger',
+    ft = 'ledger',
+    config = function()
+      vim.cmd([[
+          " For ledger
+          au BufNewFile,BufRead *.ldg,*.ledger setf ledger | comp ledger
+          let g:ledger_maxwidth = 120
+          let g:ledger_fold_blanks = 1
+          function LedgerSort()
+              :%! ledger -f - print --sort 'date, amount'
+              :%LedgerAlign
+          endfunction
+          command LedgerSort call LedgerSort()
+          ]])
+    end,
   },
 }
 
