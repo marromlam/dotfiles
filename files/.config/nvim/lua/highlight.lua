@@ -1,4 +1,5 @@
-local api, notify, fmt, augroup = vim.api, vim.notify, string.format, mrl.augroup
+local api, notify, fmt, augroup =
+  vim.api, vim.notify, string.format, mrl.augroup
 
 ---@alias HLAttrs {from: string, attr: "fg" | "bg", alter: integer}
 
@@ -79,7 +80,10 @@ end
 ---@param percent number a negative number darkens and a positive one brightens
 ---@return string
 local function tint(color, percent)
-  assert(color and percent, 'cannot alter a color without specifying a color and percentage')
+  assert(
+    color and percent,
+    'cannot alter a color without specifying a color and percentage'
+  )
   local r = tonumber(color:sub(2, 3), 16)
   local g = tonumber(color:sub(4, 5), 16)
   local b = tonumber(color:sub(6), 16)
@@ -92,9 +96,18 @@ local function tint(color, percent)
 end
 
 local err_warn = vim.schedule_wrap(function(group, attribute)
-  notify(fmt('failed to get highlight %s for attribute %s\n%s', group, attribute, debug.traceback()), 'ERROR', {
-    title = fmt('Highlight - get(%s)', group),
-  }) -- stylua: ignore
+  notify(
+    fmt(
+      'failed to get highlight %s for attribute %s\n%s',
+      group,
+      attribute,
+      debug.traceback()
+    ),
+    'ERROR',
+    {
+      title = fmt('Highlight - get(%s)', group),
+    }
+  ) -- stylua: ignore
 end)
 
 ---Get the value a highlight group whilst handling errors, fallbacks as well as returning a gui value
@@ -110,7 +123,10 @@ local function get(group, attribute, fallback)
   local data = get_hl_as_hex({ name = group })
   if not attribute then return data end
 
-  assert(attrs[attribute], ('the attribute passed in is invalid: %s'):format(attribute))
+  assert(
+    attrs[attribute],
+    ('the attribute passed in is invalid: %s'):format(attribute)
+  )
   local color = data[attribute] or fallback
   if not color then
     if vim.v.vim_did_enter == 0 then
@@ -156,7 +172,11 @@ local function set(ns, name, opts)
     opts, name, ns = name, ns, 0
   end
 
-  vim.validate({ opts = { opts, 'table' }, name = { name, 'string' }, ns = { ns, 'number' } })
+  vim.validate({
+    opts = { opts, 'table' },
+    name = { name, 'string' },
+    ns = { ns, 'number' },
+  })
 
   local hl = opts.clear and {} or get_hl_as_hex({ name = opts.inherit or name })
   for attribute, hl_data in pairs(opts) do

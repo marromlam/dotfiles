@@ -1,8 +1,8 @@
-vim.cmd [[
+vim.cmd([[
 set grepprg=rg\ --vimgrep
 
 function! Grep(...)
-	return system(join([&grepprg] + [expandcmd(join(a:000, ' '))], ' '))
+        return system(join([&grepprg] + [expandcmd(join(a:000, ' '))], ' '))
 endfunction
 
 command! -nargs=+ -complete=file_in_path -bar Grep  cgetexpr Grep(<f-args>)
@@ -12,20 +12,20 @@ cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'G
 cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
 
 augroup quickfix
-	autocmd!
-	autocmd QuickFixCmdPost cgetexpr cwindow
-	autocmd QuickFixCmdPost lgetexpr lwindow
+        autocmd!
+        autocmd QuickFixCmdPost cgetexpr cwindow
+        autocmd QuickFixCmdPost lgetexpr lwindow
 augroup END
-]]
+]])
 
 function mrl.external_grep(word, no_ignore)
-  local word0 = (word or vim.fn.input 'RG  ')
+  local word0 = (word or vim.fn.input('RG  '))
   if no_ignore then
     vim.cmd((('silent grep ' .. word0) .. ' --no-ignore'))
   else
     vim.cmd(('silent grep ' .. word0))
   end
-  return vim.cmd 'copen'
+  return vim.cmd('copen')
 end
 
 vim.keymap.set(
@@ -34,3 +34,5 @@ vim.keymap.set(
   mrl.external_grep,
   { desc = 'Ripgrep to QuickFix' }
 )
+
+-- vim: et

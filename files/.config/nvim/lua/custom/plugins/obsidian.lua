@@ -2,12 +2,23 @@
 --   .. "/Library/Mobile Documents/iCloud~md~obsidian/Documents/**.md"
 return {
   'epwalsh/obsidian.nvim',
-  cmd = { 'ObsidianOpen', 'ObsidianNew' },
+  cmd = {
+    'ObsidianOpen',
+    'ObsidianNew',
+    'ObsidianSearch',
+    'ObsidianQuickSwitch',
+  },
   -- lazy = true,
   -- event = {
   --   "BufReadPre " .. my_vault,
   --   "BufNewFile " .. my_vault,
   -- },
+  keys = {
+    { 'n', '<leader>oo', ':ObsidianOpen<CR>' },
+    { 'n', '<leader>on', ':ObsidianNew<CR>' },
+    { 'n', '<leader>os', ':ObsidianSearch<CR>' },
+    { 'n', '<leader>of', ':ObsidianQuickSwitch<CR>' },
+  },
   dependencies = {
     'nvim-lua/plenary.nvim',
     'ibhagwan/fzf-lua',
@@ -16,8 +27,7 @@ return {
   --   dir = my_vault,
   -- },
   config = function()
-    local my_vault = vim.fn.expand('~')
-      .. '/Library/Mobile Documents/iCloud~md~obsidian/Documents'
+    local my_vault = vim.g.obsidian_vault_path
 
     require('obsidian').setup({
       -- Required, the path to your vault directory.
@@ -42,20 +52,20 @@ return {
       },
 
       -- Optional, completion.
-      completion = {
-        -- If using nvim-cmp, otherwise set to false
-        nvim_cmp = true,
-        -- Trigger completion at 2 chars
-        min_chars = 2,
-        -- Where to put new notes created from completion. Valid options are
-        --  * "current_dir" - put new notes in same directory as the current buffer.
-        --  * "notes_subdir" - put new notes in the default notes subdirectory.
-        new_notes_location = 'current_dir',
-
-        -- Whether to add the output of the node_id_func to new notes in autocompletion.
-        -- E.g. "[[Foo" completes to "[[foo|Foo]]" assuming "foo" is the ID of the note.
-        prepend_note_id = true,
-      },
+      -- completion = {
+      --   -- If using nvim-cmp, otherwise set to false
+      --   nvim_cmp = true,
+      --   -- Trigger completion at 2 chars
+      --   min_chars = 2,
+      --   -- Where to put new notes created from completion. Valid options are
+      --   --  * "current_dir" - put new notes in same directory as the current buffer.
+      --   --  * "notes_subdir" - put new notes in the default notes subdirectory.
+      --   new_notes_location = 'current_dir',
+      --
+      --   -- Whether to add the output of the node_id_func to new notes in autocompletion.
+      --   -- E.g. "[[Foo" completes to "[[foo|Foo]]" assuming "foo" is the ID of the note.
+      --   prepend_note_id = true,
+      -- },
 
       -- Optional, key mappings.
       mappings = {
@@ -69,7 +79,7 @@ return {
       -- Optional, if set to true, the specified mappings in the `mappings`
       -- table will overwrite existing ones. Otherwise a warning is printed
       -- and the mappings are not applied.
-      overwrite_mappings = false,
+      -- overwrite_mappings = false,
 
       -- Optional, customize how names/IDs for new notes are created.
       note_id_func = function(title)
@@ -111,20 +121,20 @@ return {
 
       -- Optional, for templates (see below).
       templates = {
-        subdir = 'Templates',
+        subdir = 'notes/templates',
         date_format = '%Y-%m-%d',
         time_format = '%H:%M',
         -- A map for custom variables, the key should be the variable and the value a function
         substitutions = {},
       },
 
-      -- Optional, customize the backlinks interface.
-      backlinks = {
-        -- The default height of the backlinks pane.
-        height = 10,
-        -- Whether or not to wrap lines.
-        wrap = true,
-      },
+      -- -- Optional, customize the backlinks interface.
+      -- backlinks = {
+      --   -- The default height of the backlinks pane.
+      --   height = 10,
+      --   -- Whether or not to wrap lines.
+      --   wrap = true,
+      -- },
 
       -- Optional, by default when you use `:ObsidianFollowLink` on a link to an external
       -- URL it will be ignored but you can customize this behavior here.

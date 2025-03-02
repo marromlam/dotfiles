@@ -7,8 +7,10 @@ local state = { lsp_clients_visible = true }
 local str = require('custom.strings')
 
 local section, spacer, display = str.section, str.spacer, str.display
-local icons, lsp, highlight, decorations = mrl.ui.icons, mrl.ui.lsp, mrl.highlight, mrl.ui.decorations
-local api, fn, fs, fmt, strwidth = vim.api, vim.fn, vim.fs, string.format, vim.api.nvim_strwidth
+local icons, lsp, highlight, decorations =
+  mrl.ui.icons, mrl.ui.lsp, mrl.highlight, mrl.ui.decorations
+local api, fn, fs, fmt, strwidth =
+  vim.api, vim.fn, vim.fs, string.format, vim.api.nvim_strwidth
 local P, falsy = mrl.ui.palette, mrl.falsy
 
 local sep = package.config:sub(1, 1)
@@ -130,7 +132,6 @@ local function colors()
   })
 end
 
-
 local identifiers = {
   buftypes = {
     terminal = ' ',
@@ -185,7 +186,6 @@ local identifiers = {
       local parts = vim.split(fname, ' ')
       return fmt('Explorer(%s)', parts[2])
     end,
-
   }),
 }
 
@@ -211,15 +211,18 @@ local function adopt_window_highlights()
     local name = part.hl(api.nvim_get_current_win())
     local hl = highlight.get(name)
     if not falsy(hl) then return end
-    highlight.set(name, { inherit = part.fallback, bg = { from = curr_winhl.StatusLine, attr = 'bg' } })
+    highlight.set(name, {
+      inherit = part.fallback,
+      bg = { from = curr_winhl.StatusLine, attr = 'bg' },
+    })
   end
 end
-
 
 --- @param ctx StatuslineContext
 --- @return string, string?
 local function filetype(ctx)
-  local ft, bt = identifiers.filetypes[ctx.filetype], identifiers.buftypes[ctx.buftype]
+  local ft, bt =
+    identifiers.filetypes[ctx.filetype], identifiers.buftypes[ctx.buftype]
   if ft then return ft end
   if bt then return bt end
   return get_buffer_icon(ctx.bufnum, { default = true })
@@ -235,14 +238,18 @@ local function special_buffers(ctx)
   if ctx.buftype == 'terminal' and falsy(ctx.filetype) then
     return ('Terminal(%s)'):format(fn.fnamemodify(vim.env.SHELL, ':t'))
   end
-  if fn.getloclist(0, { filewinid = 0 }).filewinid > 0 then return 'Location List' end
+  if fn.getloclist(0, { filewinid = 0 }).filewinid > 0 then
+    return 'Location List'
+  end
   return nil
 end
 
 ---Only append the path separator if the path is not empty
 ---@param path string
 ---@return string
-local function with_sep(path) return (not falsy(path) and path:sub(-1) ~= sep) and path .. sep or path end
+local function with_sep(path)
+  return (not falsy(path) and path:sub(-1) ~= sep) and path .. sep or path
+end
 
 --- Replace the directory path with an identifier if it matches a commonly visited
 --- directory of mine such as my projects directory or my work directory
@@ -257,14 +264,17 @@ local function dir_env(directory)
   local paths = {
     [vim.g.dotfiles] = '$DOTFILES',
     [vim.g.projects_directory .. '/personal/dotfiles'] = '$DOTFILES',
-    [vim.env.HOME] = '~',
     [vim.g.work_directory] = '$WORK',
     [vim.env.VIMRUNTIME] = '$VIMRUNTIME',
     [vim.g.projects_directory] = '$PROJECTS',
+    ['/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
+    ['~/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
+    [vim.env.HOME] = '~',
   }
   local result, env, prev_match = directory, '', ''
   for dir, alias in pairs(paths) do
-    local match, count = fs.normalize(directory):gsub(vim.pesc(with_sep(dir)), '')
+    local match, count = fs.normalize(directory)
+      :gsub(vim.pesc(with_sep(dir)), '')
     if count == 1 and #dir > #prev_match then
       result, env, prev_match = match, alias, dir
     end
@@ -286,7 +296,9 @@ local function filename(ctx)
   local fname = table.remove(parts)
 
   local name = identifiers.names[ft]
-  if name then return { fname = vim.is_callable(name) and name(fname, buf) or name } end
+  if name then
+    return { fname = vim.is_callable(name) and name(fname, buf) or name }
+  end
 
   local parent = table.remove(parts)
   fname = fn.isdirectory(fname) == 1 and fname .. sep or fname
@@ -295,23 +307,32 @@ local function filename(ctx)
   local dir = with_sep(table.concat(parts, sep))
   local new_dir, env = dir_env(dir)
   local segment = not falsy(env) and env .. new_dir or dir
-  if strwidth(segment) > math.floor(vim.o.columns / 3) then new_dir = fn.pathshorten(new_dir) end
+  if strwidth(segment) > math.floor(vim.o.columns / 3) then
+    new_dir = fn.pathshorten(new_dir)
+  end
 
-  return { env = with_sep(env), dir = with_sep(new_dir), parent = with_sep(parent), fname = fname }
+  return {
+    env = with_sep(env),
+    dir = with_sep(new_dir),
+    parent = with_sep(parent),
+    fname = fname,
+  }
 end
 
 -- Create the various segments of the current filename
 local function stl_file(ctx, minimal)
   -- highlight the filename components separately
   local filename_hl = ctx.winhl and stl_winhl.filename.hl(ctx.win)
-      or (minimal and hls.filename_inactive or hls.filename)
+    or (minimal and hls.filename_inactive or hls.filename)
 
   local directory_hl = ctx.winhl and stl_winhl.directory.hl(ctx.win)
-      or (minimal and hls.directory_inactive or hls.directory)
+    or (minimal and hls.directory_inactive or hls.directory)
 
-  local parent_hl = ctx.winhl and stl_winhl.parent.hl(ctx.win) or (minimal and directory_hl or hls.parent_directory)
+  local parent_hl = ctx.winhl and stl_winhl.parent.hl(ctx.win)
+    or (minimal and directory_hl or hls.parent_directory)
 
-  local env_hl = ctx.winhl and stl_winhl.env.hl(ctx.win) or (minimal and directory_hl or hls.env)
+  local env_hl = ctx.winhl and stl_winhl.env.hl(ctx.win)
+    or (minimal and directory_hl or hls.env)
 
   local ft_icon, icon_highlight = filetype(ctx)
   local ft_hl = hls.comment
@@ -324,18 +345,24 @@ local function stl_file(ctx, minimal)
   local p = filename(ctx)
 
   -- Depending on which filename segments are empty we select a section to add the file icon to
-  local env_empty, dir_empty, parent_empty = falsy(p.env), falsy(p.dir), falsy(p.parent)
+  local env_empty, dir_empty, parent_empty =
+    falsy(p.env), falsy(p.dir), falsy(p.parent)
   local to_update = (env_empty and dir_empty and parent_empty) and file_opts
-      or (env_empty and dir_empty) and parent_opts
-      or env_empty and dir_opts
-      or env_opts
+    or (env_empty and dir_empty) and parent_opts
+    or env_empty and dir_opts
+    or env_opts
 
   table.insert(to_update[1], { ft_icon .. ' ', not minimal and ft_hl or nil })
   table.insert(env_opts[1], { p.env or '', env_hl })
   table.insert(dir_opts[1], { p.dir or '', directory_hl })
   table.insert(file_opts[1], { p.fname or '', filename_hl })
   table.insert(parent_opts[1], { p.parent or '', parent_hl })
-  return { env = env_opts, file = file_opts, dir = dir_opts, parent = parent_opts }
+  return {
+    env = env_opts,
+    file = file_opts,
+    dir = dir_opts,
+    parent = parent_opts,
+  }
 end
 
 local function diagnostic_info(context)
@@ -356,16 +383,9 @@ local function diagnostic_info(context)
   end)
 end
 
-
-
-
-
-
-
-
-
-
-local function debugger() return not package.loaded.dap and '' or require('dap').status() end
+local function debugger()
+  return not package.loaded.dap and '' or require('dap').status()
+end
 
 -----------------------------------------------------------------------------//
 -- Last search count
@@ -375,7 +395,7 @@ local function search_count()
   local ok, result = pcall(fn.searchcount, { recompute = 1 })
   if not ok then return '' end
   if vim.tbl_isempty(result) then return '' end
-  if result.incomplete == 1 then     -- timed out
+  if result.incomplete == 1 then -- timed out
     return ' ?/?? '
   elseif result.incomplete == 2 then -- max count exceeded
     if result.total > result.maxcount and result.current > result.maxcount then
@@ -386,7 +406,6 @@ local function search_count()
   end
   return fmt(' %d/%d ', result.current, result.total)
 end
-
 
 ----------------------------------------------------------------------------------------------------
 --  LSP Clients
@@ -404,11 +423,16 @@ end
 ---@return table[]
 local function stl_lsp_clients(ctx)
   local clients = vim.lsp.get_clients({ bufnr = ctx.bufnum })
-  if not state.lsp_clients_visible then return { { name = fmt('%d attached', #clients), priority = 7 } } end
+  if not state.lsp_clients_visible then
+    return { { name = fmt('%d attached', #clients), priority = 7 } }
+  end
   if falsy(clients) then return { { name = 'none', priority = 7 } } end
   table.sort(clients, function(a, b) return a.name < b.name end)
 
-  return vim.tbl_map(function(client) return { name = client.name, priority = 4 } end, clients)
+  return vim.tbl_map(
+    function(client) return { name = client.name, priority = 4 } end,
+    clients
+  )
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -426,7 +450,11 @@ local function run_task_on_interval(interval, task)
     pending_job = task()
   end
   local fail = timer:start(0, interval, vim.schedule_wrap(callback))
-  if fail ~= 0 then vim.schedule(function() vim.notify('Failed to start git update job: ' .. fail) end) end
+  if fail ~= 0 then
+    vim.schedule(
+      function() vim.notify('Failed to start git update job: ' .. fail) end
+    )
+  end
 end
 
 --- Check if in a git repository
@@ -473,20 +501,26 @@ local function git_updates() run_task_on_interval(10000, update_git_status) end
 
 --- @param ctx StatuslineContext
 local function is_plain(ctx)
-  local decor = decorations.get({ ft = ctx.filetype, bt = ctx.buftype, setting = 'statusline' })
+  local decor = decorations.get({
+    ft = ctx.filetype,
+    bt = ctx.buftype,
+    setting = 'statusline',
+  })
   local is_plain_ft, is_plain_bt = decor.ft == 'minimal', decor.bt == 'minimal'
   return is_plain_ft or is_plain_bt or ctx.preview
 end
 
 --- @param ctx StatuslineContext
 --- @param icon string | nil
-local function is_modified(ctx, icon) 
+local function is_modified(ctx, icon)
   return ctx.filetype == 'help' and '' or ctx.modified and (icon or '✎') or ''
 end
 
 --- @param ctx StatuslineContext
 --- @param icon string | nil
-local function is_readonly(ctx, icon) return ctx.readonly and ' ' .. (icon or '') or '' end
+local function is_readonly(ctx, icon)
+  return ctx.readonly and ' ' .. (icon or '') or ''
+end
 
 -------------------------------------------------------------------------------
 --  RENDER
@@ -524,7 +558,8 @@ function mrl.ui.statusline.render()
   -- Setup
   ----------------------------------------------------------------------------//
   local l1 = section:new({
-    { --[[empty]] },
+    { --[[empty]]
+    },
     cond = not plain,
     before = '',
     after = '',
@@ -534,15 +569,23 @@ function mrl.ui.statusline.render()
   -- Filename
   ----------------------------------------------------------------------------//
   local path = stl_file(ctx, plain)
-  local readonly_hl = ctx.winhl and stl_winhl.readonly.hl(ctx.win) or stl_winhl.readonly.fallback
-  local readonly_component = { { { is_readonly(ctx),  readonly_hl } }, priority = 1 }
+  local readonly_hl = ctx.winhl and stl_winhl.readonly.hl(ctx.win)
+    or stl_winhl.readonly.fallback
+  local readonly_component =
+    { { { is_readonly(ctx), readonly_hl } }, priority = 1 }
   ----------------------------------------------------------------------------//
   -- Mode
   ----------------------------------------------------------------------------//
   -- show a minimal statusline with only the mode and file component
   ----------------------------------------------------------------------------//
   if plain or not focused then
-    local l2 = section:new(readonly_component, path.env, path.dir, path.parent, path.file)
+    local l2 = section:new(
+      readonly_component,
+      path.env,
+      path.dir,
+      path.parent,
+      path.file
+    )
     return display({ l1 + l2 }, available_space)
   end
   -----------------------------------------------------------------------------//
@@ -574,57 +617,81 @@ function mrl.ui.statusline.render()
   local flutter = vim.g.flutter_tools_decorations or {}
   local diagnostics = diagnostic_info(ctx)
   local lsp_clients = vim
-      .iter(ipairs(stl_lsp_clients(ctx)))
-      :map(
-        function(_, client)
-          return {
-            {
-              {
-                -- client.name == 'GitHub Copilot' and icons.misc.copilot .. ' ' or client.name,
-                client.name == 'copilot' and icons.misc.copilot .. ' ' or client.name,
-                hls.client,
-              },
-              { space, 'StSeparator' },
-              { '', hls.metadata_prefix },
-            },
-            priority = client.priority,
-          }
-        end
-      )
-      :totable()
-  table.insert(lsp_clients[1][1], 1, { icons.misc.clippy .. ': ', hls.metadata })
+    .iter(ipairs(stl_lsp_clients(ctx)))
+    :map(function(_, client)
+      return {
+        {
+          {
+            -- client.name == 'GitHub Copilot' and icons.misc.copilot .. ' ' or client.name,
+            client.name == 'copilot' and icons.misc.copilot .. ' '
+              or client.name,
+            hls.client,
+          },
+          { space, 'StSeparator' },
+          { '', hls.metadata_prefix },
+        },
+        priority = client.priority,
+      }
+    end)
+    :totable()
+  table.insert(
+    lsp_clients[1][1],
+    1,
+    { icons.misc.clippy .. ': ', hls.metadata }
+  )
   lsp_clients[1].id = LSP_COMPONENT_ID -- the unique id of the component
   lsp_clients[1].click = 'v:lua.mrl.ui.statusline.lsp_client_click'
   -----------------------------------------------------------------------------//
   -- Left section
   -----------------------------------------------------------------------------//
   local l2 = section:new(
-    { { {  file_modified, hls.modified }, {space, 'StSeparator'} }, cond = ctx.modified, priority = 1 },
+    {
+      { { file_modified, hls.modified }, { space, 'StSeparator' } },
+      cond = ctx.modified,
+      priority = 1,
+    },
     -- readonly_component ,
     -- { { { mode, mode_hl } }, priority = 0 },
-    { { { search_count(), 'StSearchCount' } }, cond = vim.v.hlsearch > 0, priority = 1 },
+    {
+      { { search_count(), 'StSearchCount' } },
+      cond = vim.v.hlsearch > 0,
+      priority = 1,
+    },
     path.env,
     path.dir,
     path.parent,
     path.file,
     {
-      { { diagnostics.warn.icon, hls.warn }, { space, 'StSeparator' }, { diagnostics.warn.count, hls.warn } },
+      {
+        { diagnostics.warn.icon, hls.warn },
+        { space, 'StSeparator' },
+        { diagnostics.warn.count, hls.warn },
+      },
       cond = diagnostics.warn.count,
       priority = 3,
     },
     {
-      { { diagnostics.error.icon, hls.error }, { space, 'StSeparator' }, { diagnostics.error.count, hls.error } },
+      {
+        { diagnostics.error.icon, hls.error },
+        { space, 'StSeparator' },
+        { diagnostics.error.count, hls.error },
+      },
       cond = diagnostics.error.count,
       priority = 1,
     },
     {
-      { { diagnostics.info.icon, hls.info }, { space, 'StSeparator' }, { diagnostics.info.count, hls.info } },
+      {
+        { diagnostics.info.icon, hls.info },
+        { space, 'StSeparator' },
+        { diagnostics.info.count, hls.info },
+      },
       cond = diagnostics.info.count,
       priority = 4,
     },
     {
       { { icons.misc.shaded_lock, hls.metadata } },
-      cond = vim.b[ctx.bufnum].formatting_disabled == true or vim.g.formatting_disabled == true,
+      cond = vim.b[ctx.bufnum].formatting_disabled == true
+        or vim.g.formatting_disabled == true,
       priority = 5,
     }
   )
@@ -642,7 +709,6 @@ function mrl.ui.statusline.render()
   -- }}}
   -----------------------------------------------------------------------------
 
-
   -----------------------------------------------------------------------------
   -- Right section
   -----------------------------------------------------------------------------
@@ -650,7 +716,11 @@ function mrl.ui.statusline.render()
   local r1 = section:new(
     {
       -- neovim package updates
-      { { 'updates:', hls.comment }, { space , 'StSeparator'}, { pending_updates, hls.title } },
+      {
+        { 'updates:', hls.comment },
+        { space, 'StSeparator' },
+        { pending_updates, hls.title },
+      },
       priority = 3,
       cond = has_pending_updates,
     },
@@ -660,39 +730,67 @@ function mrl.ui.statusline.render()
 
   local r2 = section:new(
     {
-      { { icons.misc.bug }, { space, 'StSeparator' }, { debugger(), hls.metadata } },
+      {
+        { icons.misc.bug },
+        { space, 'StSeparator' },
+        { debugger(), hls.metadata },
+      },
       priority = 4,
       cond = debugger(),
     },
     --  Git status {{{
     {
-      { { icons.git.branch, hls.git }, { space,  'StSeparator' }, { status.head, hls.blue } },
+      {
+        { icons.git.branch, hls.git },
+        { space, 'StSeparator' },
+        { status.head, hls.blue },
+      },
       priority = 1,
       cond = not falsy(status.head),
     },
     {
-      { { icons.git.mod, hls.warn }, { space , 'StSeparator'}, { status.changed, hls.title } },
+      {
+        { icons.git.mod, hls.warn },
+        { space, 'StSeparator' },
+        { status.changed, hls.title },
+      },
       priority = 3,
       cond = not falsy(status.changed),
     },
     {
-      { { icons.git.remove, hls.error }, { space , 'StSeparator'}, { status.removed, hls.title } },
+      {
+        { icons.git.remove, hls.error },
+        { space, 'StSeparator' },
+        { status.removed, hls.title },
+      },
       priority = 3,
       cond = not falsy(status.removed),
     },
     {
-      { { icons.git.add, hls.green }, { space , 'StSeparator'}, { status.added, hls.title } },
+      {
+        { icons.git.add, hls.green },
+        { space, 'StSeparator' },
+        { status.added, hls.title },
+      },
       priority = 3,
       cond = not falsy(status.added),
     },
     {
-      { { icons.misc.up, hls.green }, { space , 'StSeparator'}, { ahead, hls.title } },
+      {
+        { icons.misc.up, hls.green },
+        { space, 'StSeparator' },
+        { ahead, hls.title },
+      },
       cond = ahead,
       before = '',
       priority = 5,
     },
     {
-      { { icons.misc.down, hls.number }, { space , 'StSeparator'}, { behind, hls.title } },
+      {
+        { icons.misc.down, hls.number },
+        { space, 'StSeparator' },
+        { behind, hls.title },
+      },
       after = ' ',
       cond = behind,
       priority = 5,
@@ -704,12 +802,19 @@ function mrl.ui.statusline.render()
         { '(', hls.metadata_prefix },
         { fmt('%+' .. strwidth(tostring(line_count)) .. 's', lnum), hls.title },
         { '/', hls.comment },
-        { tostring(line_count) .. ',',                                               hls.comment },
+        {
+          tostring(line_count) .. ',',
+          hls.comment,
+        },
       },
       priority = 7,
     },
     {
-      {  { space, 'StSeparator' }, { fmt('%+2s', col), hls.title }, { ')', hls.metadata_prefix } },
+      {
+        { space, 'StSeparator' },
+        { fmt('%+2s', col), hls.title },
+        { ')', hls.metadata_prefix },
+      },
       priority = 7,
     },
     -- }}}
@@ -718,12 +823,12 @@ function mrl.ui.statusline.render()
       {
         { ctx.expandtab and icons.misc.indent or icons.misc.tab },
         { space, 'StSeparator' },
-        { ctx.shiftwidth,                                       hls.title },
+        { ctx.shiftwidth, hls.title },
       },
       cond = ctx.shiftwidth > 2 or not ctx.expandtab,
       priority = 6,
     }
-  -- }}}
+    -- }}}
   )
   -- removes 5 columns to add some padding
   return display({ l1 + l2, m1, r1 + r2 }, available_space - 5)
@@ -743,9 +848,7 @@ mrl.augroup('CustomStatusline', {
   command = function() vim.g.vim_in_focus = false end,
 }, {
   event = 'ColorScheme',
-  command = function()
-    colors()
-  end,
+  command = function() colors() end,
 }, {
   event = 'WinEnter',
   command = adopt_window_highlights,
@@ -757,13 +860,18 @@ mrl.augroup('CustomStatusline', {
   event = 'LspAttach',
   command = function(args)
     local clients = vim.lsp.get_clients({ bufnr = args.buf })
-    if vim.o.columns < 200 and #clients > MAX_LSP_SERVER_COUNT then state.lsp_clients_visible = false end
+    if vim.o.columns < 200 and #clients > MAX_LSP_SERVER_COUNT then
+      state.lsp_clients_visible = false
+    end
   end,
 }, {
   event = 'User',
-  pattern = { 'NeogitPushComplete', 'NeogitCommitComplete', 'NeogitStatusRefresh' },
+  pattern = {
+    'NeogitPushComplete',
+    'NeogitCommitComplete',
+    'NeogitStatusRefresh',
+  },
   command = update_git_status,
 })
-
 
 -- vim: fdm=marker

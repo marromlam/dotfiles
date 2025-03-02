@@ -14,4 +14,4 @@
 -- ]]
 
 -- cfilter plugin allows filtering down an existing quickfix list
-vim.cmd.packadd 'cfilter'
+vim.cmd.packadd('cfilter')

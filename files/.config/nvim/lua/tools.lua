@@ -19,9 +19,7 @@
 ---@return T?
 function mrl.find(matcher, haystack)
   for _, needle in ipairs(haystack) do
-    if matcher(needle) then
-      return needle
-    end
+    if matcher(needle) then return needle end
   end
 end
 
@@ -39,7 +37,7 @@ end
 function mrl.adjust_split_height(min_height, max_height)
   vim.api.nvim_win_set_height(
     0,
-    math.max(math.min(vim.fn.line '$', max_height), min_height)
+    math.max(math.min(vim.fn.line('$'), max_height), min_height)
   )
 end
 
