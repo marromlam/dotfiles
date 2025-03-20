@@ -1,10 +1,7 @@
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
---
---
 if not mrl then return end
 
-local fn, api, v, env, cmd, fmt = vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
+local fn, api, v, env, cmd, fmt =
+  vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -18,34 +15,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
 })
 
-function mrl.augroup(name, ...)
-  local commands = { ... }
-  assert(name ~= 'User', 'The name of an augroup CANNOT be User')
-  assert(
-    #commands > 0,
-    fmt('You must specify at least one autocommand for %s', name)
-  )
-  local id = api.nvim_create_augroup(name, { clear = true })
-  for _, autocmd in ipairs(commands) do
-    -- validate_autocmd(name, autocmd)
-    local is_callback = type(autocmd.command) == 'function'
-    vim.api.nvim_create_autocmd(autocmd.event, {
-      group = name,
-      pattern = autocmd.pattern,
-      desc = autocmd.desc,
-      callback = is_callback and autocmd.command or nil,
-      command = not is_callback and autocmd.command or nil,
-      once = autocmd.once,
-      nested = autocmd.nested,
-      buffer = autocmd.buffer,
-    })
-  end
-  return id
-end
-
 local function stop_hl()
   if v.hlsearch == 0 or api.nvim_get_mode().mode ~= 'n' then return end
-  api.nvim_feedkeys(vim.keycode('<Plug>(StopHL)'), 'm', false)
+  vim.api.nvim_feedkeys(vim.keycode('<Plug>(StopHL)'), 'm', false)
 end
 
 local function hl_search()
@@ -94,8 +66,12 @@ mrl.augroup('VimrcIncSearchHighlight', {
 -- This is based on the implementation discussed here:
 -- https://github.com/neovim/neovim/issues/5581
 
-
-vim.keymap.set( { 'n', 'v', 'o', 'i', 'c' }, '<Plug>(StopHL)', 'execute("nohlsearch")[-1]', { expr = true })
+vim.keymap.set(
+  { 'n', 'v', 'o', 'i', 'c' },
+  '<Plug>(StopHL)',
+  'execute("nohlsearch")[-1]',
+  { expr = true }
+)
 
 local function stop_hl()
   if v.hlsearch == 0 or api.nvim_get_mode().mode ~= 'n' then return end
@@ -134,8 +110,6 @@ mrl.augroup('VimrcIncSearchHighlight', {
 
 -- }}}
 
-
-
 -- Recording macro {{{
 
 vim.api.nvim_create_autocmd('RecordingEnter', {
@@ -157,9 +131,6 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
 
 -- }}}
 
-
-
-
 mrl.augroup('UpdateVim', {
   event = { 'FocusLost' },
   pattern = { '*' },
@@ -171,30 +142,21 @@ mrl.augroup('UpdateVim', {
 })
 
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-  group =  vim.api.nvim_create_augroup("AutoCreateDir", { clear = true }),
+vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+  group = vim.api.nvim_create_augroup('AutoCreateDir', { clear = true }),
   callback = function(event)
-    if event.match:match("^%w%w+:[\\/][\\/]") then
-      return
-    end
+    if event.match:match('^%w%w+:[\\/][\\/]') then return end
     local file = vim.uv.fs_realpath(event.match) or event.match
-    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ':p:h'), 'p')
   end,
 })
 
 -- Check if we need to reload the file when it changed
-vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
-  group =  vim.api.nvim_create_augroup("CheckAutoReload", { clear = true }),
+vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
+  group = vim.api.nvim_create_augroup('CheckAutoReload', { clear = true }),
   callback = function()
-    if vim.o.buftype ~= "nofile" then
-      vim.cmd("checktime")
-    end
+    if vim.o.buftype ~= 'nofile' then vim.cmd('checktime') end
   end,
 })
-
-
-
-
-
 
 -- }}}
