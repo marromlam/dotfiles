@@ -140,12 +140,12 @@ vim.keymap.set(
   '<C-w>vgf',
   { desc = 'open file in vertical split' }
 )
-vim.keymap.set(
-  'n',
-  '<leader>qw',
-  '<cmd>bd!<CR>',
-  { desc = 'Close current buffer (and window)' }
-)
+-- vim.keymap.set(
+--   'n',
+--   '<leader>qw',
+--   '<cmd>bd!<CR>',
+--   { desc = 'Close current buffer (and window)' }
+-- )
 
 -- }}}
 
@@ -272,12 +272,12 @@ vim.keymap.set(
     desc = 'source $VIMRC',
   }
 )
-vim.keymap.set(
-  'n',
-  '<leader>yf',
-  ":let @*=expand('%:p')<CR>",
-  { desc = 'yank file path into the clipboard' }
-)
+-- vim.keymap.set(
+--   'n',
+--   '<leader>yf',
+--   ":let @*=expand('%:p')<CR>",
+--   { desc = 'yank file path into the clipboard' }
+-- )
 -----------------------------------------------------------------------------//
 -- Quotes
 -----------------------------------------------------------------------------//
@@ -490,9 +490,9 @@ vim.keymap.set(
   '<cmd>%bdelete!<CR>',
   { desc = 'Force Close All Buffers' }
 )
-vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save' })
+-- vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save' })
 vim.keymap.set('n', '<leader>q', ':q<CR>', { desc = 'Quit' })
-vim.keymap.set('n', '<leader>W', '<cmd>w!<CR>', { desc = 'Save (force)' })
+-- vim.keymap.set('n', '<leader>W', '<cmd>w!<CR>', { desc = 'Save (force)' })
 vim.keymap.set('n', '<leader>Q', '<cmd>q!<CR>', { desc = 'Quit (force)' })
 
 -- naviagate buffers
@@ -808,5 +808,12 @@ vim.keymap.set(
 -- search visual selection
 -- vim.keymap.set('v', '//', [[y/<C-R>"<CR>]])
 -- }}}
+
+vim.keymap.set(
+  { 'n' },
+  '<leader>ls',
+  '<cmd>lua vim.lsp.diagnostic.get_line_diagnostics()<CR>',
+  { noremap = true, silent = true }
+)
 
 -- vim: fdm=marker
