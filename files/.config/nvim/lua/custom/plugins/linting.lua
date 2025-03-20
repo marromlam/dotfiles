@@ -2,10 +2,14 @@ return {
   'mfussenegger/nvim-lint',
   events = { 'BufWritePost', 'BufReadPost', 'InsertLeave' },
   keys = {
-    { 'n,', '<leader>ll', function() require('lint').try_lint() end, desc = 'Trigger linting for current file', },
+    {
+      '<leader>ll',
+      function() require('lint').try_lint() end,
+      desc = 'Trigger linting for current file',
+    },
   },
   config = function()
-    local lint = require 'lint'
+    local lint = require('lint')
 
     lint.linters_by_ft = {
       javascript = { 'eslint_d' },
@@ -27,10 +31,7 @@ return {
 
     vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
       group = lint_augroup,
-      callback = function()
-        require('lint').try_lint()
-      end,
+      callback = function() require('lint').try_lint() end,
     })
-
   end,
 }

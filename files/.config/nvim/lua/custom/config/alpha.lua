@@ -7,36 +7,34 @@ local strwidth = api.nvim_strwidth
 
 local function get_installed_plugins()
   local ok, lazy = pcall(require, 'lazy')
-  if not ok then
-    return 0
-  end
+  if not ok then return 0 end
   return lazy.stats().count
 end
 
 local M = {}
 
 function M.config()
-  local alpha = require 'alpha'
-  local dashboard = require 'alpha.themes.dashboard'
+  local alpha = require('alpha')
+  local dashboard = require('alpha.themes.dashboard')
 
   local button = function(h, ...)
     local btn = dashboard.button(...)
     local details = select(2, ...)
-    local icon = details:match '[^%w%s]+' -- match non alphanumeric or space characters
+    local icon = details:match('[^%w%s]+') -- match non alphanumeric or space characters
     btn.opts.hl = { { h, 0, #icon + 1 } } -- add one space padding
     btn.opts.hl_shortcut = 'Title'
     return btn
   end
 
   local color_list = {
-'#458588',
-'#3f7e7e',
-'#397474',
-'#336a6a',
-'#2d6060',
-'#275656',
-'#214c4c',
-'#1b4242',
+    '#458588',
+    '#3f7e7e',
+    '#397474',
+    '#336a6a',
+    '#2d6060',
+    '#275656',
+    '#214c4c',
+    '#1b4242',
   }
   -- loop over the color list and set the colors
   for i, color in ipairs(color_list) do
@@ -63,39 +61,40 @@ function M.config()
     -- [[   █████████ ██████████ █████████ █████ █████ ████ █████  ]],
     -- [[ ███████████ ███    ███ █████████ █████ █████ ████ █████ ]],
     -- [[██████  █████████████████████ ████ █████ █████ ████ ██████]],
--- [[                                                                           ]],
--- [[                                                         ▀▀▀               ]],
--- [[ █████████████ █████████████ █████████████ ███      ██ ███ █████████████ ]],
--- [[ ███       ███ ███       ███ ███       ███ ███     ██  ███ ███  ███  ███ ]],
--- [[ ███       ███ █████████████ ███       ███ ███    ██   ███ ███  ███  ███ ]],
--- [[ ███       ███ ███           ███       ███ ███   ██    ███ ███  ███  ███ ]],
--- [[ ███       ███ █████████████ █████████████ ████████     ███ ███  ███  ███ ]],
--- [[                                                                           ]],
--------------------------------------------------------------------------------
-[[                                                               ]],
-[[                                                               ]],
-[[ ██████████ █████████ ██████████ ███   ██ ███ █████████████  ]],
-[[ ███    ███ ███   ███ ███    ███ ███  ██  ███ ███  ███  ███  ]],
-[[ ███    ███ █████████ ███    ███ ███ ██   ███ ███  ███  ███  ]],
-[[ ███    ███ ███       ███    ███ █████    ███ ███  ███  ███  ]],
-[[ ███    ███ █████████ ██████████ █████     ███ ███  ███  ███  ]],
-[[                                                               ]],
-
-
+    -- [[                                                                           ]],
+    -- [[                                                         ▀▀▀               ]],
+    -- [[ █████████████ █████████████ █████████████ ███      ██ ███ █████████████ ]],
+    -- [[ ███       ███ ███       ███ ███       ███ ███     ██  ███ ███  ███  ███ ]],
+    -- [[ ███       ███ █████████████ ███       ███ ███    ██   ███ ███  ███  ███ ]],
+    -- [[ ███       ███ ███           ███       ███ ███   ██    ███ ███  ███  ███ ]],
+    -- [[ ███       ███ █████████████ █████████████ ████████     ███ ███  ███  ███ ]],
+    -- [[                                                                           ]],
+    -------------------------------------------------------------------------------
+    [[                                                               ]],
+    [[                                                               ]],
+    [[ ██████████ █████████ ██████████ ███   ██ ███ █████████████  ]],
+    [[ ███    ███ ███   ███ ███    ███ ███  ██  ███ ███  ███  ███  ]],
+    [[ ███    ███ █████████ ███    ███ ███ ██   ███ ███  ███  ███  ]],
+    [[ ███    ███ ███       ███    ███ █████    ███ ███  ███  ███  ]],
+    [[ ███    ███ █████████ ██████████ █████     ███ ███  ███  ███  ]],
+    [[                                                               ]],
   }
 
   local function neovim_header()
-    return mrl.map(function(chars, i)
-      return {
-        type = 'text',
-        val = chars,
-        opts = {
-          hl = 'StartLogo' .. i,
-          shrink_margin = false,
-          position = 'center',
-        },
-      }
-    end, header)
+    return mrl.map(
+      function(chars, i)
+        return {
+          type = 'text',
+          val = chars,
+          opts = {
+            hl = 'StartLogo' .. i,
+            shrink_margin = false,
+            position = 'center',
+          },
+        }
+      end,
+      header
+    )
   end
 
   local installed_plugins = {
@@ -132,13 +131,13 @@ function M.config()
     button('Title', 'q', '  Quit', ':qa<CR>'),
   }
 
-  dashboard.section.footer.val = require 'alpha.fortune'
+  dashboard.section.footer.val = require('alpha.fortune')
   dashboard.section.footer.opts.hl = 'TSEmphasis'
 
   ------------------------------------------------------------------------------------------------
   --  Setup
   ------------------------------------------------------------------------------------------------
-  alpha.setup {
+  alpha.setup({
     layout = {
       { type = 'padding', val = 5 },
       { type = 'group', val = neovim_header() },
@@ -155,7 +154,7 @@ function M.config()
       dashboard.section.footer,
     },
     opts = { margin = 10 },
-  }
+  })
 
   -- mrl.augroup('AlphaSettings', {
   --   event = 'User ',

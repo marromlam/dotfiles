@@ -8,7 +8,7 @@ function M.config()
   vim.g.vimtex_view_automatic = 0
   -- vim.g.vimtex_quickfix_mode = 2
   -- Config from castel.dev
-  vim.cmd [[set conceallevel=1]]
+  vim.cmd([[set conceallevel=1]])
   vim.g.tex_conceal = 'abdmg'
 end
 
