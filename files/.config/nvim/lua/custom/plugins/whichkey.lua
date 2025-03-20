@@ -1,20 +1,16 @@
 return {
   'folke/which-key.nvim',
   event = 'VeryLazy',
-  cond = false,
-  disable = true,
-  tag = 'v3.9.0',
   config = function()
     local wk = require('which-key')
     wk.setup({
-      -- plugins = { spelling = { enabled = true } },
-      window = { border = mrl.ui.current.border },
+      win = { border = false },
       layout = { align = 'center' },
     })
 
     -- wk.add({
     --   [']'] = { name = '+next' },
-    --   ['['] = { name = '+prev' },
+    -- ['['] = { name = '+prev' },
     --   g = {
     --     c = { name = '+comment' },
     --     b = { name = '+bufferline' },
