@@ -8,14 +8,6 @@ vim.opt_local.wrap = false
 vim.opt_local.spell = true
 vim.opt_local.textwidth = 78
 
--- mrl.ftplugin_conf({
---   ["virt-column"] = function(col)
---     if vim.bo.modifiable then
---       col.setup_buffer({ virtcolumn = "+1" })
---     end
---   end,
--- })
-
 local opts = { buffer = 0 }
 
 -- if this a vim help file create mappings to make navigation easier otherwise

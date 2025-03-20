@@ -1,7 +1,4 @@
 -- CUSTOM QUICKFIX WINDOW
---
--- References:
--- https://vim.fandom.com/wiki/Learn_to_use_help
 
 vim.opt_local.wrap = false
 vim.opt_local.number = false
