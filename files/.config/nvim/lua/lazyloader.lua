@@ -14,6 +14,8 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local icons = mrl.ui.icons
+
 require('lazy').setup({
   { import = 'custom.plugins' },
 }, {
@@ -67,19 +69,19 @@ require('lazy').setup({
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
     icons = {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
+      cmd = icons.cmd,
+      config = icons.config,
+      event = icons.calendar,
+      ft = icons.folder,
+      init = icons.settings,
+      keys = icons.key,
+      plugin = icons.box,
+      runtime = icons.runtime,
+      require = icons.moon,
+      source = icons.source,
+      start = icons.rocket,
+      task = icons.task,
+      lazy = icons.sleep,
     },
   },
 })

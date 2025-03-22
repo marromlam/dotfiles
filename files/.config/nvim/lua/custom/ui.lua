@@ -79,6 +79,7 @@ mrl.ui.icons = {
     bug = '', --  '󰠭'
     question = '',
     clock = '',
+    cmd = '⌘',
     lock = '',
     shaded_lock = '',
     circle = '',
@@ -111,6 +112,16 @@ mrl.ui.icons = {
     -- block = "▌",
     block = '▏',
     clippy = '',
+    settings = '⚙',
+    key = '',
+    config = '',
+    box = '',
+    moon = '󰤄',
+    source = '󰈙',
+    sleep = '󰒲',
+    rocket = '',
+    task = '󰐃',
+    runtime = '',
   },
 }
 mrl.ui.lsp = {
