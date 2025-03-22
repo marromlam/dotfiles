@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Define your subnet (replace with your actual subnet)
+SUBNET="192.168.1.0/24"
+
+echo "Scanning network $SUBNET..."
+echo -e "IP Address\t\tHostname"
+
+# Run nmap ping scan and parse output
+nmap -sn $SUBNET | while read line; do
+    if [[ $line == *"Nmap scan report for"* ]]; then
+        ip=$(echo $line | awk '{print $5}')
+        host=$(echo $line | cut -d ' ' -f 5-)
+        echo -e "$ip\t\t$host"
+    fi
+done

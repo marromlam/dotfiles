@@ -1,0 +1,76 @@
+node_modules
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*~
+tags
+tags.lock
+tags.temp
+*.un~
+Session.vim
+# Compiled source
+*.com
+*.class
+*.dll
+*.o
+*.so
+.lvimrc
+.idea
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+gin-bin
+.tern-port
+
+# VSCode workspaces
+*.code-workspace
+.vscode
+*.doc#
+:merlin-log:
+
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+.vim/
+.nvimrc
+.projections.json
+.classpath
+.factorypath
+.settings/
+*.iml
+bin/
+
+# Spell files (ignore all but those my personal dictionary)
+*.add
+*.add.spl
+!/.dotfiles/**/*.add
+
+# Vim Wiki tag files
+.vimwiki_tags
+
+.nvim.lua
+.localrc.lua
+.exrc
+.ignore
+.fvm/
+.gonvim/
+
+.ccls-cache/
+.project
+# vim:filetype=conf
