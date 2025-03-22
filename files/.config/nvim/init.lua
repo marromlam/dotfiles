@@ -14,13 +14,13 @@ vim.g.icloud = vim.fn.expand('~') .. '/Library/Mobile Documents'
 vim.g.obsidian = vim.g.icloud .. '/iCloud~md~obsidian/Documents'
 
 -- Leader bindings
-vim.g.mapleader = ' '       -- Remap leader key
+vim.g.mapleader = ' ' -- Remap leader key
 vim.g.maplocalleader = '\\' -- Local leader is <Space>
-
 
 --------------------------------------------------------------------------------
 -- Global namespace {{{
 --------------------------------------------------------------------------------
+vim.g.use_cmp = true
 
 local namespace = {
   ui = {
@@ -28,8 +28,9 @@ local namespace = {
     statuscolumn = { enable = true },
     statusline = { enable = true },
   },
-  -- some vim mappings require a mixture of commandline commands and function calls
-  -- this table is place to store lua functions to be called in those mappings
+  -- some vim mappings require a mixture of commandline commands and function
+  -- calls this table is place to store lua functions to be called in those
+  -- mappings
   mappings = { enable = true },
 }
 
@@ -47,45 +48,32 @@ end
 -- }}}
 --------------------------------------------------------------------------------
 
-
 --------------------------------------------------------------------------------
 -- Load modules {{{
 --------------------------------------------------------------------------------
 
 require('tools') -- has to be loaded before plugins
--- require('remaps')
 require('keymaps')
-require('tools')
--- require('autocommands')
-require('custom.globals')
 require('options')
 require('highlight')
 require('custom.ui')
 require('custom.strings')
 require('lazyloader')
--- require('custom.ui')
 require('external_grep')
-
-vim.keymap.set(
-  'n',
-  '<space>ls',
-  '<cmd>lua vim.lsp.diagnostic.get_line_diagnostics()<CR>',
-  { noremap = true, silent = true }
-)
 
 -- }}}
 --------------------------------------------------------------------------------
-
 
 --------------------------------------------------------------------------------
 -- Colorscheme and extra temporal highlights {{{
 --------------------------------------------------------------------------------
 
 vim.o.background = 'dark' -- or "light"
-vim.cmd([[colorscheme gruvbox]])
+-- vim.cmd([[colorscheme gruvbox]])
 -- vim.cmd([[colorscheme horizon]])
 -- vim.cmd([[colorscheme rose-pine]])
 -- vim.cmd([[colorscheme github_dark]])
+vim.cmd([[colorscheme github_dark_default]])
 
 vim.cmd([[
 
@@ -94,7 +82,6 @@ sig define highlightline linehl=Match
 au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost * if expand("%:p") != "" | exe("call map(range(1,1000), {i->execute('sig unplace 999 file='.expand('%:p'))})") | call map(getline(1, '$'), {idx, val -> execute('if val =~ "^\\s*##" | exe "sig place 999 line=".expand(idx+1)." name=highlightline file=".expand("%:p") | endif')}) | endif
 ]])
 
-
 vim.cmd([[
 autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
 autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
@@ -102,9 +89,7 @@ autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
 set colorcolumn=81
 ]])
 
-
 -- }}}
 --------------------------------------------------------------------------------
-
 
 -- vim: ts=2 sts=2 sw=2 et fdm=marker
