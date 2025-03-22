@@ -19,118 +19,17 @@ local space = ' '
 --  Colors
 -------------------------------------------------------------------------------
 
-local hls = {
-  statusline = 'StatusLine',
-  statusline_nc = 'StatusLineNC',
-  metadata = 'StMetadata',
-  metadata_prefix = 'StMetadataPrefix',
-  indicator = 'StIndicator',
-  modified = 'StModified',
-  git = 'StGit',
-  green = 'StGreen',
-  blue = 'StBlue',
-  number = 'StNumber',
-  count = 'StCount',
-  client = 'StClient',
-  env = 'StEnv',
-  directory = 'StDirectory',
-  directory_inactive = 'StDirectoryInactive',
-  parent_directory = 'StParentDirectory',
-  title = 'StTitle',
-  comment = 'StComment',
-  info = 'StInfo',
-  warn = 'StWarn',
-  error = 'StError',
-  filename = 'StFilename',
-  filename_inactive = 'StFilenameInactive',
-  mode_normal = 'StModeNormal',
-  mode_insert = 'StModeInsert',
-  mode_visual = 'StModeVisual',
-  mode_replace = 'StModeReplace',
-  mode_command = 'StModeCommand',
-  mode_select = 'StModeSelect',
-}
-
----@param hl string
----@return fun(id: number): string
 local function with_win_id(hl)
   return function(id) return hl .. id end
 end
 
 local stl_winhl = {
-  filename = { hl = with_win_id('StCustomFilename'), fallback = hls.title },
-  directory = { hl = with_win_id('StCustomDirectory'), fallback = hls.title },
-  parent = { hl = with_win_id('StCustomParentDirectory'), fallback = hls.title },
-  readonly = { hl = with_win_id('StCustomError'), fallback = hls.error },
-  env = { hl = with_win_id('StCustomEnv'), fallback = hls.env },
+  filename = { hl = with_win_id('StFilename') },
+  directory = { hl = with_win_id('StDirectory') },
+  parent = { hl = with_win_id('StParentDirectory') },
+  readonly = { hl = with_win_id('StError') },
+  env = { hl = with_win_id('StEnv') },
 }
-
-function mrl.get_hi(name, id)
-  id = id or 0
-  local hi = vim.api.nvim_get_hl(0, { name = name })
-  -- hi is a table with bg and fg keys. for those we want to return the hex
-  -- value with ('#%06x'):format(num)
-  for k, v in pairs(hi) do
-    if type(v) == 'number' then hi[k] = ('#%06x'):format(v) end
-  end
-  return hi
-end
-
-local function colors()
-  --- NOTE: Unicode characters including vim devicons should NOT be highlighted
-  --- as italic or bold, this is because the underlying bold font is not necessarily
-  --- patched with the nerd font characters
-  --- terminal emulators like kitty handle this by fetching nerd fonts elsewhere
-  --- but this is not universal across terminals so should be avoided
-
-  local indicator_color = P.bright_blue
-  local warning_fg = lsp.colors.warn
-
-  local error_color = lsp.colors.error
-  local info_color = lsp.colors.info
-  local normal_fg = highlight.get('Normal', 'fg')
-  local string_fg = highlight.get('String', 'fg')
-  local number_fg = highlight.get('Number', 'fg')
-  local normal_bg = highlight.get('Normal', 'bg')
-
-  local bg_color = highlight.tint(normal_bg, -0.25)
-  local string_fg = highlight.get('String', 'fg')
-
-  -- stylua: ignore
-  highlight.all({
-    { [hls.metadata] = { bg = bg_color, inherit = 'Comment' } },
-    { [hls.metadata_prefix] = { bg = bg_color, fg = { from = 'Comment' } } },
-    { [hls.indicator] = { bg = bg_color, fg = indicator_color } },
-    { [hls.modified] = { fg = string_fg, bg = bg_color } },
-    { [hls.git] = { fg = P.light_gray, bg = bg_color } },
-    { [hls.green] = { fg = string_fg, bg = bg_color } },
-    { [hls.blue] = { fg = P.dark_blue, bg = bg_color, bold = true } },
-    { [hls.number] = { fg = number_fg, bg = bg_color } },
-    { [hls.count] = { fg = 'bg', bg = indicator_color, bold = true } },
-    { [hls.client] = { bg = bg_color, fg = normal_fg, bold = true } },
-    { [hls.env] = { bg = bg_color, fg = error_color, italic = true, bold = true } },
-    { [hls.directory] = { bg = bg_color, fg = 'Gray', italic = true } },
-    { [hls.directory_inactive] = { bg = bg_color, italic = true, fg = { from = 'Normal', alter = 0.4 } } },
-    { [hls.parent_directory] = { bg = bg_color, fg = string_fg, bold = true } },
-    { [hls.title] = { bg = bg_color, fg = 'LightGray', bold = true } },
-    { [hls.comment] = { bg = bg_color, inherit = 'Comment' } },
-
-    -- { [hls.statusline] = { bg = fg_color } },
-    { [hls.statusline_nc] = { link = 'VertSplit' } },
-    -- { [hls.statusline_nc] = { link = 'VertSplit' } },
-    { [hls.info] = { fg = info_color, bg = bg_color, bold = true } },
-    { [hls.warn] = { fg = warning_fg, bg = bg_color } },
-    { [hls.error] = { fg = error_color, bg = bg_color } },
-    { [hls.filename] = { bg = bg_color, fg = 'LightGray', bold = true } },
-    { [hls.filename_inactive] = { inherit = 'Comment', bg = bg_color, bold = true } },
-    { [hls.mode_normal] = { bg = bg_color, fg = P.light_gray, bold = true } },
-    { [hls.mode_insert] = { bg = bg_color, fg = P.dark_blue, bold = true } },
-    { [hls.mode_visual] = { bg = bg_color, fg = P.magenta, bold = true } },
-    { [hls.mode_replace] = { bg = bg_color, fg = P.dark_red, bold = true } },
-    { [hls.mode_command] = { bg = bg_color, fg = P.light_yellow, bold = true } },
-    { [hls.mode_select] = { bg = bg_color, fg = P.teal, bold = true } },
-  })
-end
 
 local identifiers = {
   buftypes = {
@@ -218,8 +117,6 @@ local function adopt_window_highlights()
   end
 end
 
---- @param ctx StatuslineContext
---- @return string, string?
 local function filetype(ctx)
   local ft, bt =
     identifiers.filetypes[ctx.filetype], identifiers.buftypes[ctx.buftype]
@@ -231,7 +128,6 @@ end
 --- This function allow me to specify titles for special case buffers
 --- like the preview window or a quickfix window
 --- CREDIT: https://vi.stackexchange.com/a/18090
---- @param ctx StatuslineContext
 local function special_buffers(ctx)
   if ctx.preview then return 'preview' end
   if ctx.buftype == 'quickfix' then return 'Quickfix List' end
@@ -245,8 +141,6 @@ local function special_buffers(ctx)
 end
 
 ---Only append the path separator if the path is not empty
----@param path string
----@return string
 local function with_sep(path)
   return (not falsy(path) and path:sub(-1) ~= sep) and path .. sep or path
 end
@@ -320,23 +214,8 @@ local function filename(ctx)
 end
 
 -- Create the various segments of the current filename
-local function stl_file(ctx, minimal)
-  -- highlight the filename components separately
-  local filename_hl = ctx.winhl and stl_winhl.filename.hl(ctx.win)
-    or (minimal and hls.filename_inactive or hls.filename)
-
-  local directory_hl = ctx.winhl and stl_winhl.directory.hl(ctx.win)
-    or (minimal and hls.directory_inactive or hls.directory)
-
-  local parent_hl = ctx.winhl and stl_winhl.parent.hl(ctx.win)
-    or (minimal and directory_hl or hls.parent_directory)
-
-  local env_hl = ctx.winhl and stl_winhl.env.hl(ctx.win)
-    or (minimal and directory_hl or hls.env)
-
+local function stl_file(ctx)
   local ft_icon, icon_highlight = filetype(ctx)
-  local ft_hl = hls.comment
-
   local file_opts = { {}, before = '', after = ' ', priority = 0 }
   local parent_opts = { {}, before = '', after = '', priority = 2 }
   local dir_opts = { {}, before = '', after = '', priority = 3 }
@@ -352,11 +231,11 @@ local function stl_file(ctx, minimal)
     or env_empty and dir_opts
     or env_opts
 
-  table.insert(to_update[1], { ft_icon .. ' ', not minimal and ft_hl or nil })
-  table.insert(env_opts[1], { p.env or '', env_hl })
-  table.insert(dir_opts[1], { p.dir or '', directory_hl })
-  table.insert(file_opts[1], { p.fname or '', filename_hl })
-  table.insert(parent_opts[1], { p.parent or '', parent_hl })
+  table.insert(to_update[1], { ' ' .. ft_icon .. ' ', 'StTitle' })
+  table.insert(env_opts[1], { p.env or '', 'StEnv' })
+  table.insert(dir_opts[1], { p.dir or '', 'StDirectory' })
+  table.insert(file_opts[1], { p.fname or '', 'StFilename' })
+  table.insert(parent_opts[1], { p.parent or '', 'StParent' })
   return {
     env = env_opts,
     file = file_opts,
@@ -387,9 +266,9 @@ local function debugger()
   return not package.loaded.dap and '' or require('dap').status()
 end
 
------------------------------------------------------------------------------//
--- Last search count
------------------------------------------------------------------------------//
+--------------------------------------------------------------------------------
+-- Last search count {{{
+--------------------------------------------------------------------------------
 
 local function search_count()
   local ok, result = pcall(fn.searchcount, { recompute = 1 })
@@ -407,9 +286,13 @@ local function search_count()
   return fmt(' %d/%d ', result.current, result.total)
 end
 
-----------------------------------------------------------------------------------------------------
+-- }}}
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
 --  LSP Clients
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local LSP_COMPONENT_ID = 2000
 local MAX_LSP_SERVER_COUNT = 3
 
@@ -424,7 +307,7 @@ end
 local function stl_lsp_clients(ctx)
   local clients = vim.lsp.get_clients({ bufnr = ctx.bufnum })
   if not state.lsp_clients_visible then
-    return { { name = fmt('%d attached', #clients), priority = 7 } }
+    return { { name = fmt('%d attached', #clients), priority = 2 } }
   end
   if falsy(clients) then return { { name = 'none', priority = 7 } } end
   table.sort(clients, function(a, b) return a.name < b.name end)
@@ -435,9 +318,9 @@ local function stl_lsp_clients(ctx)
   )
 end
 
-----------------------------------------------------------------------------------------------------
---  Git components
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--  Git components {{{
+--------------------------------------------------------------------------------
 
 ---@param interval number
 ---@param task function
@@ -458,8 +341,8 @@ local function run_task_on_interval(interval, task)
 end
 
 --- Check if in a git repository
---- NOTE: This check is incredibly naive and depends on the fact that I use a rooter
---- function to and am always at the root of a repository
+--- NOTE: This check is incredibly naive and depends on the fact that I use a
+--- rooter function to and am always at the root of a repository
 ---@return boolean
 local function is_git_repo(win_id)
   win_id = win_id or api.nvim_get_current_win()
@@ -495,6 +378,9 @@ end
 --- we are currently ahead or behind upstream
 local function git_updates() run_task_on_interval(10000, update_git_status) end
 
+-- }}}
+--------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------------------
 --  Utility functions
 ----------------------------------------------------------------------------------------------------
@@ -522,9 +408,9 @@ local function is_readonly(ctx, icon)
   return ctx.readonly and ' ' .. (icon or '') or ''
 end
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --  RENDER
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function mrl.ui.statusline.render()
   local curwin = api.nvim_get_current_win()
@@ -532,7 +418,6 @@ function mrl.ui.statusline.render()
 
   local available_space = vim.o.columns
 
-  ---@type StatuslineContext
   local ctx = {
     bufnum = curbuf,
     win = curwin,
@@ -545,7 +430,7 @@ function mrl.ui.statusline.render()
     fileformat = vim.bo[curbuf].fileformat,
     shiftwidth = vim.bo[curbuf].shiftwidth,
     expandtab = vim.bo[curbuf].expandtab,
-    winhl = vim.wo[curwin].winhl:match(hls.statusline) ~= nil,
+    winhl = vim.wo[curwin].winhl:match('StatusLine') ~= nil,
   }
   ----------------------------------------------------------------------------//
   -- Modifiers
@@ -554,27 +439,26 @@ function mrl.ui.statusline.render()
   local plain = is_plain(ctx)
   local file_modified = is_modified(ctx, icons.misc.pencil)
   local focused = vim.g.vim_in_focus or true
+
   ----------------------------------------------------------------------------//
   -- Setup
   ----------------------------------------------------------------------------//
+
   local l1 = section:new({
-    { --[[empty]]
+    {
+      { '', 'StSeparator' },
     },
-    cond = not plain,
-    before = '',
-    after = '',
-    priority = 0,
-  }, spacer(1))
-  ----------------------------------------------------------------------------//
-  -- Filename
-  ----------------------------------------------------------------------------//
-  local path = stl_file(ctx, plain)
-  local readonly_hl = ctx.winhl and stl_winhl.readonly.hl(ctx.win)
-    or stl_winhl.readonly.fallback
+    priority = 1,
+    cond = true,
+  })
+
+  -- filename {{{
+  local path = stl_file(ctx)
   local readonly_component =
-    { { { is_readonly(ctx), readonly_hl } }, priority = 1 }
-  ----------------------------------------------------------------------------//
-  -- Mode
+    { { { is_readonly(ctx), 'StFaded' } }, priority = 1 }
+  -- }}}
+  --
+  --
   ----------------------------------------------------------------------------//
   -- show a minimal statusline with only the mode and file component
   ----------------------------------------------------------------------------//
@@ -604,9 +488,9 @@ function mrl.ui.statusline.render()
   local behind = updates.behind and tonumber(updates.behind) or 0
 
   -----------------------------------------------------------------------------//
-  local ok, noice = pcall(require, 'noice')
+  -- local ok, noice = pcall(require, 'noice')
   -- local noice_mode = ok and noice.api.status.mode.get() or ''
-  local has_noice_mode = ok and noice.api.status.mode.has() or false
+  -- local has_noice_mode = ok and noice.api.status.mode.has() or false
   -----------------------------------------------------------------------------//
   local lazy_ok, lazy = pcall(require, 'lazy.status')
   local pending_updates = lazy_ok and lazy.updates() or nil
@@ -614,7 +498,6 @@ function mrl.ui.statusline.render()
   -----------------------------------------------------------------------------//
   -- LSP
   -----------------------------------------------------------------------------//
-  local flutter = vim.g.flutter_tools_decorations or {}
   local diagnostics = diagnostic_info(ctx)
   local lsp_clients = vim
     .iter(ipairs(stl_lsp_clients(ctx)))
@@ -625,20 +508,16 @@ function mrl.ui.statusline.render()
             -- client.name == 'GitHub Copilot' and icons.misc.copilot .. ' ' or client.name,
             client.name == 'copilot' and icons.misc.copilot .. ' '
               or client.name,
-            hls.client,
+            'StFaded',
           },
           { space, 'StSeparator' },
-          { '', hls.metadata_prefix },
+          { '', 'StFaded' },
         },
         priority = client.priority,
       }
     end)
     :totable()
-  table.insert(
-    lsp_clients[1][1],
-    1,
-    { icons.misc.clippy .. ': ', hls.metadata }
-  )
+  table.insert(lsp_clients[1][1], 1, { icons.misc.clippy .. ': ', 'StTitle' })
   lsp_clients[1].id = LSP_COMPONENT_ID -- the unique id of the component
   lsp_clients[1].click = 'v:lua.mrl.ui.statusline.lsp_client_click'
   -----------------------------------------------------------------------------//
@@ -646,7 +525,7 @@ function mrl.ui.statusline.render()
   -----------------------------------------------------------------------------//
   local l2 = section:new(
     {
-      { { file_modified, hls.modified }, { space, 'StSeparator' } },
+      { { ' ' .. file_modified, 'StFaded' }, { space, 'StSeparator' } },
       cond = ctx.modified,
       priority = 1,
     },
@@ -663,36 +542,42 @@ function mrl.ui.statusline.render()
     path.file,
     {
       {
-        { diagnostics.warn.icon, hls.warn },
         { space, 'StSeparator' },
-        { diagnostics.warn.count, hls.warn },
+        { diagnostics.warn.icon, 'StWarn' },
+        { space, 'StSeparator' },
+        { diagnostics.warn.count, 'StWarn' },
       },
       cond = diagnostics.warn.count,
       priority = 3,
     },
     {
       {
-        { diagnostics.error.icon, hls.error },
+        { diagnostics.error.icon, 'StError' },
         { space, 'StSeparator' },
-        { diagnostics.error.count, hls.error },
+        { diagnostics.error.count, 'StError' },
       },
       cond = diagnostics.error.count,
       priority = 1,
     },
     {
       {
-        { diagnostics.info.icon, hls.info },
+        { diagnostics.info.icon, 'StInfo' },
         { space, 'StSeparator' },
-        { diagnostics.info.count, hls.info },
+        { diagnostics.info.count, 'StInfo' },
       },
       cond = diagnostics.info.count,
       priority = 4,
     },
     {
-      { { icons.misc.shaded_lock, hls.metadata } },
+      { { icons.misc.shaded_lock, 'StFaded' } },
       cond = vim.b[ctx.bufnum].formatting_disabled == true
         or vim.g.formatting_disabled == true,
       priority = 5,
+    },
+    {
+      { { space, 'StSeparator' } },
+      cond = true,
+      priority = 1,
     }
   )
   -----------------------------------------------------------------------------
@@ -715,11 +600,18 @@ function mrl.ui.statusline.render()
 
   local r1 = section:new(
     {
-      -- neovim package updates
+      -- empty space
+      { { space, 'StSeparator' } },
+      priority = 3,
+      cond = true,
+    },
+    -- neovim package updates
+    {
       {
-        { 'updates:', hls.comment },
+        { 'updates:', 'StFaded' },
         { space, 'StSeparator' },
-        { pending_updates, hls.title },
+        { pending_updates, 'StTitle' },
+        { space, 'StSeparator' },
       },
       priority = 3,
       cond = has_pending_updates,
@@ -733,53 +625,57 @@ function mrl.ui.statusline.render()
       {
         { icons.misc.bug },
         { space, 'StSeparator' },
-        { debugger(), hls.metadata },
+        { debugger(), 'StFaded' },
       },
       priority = 4,
       cond = debugger(),
     },
-    --  Git status {{{
+    -- Git status {{{
     {
       {
-        { icons.git.branch, hls.git },
+        { icons.git.branch, 'StTitle' },
         { space, 'StSeparator' },
-        { status.head, hls.blue },
+        { status.head, 'StBranch' },
+        { space, 'StSeparator' },
       },
       priority = 1,
       cond = not falsy(status.head),
     },
     {
       {
-        { icons.git.mod, hls.warn },
+        { icons.git.mod, 'StGitModified' },
         { space, 'StSeparator' },
-        { status.changed, hls.title },
+        { status.changed, 'StTitle' },
+        { space, 'StSeparator' },
       },
-      priority = 3,
+      priority = 5,
       cond = not falsy(status.changed),
     },
     {
       {
-        { icons.git.remove, hls.error },
+        { icons.git.remove, 'StGitDelete' },
         { space, 'StSeparator' },
-        { status.removed, hls.title },
+        { status.removed, 'StTitle' },
+        { space, 'StSeparator' },
       },
-      priority = 3,
+      priority = 5,
       cond = not falsy(status.removed),
     },
     {
       {
-        { icons.git.add, hls.green },
+        { icons.git.add, 'StGitAdd' },
         { space, 'StSeparator' },
-        { status.added, hls.title },
+        { status.added, 'StTitle' },
+        { space, 'StSeparator' },
       },
-      priority = 3,
+      priority = 5,
       cond = not falsy(status.added),
     },
     {
       {
-        { icons.misc.up, hls.green },
+        { icons.misc.up, 'StGitAdd' },
         { space, 'StSeparator' },
-        { ahead, hls.title },
+        { ahead, 'StTitle' },
       },
       cond = ahead,
       before = '',
@@ -787,47 +683,40 @@ function mrl.ui.statusline.render()
     },
     {
       {
-        { icons.misc.down, hls.number },
+        { icons.misc.down, 'StGitDelete' },
         { space, 'StSeparator' },
-        { behind, hls.title },
+        { behind, 'StTitle' },
       },
       after = ' ',
       cond = behind,
       priority = 5,
     },
     -- }}}
-    -- Current line number/total line number {{{
-    {
-      {
-        { '(', hls.metadata_prefix },
-        { fmt('%+' .. strwidth(tostring(line_count)) .. 's', lnum), hls.title },
-        { '/', hls.comment },
-        {
-          tostring(line_count) .. ',',
-          hls.comment,
-        },
-      },
-      priority = 7,
-    },
+    -- Current position in buffer and percentage {{{
     {
       {
         { space, 'StSeparator' },
-        { fmt('%+2s', col), hls.title },
-        { ')', hls.metadata_prefix },
+        { lnum .. ':' .. col, 'StTitle' },
+        { space, 'StSeparator' },
+        { fmt('%d', 100 * lnum / line_count) .. '%', 'StFaded' },
+        { space, 'StSeparator' },
       },
-      priority = 7,
+      priority = 2,
     },
     -- }}}
     -- (Unexpected) Indentation {{{
     {
       {
-        { ctx.expandtab and icons.misc.indent or icons.misc.tab },
+        { ctx.expandtab and icons.misc.indent or icons.misc.tab, 'StTitle' },
         { space, 'StSeparator' },
-        { ctx.shiftwidth, hls.title },
+        { ctx.shiftwidth, 'StTitle' },
       },
       cond = ctx.shiftwidth > 2 or not ctx.expandtab,
       priority = 6,
-    }
+    },
+    -- }}}
+    -- Space after {{{
+    { { { space, 'StSeparator' } }, priority = 1 }
     -- }}}
   )
   -- removes 5 columns to add some padding
@@ -846,9 +735,6 @@ mrl.augroup('CustomStatusline', {
 }, {
   event = 'FocusLost',
   command = function() vim.g.vim_in_focus = false end,
-}, {
-  event = 'ColorScheme',
-  command = function() colors() end,
 }, {
   event = 'WinEnter',
   command = adopt_window_highlights,
