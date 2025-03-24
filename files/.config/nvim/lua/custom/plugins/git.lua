@@ -1,7 +1,9 @@
 local icons = mrl.ui.icons.separators
 
 local gitlinker = mrl.require_for_later_index('gitlinker')
-local function browser_open() return { action_callback = require('gitlinker.actions').open_in_browser } end
+local function browser_open()
+  return { action_callback = require('gitlinker.actions').open_in_browser }
+end
 
 return {
   -----------------------------------------------------------------------------
