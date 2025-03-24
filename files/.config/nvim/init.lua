@@ -11,7 +11,7 @@ vim.g.personal_directory = vim.g.projects_directory .. '/personal'
 vim.g.work_directory = vim.g.projects_directory .. '/work'
 
 vim.g.icloud = vim.fn.expand('~') .. '/Library/Mobile Documents'
-vim.g.obsidian = vim.g.icloud .. '/iCloud~md~obsidian/Documents'
+vim.g.obsidian = vim.g.icloud .. '/iCloud~md~obsidian/Documents/Marcos'
 
 -- Leader bindings
 vim.g.mapleader = ' ' -- Remap leader key
@@ -73,6 +73,7 @@ vim.o.background = 'dark' -- or "light"
 -- vim.cmd([[colorscheme horizon]])
 -- vim.cmd([[colorscheme rose-pine]])
 -- vim.cmd([[colorscheme github_dark]])
+-- COLORSCHEME
 vim.cmd([[colorscheme github_dark_default]])
 
 vim.cmd([[

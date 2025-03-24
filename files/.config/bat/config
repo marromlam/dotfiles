@@ -1,4 +1,7 @@
 --style="changes,numbers"
 --color=always
 --italic-text=always
---theme="Gruvbox Dark"
+# --theme="Gruvbox Dark"  # COLORSCHEME
+--theme="Github"
+
+# vim:ft=sh
