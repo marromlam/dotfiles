@@ -33,11 +33,11 @@ local stl_winhl = {
 
 local identifiers = {
   buftypes = {
-    terminal = ' ',
+    terminal = '',
     quickfix = '',
   },
   filetypes = mrl.p_table({
-    ['fzf'] = '',
+    ['fzf'] = '󱁴', -- '',
     ['log'] = '',
     ['org'] = '',
     ['orgagenda'] = '',

@@ -1,5 +1,9 @@
 return {
   {
+    'nvim-lua/plenary.nvim',
+    lazy = false,
+  },
+  {
     'jghauser/fold-cycle.nvim',
     opts = {},
     keys = {
@@ -41,6 +45,29 @@ return {
         -- text = icons.misc.lightbulb,
         enabled = true,
         win_opts = { border = 'none' },
+      },
+    },
+  },
+  {
+    'andrewferrier/debugprint.nvim',
+    opts = { create_keymaps = false },
+    keys = {
+      {
+        '<leader>dp',
+        function() return require('debugprint').debugprint({ variable = true }) end,
+        desc = 'debugprint: cursor',
+        expr = true,
+      },
+      {
+        '<leader>do',
+        function() return require('debugprint').debugprint({ motion = true }) end,
+        desc = 'debugprint: operator',
+        expr = true,
+      },
+      {
+        '<leader>dC',
+        '<Cmd>DeleteDebugPrints<CR>',
+        desc = 'debugprint: clear all',
       },
     },
   },
@@ -164,6 +191,21 @@ return {
 
   {
     'willothy/flatten.nvim',
+    lazy = false,
+    priority = 1001,
+    config = {
+      window = { open = 'alternate' },
+      hooks = {
+        block_end = function() require('toggleterm').toggle() end,
+        post_open = function(_, winnr, _, is_blocking)
+          if is_blocking then
+            require('toggleterm').toggle()
+          else
+            vim.api.nvim_set_current_win(winnr)
+          end
+        end,
+      },
+    },
   },
 
   {

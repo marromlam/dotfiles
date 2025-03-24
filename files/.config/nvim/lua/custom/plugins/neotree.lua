@@ -10,8 +10,9 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
     cmd = { 'Neotree' },
-    cond = false, disable = true,
-    keys = { 
+    -- cond = false,
+    -- disable = true,
+    keys = {
       { '<C-N>', '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' },
       -- { '-',     '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' }
     },
@@ -32,7 +33,7 @@ return {
 
       require('neo-tree').setup({
         window = {
-          position = "left",
+          position = 'left',
           width = 30,
         },
         sources = { 'filesystem', 'git_status', 'document_symbols' },
