@@ -1,36 +1,23 @@
 if not mrl then return end
-local P = mrl.ui.palette
 local highlight = mrl.highlight
 
-
-function mrl.get_hi(name, id)
-  id = id or 0
-  local hi = vim.api.nvim_get_hl(0, { name = name })
-  -- hi is a table with bg and fg keys. for those we want to return the hex
-  -- value with ('#%06x'):format(num)
-  for k, v in pairs(hi) do
-    if type(v) == 'number' then hi[k] = ('#%06x'):format(v) end
-  end
-  return hi
-end
-
-local function general_overrides()
+local function general_overrides(dim_factor)
   local is_dark = vim.g.high_contrast_theme
-  local dim_factor = is_dark and 0.75 or 0.25
   local normal_bg = highlight.get('Normal', 'bg')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
-  local bg_color2 = highlight.tint(normal_bg, -1.5 * dim_factor)
+  local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
   highlight.all({
     ---------------------------------------------------------------------------
     -- Native
     ---------------------------------------------------------------------------
     { VertSplit = { fg = { from = 'Comment' } } },
-    { StatusLine = { fg = bg_color, bg = { from = 'Comment' } } },
+    { StatusLine = { fg = { from = 'Normal' }, bg = bg_color } },
+    { Statusline = { fg = { from = 'Normal' }, bg = bg_color } },
     -- { PanelSt = { link = 'StatusLine' } },
     -- Neotree
     { NeoTreeNormal = { bg = bg_color, fg = { from = 'Normal' } } },
     { NeoTreeNormalNC = { bg = bg_color, fg = { from = 'Normal' } } },
-    { NeoTreeCursorLine = { bg = bg_color2 }},
+    { NeoTreeCursorLine = { bg = bg_color2 } },
     { NeoTreeWinSeparator = { fg = { from = 'Normal', attr = 'bg' } } },
     { NeoTreeWinSeparatorNC = { fg = { from = 'Normal', attr = 'bg' } } },
     -- { NeoTreeCursorLine = { link = 'Visual' } },
@@ -38,27 +25,89 @@ local function general_overrides()
     { NeoTreeStatusLine = { link = 'PanelSt' } },
     { NeoTreeTabActive = { bg = bg_color, bold = true } },
     { NeoTreeTabInactive = { bg = bg_color, fg = { from = 'Comment' } } },
-    { NeoTreeTabSeparatorActive = { inherit = 'PanelBackground', fg = { from = 'Comment' } } },
+    {
+      NeoTreeTabSeparatorActive = {
+        inherit = 'PanelBackground',
+        fg = { from = 'Comment' },
+      },
+    },
     { NeoTreeDirectoryIcon = { link = 'WarningMsg' } },
-    { NeoTreeTabSeparatorActive = { bg=bg_color, fg=bg_color }},
-    { NeoTreeTabSeparatorInactive = { bg=bg_color, fg=bg_color }},
+    { NeoTreeTabSeparatorActive = { bg = bg_color, fg = bg_color } },
+    { NeoTreeTabSeparatorInactive = { bg = bg_color, fg = bg_color } },
+    -- Status line {{{
     -- Search count
-    { StSearchCount = { fg = "#333333", bg = "#dddddd" } },
-    { StSeparator = { fg = "#00aaff", bg = bg_color } },
-    { StModified = { fg = "#ffaaff", bg = bg_color } },
-    -- { Statusline = { fg = bg_color, bg="#4aa2b4" } },
+    { StSearchCount = { fg = '#333333', bg = '#dddddd' } },
+    { StSeparator = { fg = '#00aaff', bg = bg_color } },
+    { StModified = { fg = '#ffaaff', bg = bg_color } },
+    { StTitle = { fg = { from = 'Normal' }, bg = bg_color } },
+    { StFaded = { fg = { from = 'Comment' }, bg = bg_color } },
+    { StGit = { fg = '#ff0000', bg = '#00ff00' } },
+    { StBranch = { fg = { from = 'DiagnosticInfo' }, bg = bg_color } },
+    { StGitAdd = { fg = { from = 'GitSignsAdd' }, bg = bg_color } },
+    { StGitDelete = { fg = { from = 'GitSignsDelete' }, bg = bg_color } },
+    { StGitModified = { fg = { from = 'DiagnosticWarn' }, bg = bg_color } },
+    { StInfo = { fg = { from = 'DiagnosticInfo' }, bg = bg_color } },
+    { StWarn = { fg = { from = 'DiagnosticWarn' }, bg = bg_color } },
+    { StError = { fg = { from = 'DiagnosticError' }, bg = bg_color } },
+    { Statusline = { fg = bg_color, bg = bg_color } },
+    { StatusLine = { fg = bg_color, bg = bg_color } },
+    { StSeparator = { fg = '#00ffff', bg = bg_color } },
+    { StFilename = { fg = { from = 'Normal' }, bg = bg_color, bold = true } },
+    {
+      StEnv = {
+        fg = { from = 'DiagnosticError' },
+        bg = bg_color,
+        bold = true,
+        italic = true,
+      },
+    },
+    {
+      StDirectory = { fg = { from = 'Comment' }, bg = bg_color, italic = true },
+    },
+    -- { StFilename = { fg = '#0000ff', bg = bg_color } },
+    {
+      StParent = {
+        fg = { from = 'DiagnosticWarn' },
+        bg = bg_color,
+        italic = true,
+      },
+    },
+    -- }}}
+    -- Symbol Usage {{{
+    { SymbolUsageLeft = { fg = bg_color } },
+    { SymbolUsageRight = { fg = bg_color } },
+    {
+      SymbolUsageContent = {
+        bg = bg_color,
+        fg = { from = 'Comment' },
+      },
+    },
+    -- }}}
     { WinSeparator = { fg = { from = 'Comment' } } },
     { CursorLine = { bg = { from = 'Normal', alter = dim_factor } } },
     { CursorLineNr = { bg = 'NONE' } },
-    { iCursor = { bg = P.dark_blue } },
+    { iCursor = { bg = '#ff00ff' } },
     { PmenuSbar = { link = 'Normal' } },
-    { Folded = { fg = { from = 'Normal' }, bg = { from = 'Normal', alter = is_dark and 0.3 or 0.1 } } },
+    {
+      Folded = {
+        fg = { from = 'Normal' },
+        bg = { from = 'Normal', alter = is_dark and 0.3 or 0.1 },
+      },
+    },
     ---------------------------------------------------------------------------
     -- Floats
     ---------------------------------------------------------------------------
     { NormalFloat = { bg = { from = 'Normal', alter = -0.15 } } },
-    { FloatBorder = { bg = { from = 'NormalFloat' }, fg = { from = 'Comment' } } },
-    { FloatTitle = { bold = true, fg = 'white', bg = { from = 'FloatBorder', attr = 'fg' } } },
+    {
+      FloatBorder = { bg = { from = 'NormalFloat' }, fg = { from = 'Comment' } },
+    },
+    {
+      FloatTitle = {
+        bold = true,
+        fg = 'white',
+        bg = { from = 'FloatBorder', attr = 'fg' },
+      },
+    },
     ---------------------------------------------------------------------------
     -- Created highlights
     ---------------------------------------------------------------------------
@@ -112,7 +161,12 @@ local function general_overrides()
     { ['@lsp.type.variable'] = { clear = true } },
     { ['@lsp.type.parameter'] = { italic = true, fg = { from = 'Normal' } } },
     { ['@lsp.typemod.method'] = { link = '@method' } },
-    { ['@lsp.typemod.variable.global'] = { bold = true, inherit = '@constant.builtin' } },
+    {
+      ['@lsp.typemod.variable.global'] = {
+        bold = true,
+        inherit = '@constant.builtin',
+      },
+    },
     { ['@lsp.typemod.variable.defaultLibrary'] = { italic = true } },
     { ['@lsp.typemod.variable.readonly.typescriptreact'] = { clear = true } },
     { ['@lsp.typemod.variable.readonly.typescript'] = { clear = true } },
@@ -136,20 +190,52 @@ local function general_overrides()
     ---------------------------------------------------------------------------
     -- LSP
     ---------------------------------------------------------------------------
-    { LspReferenceWrite = { inherit = 'LspReferenceText', bold = true, italic = true, underline = true } },
+    {
+      LspReferenceWrite = {
+        inherit = 'LspReferenceText',
+        bold = true,
+        italic = true,
+        underline = true,
+      },
+    },
     { LspSignatureActiveParameter = { link = 'Visual' } },
     -- Sign column line
-    { DiagnosticSignInfoLine = { inherit = 'DiagnosticVirtualTextInfo', fg = 'NONE' } },
-    { DiagnosticSignHintLine = { inherit = 'DiagnosticVirtualTextHint', fg = 'NONE' } },
-    { DiagnosticSignErrorLine = { inherit = 'DiagnosticVirtualTextError', fg = 'NONE' } },
-    { DiagnosticSignWarnLine = { inherit = 'DiagnosticVirtualTextWarn', fg = 'NONE' } },
+    {
+      DiagnosticSignInfoLine = {
+        inherit = 'DiagnosticVirtualTextInfo',
+        fg = 'NONE',
+      },
+    },
+    {
+      DiagnosticSignHintLine = {
+        inherit = 'DiagnosticVirtualTextHint',
+        fg = 'NONE',
+      },
+    },
+    {
+      DiagnosticSignErrorLine = {
+        inherit = 'DiagnosticVirtualTextError',
+        fg = 'NONE',
+      },
+    },
+    {
+      DiagnosticSignWarnLine = {
+        inherit = 'DiagnosticVirtualTextWarn',
+        fg = 'NONE',
+      },
+    },
     -- Floating windows
     { DiagnosticFloatingWarn = { link = 'DiagnosticWarn' } },
     { DiagnosticFloatingInfo = { link = 'DiagnosticInfo' } },
     { DiagnosticFloatingHint = { link = 'DiagnosticHint' } },
     { DiagnosticFloatingError = { link = 'DiagnosticError' } },
     { DiagnosticFloatTitle = { inherit = 'FloatTitle', bold = true } },
-    { DiagnosticFloatTitleIcon = { inherit = 'FloatTitle', fg = { from = '@character' } } },
+    {
+      DiagnosticFloatTitleIcon = {
+        inherit = 'FloatTitle',
+        fg = { from = '@character' },
+      },
+    },
     ---------------------------------------------------------------------------
     --- Diagnostic Signa
     ---------------------------------------------------------------------------
@@ -165,7 +251,12 @@ local function general_overrides()
     -- FzfLua {{{
     ---------------------------------------------------------------------------
     -- FzfLuaNormal	Normal	hls.normal	Main win fg/bg
-    { FzfLuaNormal = { bg = { from = 'Normal', attr = 'bg' }, fg = { from = 'Normal', attr = 'fg' }}},
+    {
+      FzfLuaNormal = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
     -- FzfLuaBorder	Normal	hls.border	Main win border
     -- FzfLuaTitle	FzfLuaNormal	hls.title	Main win title
     -- FzfLuaBackdrop	*bg=Black	hls.backdrop	Backdrop color
@@ -199,10 +290,10 @@ local function general_overrides()
     -- FzfLuaDirPart	Comment	hls.dir_part	Path formatters directory hl group
     -- FzfLuaFilePart	@none	hls.file_part	Path formatters file hl group
     -- FzfLuaLiveSym	*Brown1	hls.live_sym	LSP live symbols query match
-    { FzfLuaFzfNormal = { bg = "#ffff00", fg = "#00ff00"} },
+    { FzfLuaFzfNormal = { bg = '#ffff00', fg = '#00ff00' } },
     -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
     -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
-    { ['@fzf.normal'] = { bg = "#ff0000", fg = "#00ff00"} },
+    { ['@fzf.normal'] = { bg = '#ff0000', fg = '#00ff00' } },
     -- FzfLuaFzfNormal	FzfLuaNormal	fzf.normal	fzf's fg|bg
     -- FzfLuaFzfCursorLine	FzfLuaCursorLine	fzf.cursorline	fzf's fg+|bg+
     -- FzfLuaFzfMatch	Special	fzf.match	fzf's hl+
@@ -222,13 +313,18 @@ local function general_overrides()
   })
 end
 
-local function set_sidebar_highlight()
+local function set_sidebar_highlight(dim_factor)
   highlight.all({
-    { PanelDarkBackground = { bg = { from = 'Normal', alter = -0.42 } } },
+    { PanelDarkBackground = { bg = { from = 'Normal', alter = dim_factor } } },
     { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
     { PanelBackground = { bg = { from = 'Normal', alter = -0.8 } } },
     { PanelHeading = { inherit = 'PanelBackground', bold = true } },
-    { PanelWinSeparator = { inherit = 'PanelBackground', fg = { from = 'WinSeparator' } } },
+    {
+      PanelWinSeparator = {
+        inherit = 'PanelBackground',
+        fg = { from = 'WinSeparator' },
+      },
+    },
     { PanelStNC = { link = 'PanelWinSeparator' } },
     { PanelSt = { bg = { from = 'Normal', alter = -0.2 } } },
   })
@@ -246,15 +342,15 @@ local function on_sidebar_enter()
   vim.opt_local.winhighlight:append({
     Normal = 'PanelBackground',
     EndOfBuffer = 'PanelBackground',
-    StatusLine = 'PanelSt',
-    StatusLineNC = 'PanelStNC',
+    -- StatusLine = 'PanelSt',
+    -- StatusLineNC = 'PanelStNC',
     SignColumn = 'PanelBackground',
     VertSplit = 'PanelVertSplit',
-    WinSeparator = 'PanelWinSeparator'
+    WinSeparator = 'PanelWinSeparator',
   })
 end
 
-local function colorscheme_overrides()
+local function colorscheme_overrides(dim_factor)
   local overrides = {
     ['horizon'] = {
       { Constant = { bold = true } },
@@ -262,12 +358,29 @@ local function colorscheme_overrides()
       { TabLineSel = { fg = { from = 'SpecialKey' } } },
       { ['@variable'] = { fg = { from = 'Normal' } } },
       { ['@constant.comment'] = { inherit = 'Constant', bold = true } },
-      { ['@constructor.lua'] = { inherit = 'Type', italic = false, bold = false } },
+      {
+        ['@constructor.lua'] = {
+          inherit = 'Type',
+          italic = false,
+          bold = false,
+        },
+      },
       { ['@lsp.type.parameter'] = { fg = { from = 'Normal' } } },
       { VisibleTab = { bg = { from = 'Normal', alter = 0.4 }, bold = true } },
       { PanelBackground = { link = 'Normal' } },
-      { PanelWinSeparator = { inherit = 'PanelBackground', fg = { from = 'WinSeparator' } } },
-      { PanelHeading = { bg = 'bg', bold = true, fg = { from = 'Normal', alter = -0.3 } } },
+      {
+        PanelWinSeparator = {
+          inherit = 'PanelBackground',
+          fg = { from = 'WinSeparator' },
+        },
+      },
+      {
+        PanelHeading = {
+          bg = 'bg',
+          bold = true,
+          fg = { from = 'Normal', alter = -0.3 },
+        },
+      },
       { PanelDarkBackground = { bg = { from = 'Normal', alter = -0.25 } } },
       { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
     },
@@ -280,9 +393,18 @@ local function colorscheme_overrides()
 end
 
 local function user_highlights()
-  general_overrides()
-  set_sidebar_highlight()
-  colorscheme_overrides()
+  local dim_factor = 0.5
+  if vim.g.colors_name == 'gruvbox' then
+    dim_factor = 0.25
+  elseif vim.g.colors_name == 'horizon' then
+    dim_factor = 0.75
+  elseif vim.g.colors_name == 'github_dark_default' then
+    dim_factor = -1
+  end
+
+  general_overrides(dim_factor)
+  set_sidebar_highlight(dim_factor)
+  colorscheme_overrides(dim_factor)
 end
 
 mrl.augroup('UserHighlights', {
