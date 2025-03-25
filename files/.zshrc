@@ -202,7 +202,7 @@ esac
 
 # test if ~/.wsl exists and source zsh/windows.sh if it does
 if [[ -f ~/.wsl ]]; then
-  source "$HOME/.dotfiles/zsh/windows.sh"
+  source "$HOME/.config/zsh/windows.sh"
 fi
 
 # }}}

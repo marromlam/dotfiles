@@ -140,16 +140,20 @@ OpenOutlook() {
 }
 
 
-#1::OpenExplorer()
+; #1::OpenExplorer()
+; #3::OpenFirefox()
+; #4::OpenTeams()
+; #0::OpenOutlook()
+#1::GoToDesktopNumber(0)
 #2::GoToDesktopNumber(1)
-#3::OpenFirefox()
-#4::OpenTeams()
+#3::GoToDesktopNumber(2)
+#4::GoToDesktopNumber(3)
 #5::GoToDesktopNumber(4)
 #6::GoToDesktopNumber(5)
 #7::GoToDesktopNumber(6)
 #8::GoToDesktopNumber(7)
 #9::GoToDesktopNumber(8)
-#0::OpenOutlook()
+#0::GoToDesktopNumber(9)
 
 ; }}}
 

@@ -1,7 +1,7 @@
 [include]
   path = ~/.gitconfig.local
-[includeIf "gitdir:~/projects/work/"]
-  path = ~/projects/work/.gitconfig.work
+[includeIf "gitdir:~/Projects/work/"]
+  path = ~/Projects/work/.gitconfig.work
 [status]
   submoduleSummary = true
 [commit]

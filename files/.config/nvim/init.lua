@@ -86,9 +86,23 @@ au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost 
 vim.cmd([[
 autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
 autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
-" let &colorcolumn = join(range(81,999), ',')
 set colorcolumn=81
 ]])
+
+
+
+vim.cmd[[
+function! GoToColumnInFile (fileInfoString)
+  let fileInfo = split(a:fileInfoString, ":")
+  let column = 0
+  normal! gF
+  if len(fileInfo) > 2
+    let column = fileInfo[2]
+    execute 'normal! ' . column . '|'
+  endif
+endfunction
+nnoremap <leader>gF :call GoToColumnInFile(expand("<cWORD>"))<CR>
+]]
 
 -- }}}
 --------------------------------------------------------------------------------

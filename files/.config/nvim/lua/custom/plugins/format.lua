@@ -2,6 +2,8 @@ return {
   { -- Autoformat
     'stevearc/conform.nvim',
     -- lazy = false,
+    cond = false,
+    disable = true,
     event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
     cmd = { 'ConformInfo' },
     keys = {
@@ -15,13 +17,14 @@ return {
       },
     },
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true, xml = true }
         if vim.g.disable_autoformat then return false end
+        local disable_filetypes =
+          { c = true, cpp = true, xml = true, cnk = true, map = true }
         return {
           timeout_ms = 5000,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
@@ -35,7 +38,7 @@ return {
         typescriptreact = { 'prettier' },
         svelte = { 'prettier' },
         css = { 'prettierd' },
-        html = { 'prettierd' },
+        html = { 'prettier' },
         json = { 'prettier' },
         yaml = { 'prettier' },
         markdown = { 'prettier' },

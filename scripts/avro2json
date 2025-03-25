@@ -1,7 +1,9 @@
+#!/bin/bash
+
 
 # check if the first argument is -f or --file we set is_printed to True
 # else we set it to False
-if [ "$1" == "-f" ] || [ "$1" == "--file" ]; then
+if [[ "$1" == "-f" ]] || [[ "$1" == "--file" ]]; then
     is_printed=False
 else
     is_printed=True
@@ -17,14 +19,14 @@ fi
 
 
 
-python -c "import fastavro" || python -m pip install fastavro
+python3 -c "import fastavro" || python3 -m pip install fastavro
 
 
 
 
 for var in "$AVROS"
 do
-python - <<EOF
+python3 - <<EOF
 from fastavro import reader, json_writer
 from fastavro import parse_schema
 from fastavro.schema import load_schema

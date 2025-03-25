@@ -138,8 +138,8 @@ return {
   {
     'marromlam/tex-kitty',
     ft = 'tex',
-    dir = '/Users/marcos/Projects/personal/tex-kitty',
-    dev = true,
+    -- dir = '/Users/marcos/Projects/personal/tex-kitty',
+    -- dev = true,
     dependencies = { 'lervag/vimtex' },
     config = function()
       require('tex-kitty').setup({
@@ -238,6 +238,13 @@ return {
     },
   },
   { 'meznaric/key-analyzer.nvim', opts = {}, cmd = 'KeyAnalyzer' },
+
+  {
+    'bogado/file-line',
+    keys = {
+      'gF',
+    },
+  },
 
   --- }}}
   ------------------------------------------------------------------------

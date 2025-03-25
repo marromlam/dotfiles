@@ -27,6 +27,8 @@ USER_PATHS=(
   # "/usr/local/opt/fzf/bin" # Fzf
   "$HOME/.cargo/env"
   "$HOME/.dotfiles/scripts" # Personal scripts
+  "$HOME/.local/bin"        # Personal scripts
+  "$HOME/.dotfiles/scripts" # Personal scripts
   "$HOME/.cargo"            # Personal scripts
 )
 
