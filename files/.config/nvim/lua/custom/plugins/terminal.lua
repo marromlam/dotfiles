@@ -1,6 +1,6 @@
 return {
   'akinsho/toggleterm.nvim',
-  event = 'VeryLazy',
+  cmd = { 'ToggleTerm', 'ToggleTermOpenAll', 'ToggleTermCloseAll' },
   dev = true,
   opts = {
     open_mapping = [[<c-\>]],

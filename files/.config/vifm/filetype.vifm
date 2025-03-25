@@ -22,3 +22,35 @@ fileviewer {*.epub,*.mobi,*.azw,*.azw[0-9]},<application/epub+zip>,<application/
     \ visualpreview epub %pw %ph %px %py %c %N
     \ %pc
     \ visualpreview clear
+
+" "fileviewer *.pdf
+" "    \ vifm-sixel pdf %pw %ph %c %pd
+" "    \ %pc
+" "    \ vifm-sixel clear
+" "
+" "fileviewer *.epub
+" "    \ vifm-sixel epub %pw %ph %c %pd
+" "    \ %pc
+" "    \ vifm-sixel clear
+" "
+" "fileviewer <video/*>
+" "    \ vifm-sixel video %pw %ph %c %pd
+" "    \ %pc
+" "    \ vifm-sixel clear
+
+" "    " \ vifm-sixel draw %pw %ph %c
+" "fileviewer {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
+" "    "\ imgcat --width %pw --height %ph %c:p %pd
+" "    \ icat --width %pw --height %ph %c:p %pd
+" "    \ vifm-sixel clear
+" "    \ %pc
+
+
+" "fileviewer *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.gif
+" "    \ kitty +kitten icat --transfer-mode=stream --place=%pwx%ph@%pxx%py %c %N
+
+" "fileviewer *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.gif
+" "    \ visualpreview image %pw %ph %px %py %c %pd %N
+" "    \ %pc
+" "    \ visualpreview clear
+" "

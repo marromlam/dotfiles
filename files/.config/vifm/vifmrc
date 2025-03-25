@@ -2,56 +2,13 @@ nnoremap w :view<cr>
 nnoremap q :q<cr>
 set fillchars='vborder:│'
 
-
-" Command used to edit files in various contexts.  The default is vim.
-" If you would like to use another vi clone such as Elvis or Vile
-" you will need to change this setting.
-
 set vicmd=nvim
-
-
-" "fileviewer *.pdf
-" "    \ vifm-sixel pdf %pw %ph %c %pd
-" "    \ %pc
-" "    \ vifm-sixel clear
-" "
-" "fileviewer *.epub
-" "    \ vifm-sixel epub %pw %ph %c %pd
-" "    \ %pc
-" "    \ vifm-sixel clear
-" "
-" "fileviewer <video/*>
-" "    \ vifm-sixel video %pw %ph %c %pd
-" "    \ %pc
-" "    \ vifm-sixel clear
-
-" "    " \ vifm-sixel draw %pw %ph %c
-" "fileviewer {*.bmp,*.jpg,*.jpeg,*.png,*.gif,*.xpm},<image/*>
-" "    "\ imgcat --width %pw --height %ph %c:p %pd
-" "    \ icat --width %pw --height %ph %c:p %pd
-" "    \ vifm-sixel clear
-" "    \ %pc
-
-
-" "fileviewer *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.gif
-" "    \ kitty +kitten icat --transfer-mode=stream --place=%pwx%ph@%pxx%py %c %N
-
-" "fileviewer *.bmp,*.jpg,*.jpeg,*.png,*.xpm,*.gif
-" "    \ visualpreview image %pw %ph %px %py %c %pd %N
-" "    \ %pc
-" "    \ visualpreview clear
-" "
-
-" source previewer
 
 " source fileviewer
 source $HOME/.config/vifm/filetype.vifm
 
-
-
-"
-colorscheme custom1
-" colorscheme material
+" colorscheme custom1
+colorscheme gruvbox
 
 
 " vim: set ft=vim

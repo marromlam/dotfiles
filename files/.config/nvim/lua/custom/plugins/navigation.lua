@@ -8,13 +8,13 @@ return {
   {
     'ThePrimeagen/harpoon',
     branch = 'harpoon2',
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    -- dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
     keys = {
+
       {
         '<leader>1',
-        function()
-          require('harpoon'):list():select(1)
-        end,
+        function() require('harpoon'):list():select(1) end,
         'Go to buffer 1',
       },
       {
@@ -64,32 +64,61 @@ return {
       },
     },
     config = function()
-      local harpoon = require 'harpoon'
-      harpoon:setup {}
+      local harpoon = require('harpoon')
+      harpoon:setup({})
 
       -- basic telescope configuration
-      local conf = require('telescope.config').values
       local function toggle_telescope(harpoon_files)
         local file_paths = {}
         for _, item in ipairs(harpoon_files.items) do
           table.insert(file_paths, item.value)
         end
 
-        require('telescope.pickers')
-          .new({}, {
-            prompt_title = 'Harpoon',
-            finder = require('telescope.finders').new_table {
-              results = file_paths,
+        -- require('telescope.pickers')
+        --   .new({}, {
+        --     prompt_title = 'Harpoon',
+        --     finder = require('telescope.finders').new_table({
+        --       results = file_paths,
+        --     }),
+        --     previewer = conf.file_previewer({}),
+        --     sorter = conf.generic_sorter({}),
+        --   })
+        --   :find()
+        print(vim.inspect(file_paths))
+        require('fzf-lua').buffers(file_paths, {
+          winopts = {
+            title = 'Harpoon',
+            height = 0.33,
+            row = 0.5,
+          },
+          previewer = false,
+          actions = {
+            ['default'] = function(selected)
+              local session = vim.iter(file_paths):find(
+                function(s) return s.name == selected[1] end
+              )
+              if not session then return end
+              -- persisted.load({ session = session.file_path })
+            end,
+            ['ctrl-d'] = {
+              function(selected)
+                local session = vim.iter(file_paths):find(
+                  function(s) return s.name == selected[1] end
+                )
+                if not session then return end
+                vim.fn.delete(vim.fn.expand(session.file_path))
+              end,
             },
-            previewer = conf.file_previewer {},
-            sorter = conf.generic_sorter {},
-          })
-          :find()
+          },
+        })
       end
 
-      vim.keymap.set('n', '<C-e>', function()
-        toggle_telescope(harpoon:list())
-      end, { desc = 'Open harpoon window' })
+      vim.keymap.set(
+        'n',
+        '<leader><leader>',
+        function() toggle_telescope(harpoon:list()) end,
+        { desc = 'Open harpoon window' }
+      )
     end,
   },
 }

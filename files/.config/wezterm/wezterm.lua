@@ -328,10 +328,9 @@ wezterm.log_info('Successfully loaded wezterm.lua. Returning config.')
 
 return {
     default_prog = DEFAULT_PROG,
-<<<<<<< Updated upstream
     font = wezterm.font_with_fallback({
-        -- 'Cartograph CF',
-        'Monaspace Neon',
+        'Cartograph CF',
+        -- 'Monaspace Neon',
         --     -- 'Monolisa',
         --     --[[ "FiraCode NF", ]]
         -- 'FiraCode Nerd Font',
@@ -349,7 +348,7 @@ return {
         --     -- "ComicMono NF",
         --     -- "Liga SFMono Nerd Font",
     }),
-    font_rules = {
+    -- font_rules = {
         --     -- Non-italic {{{
         --     {
         --         italic = false,
@@ -370,47 +369,45 @@ return {
         --     },
         --     -- }}}
         -- Italic {{{
-        {
-            italic = true,
-            intensity = 'Normal', -- Italic+Normal: normal italic text
-            font = wezterm.font('Monaspace Radon', { weight = 'Regular' }),
-        },
-        {
-            italic = true,
-            intensity = 'Half', -- Italic+Half: Copilot
-            font = wezterm.font('Monaspace Krypton', { weight = 'Black' }),
-        },
-        {
-            italic = true,
-            intensity = 'Bold', -- Italic+Bold: Documentation
-            font = wezterm.font(
-                'Monaspace Neon',
-                { weight = 'Black', style = 'Italic' }
-            ),
-        },
+        -- {
+        --     italic = true,
+        --     intensity = 'Normal', -- Italic+Normal: normal italic text
+        --     font = wezterm.font('Monaspace Radon', { weight = 'Regular' }),
+        -- },
+        -- {
+        --     italic = true,
+        --     intensity = 'Half', -- Italic+Half: Copilot
+        --     font = wezterm.font('Monaspace Krypton', { weight = 'Black' }),
+        -- },
+        -- {
+        --     italic = true,
+        --     intensity = 'Bold', -- Italic+Bold: Documentation
+        --     font = wezterm.font(
+        --         'Monaspace Neon',
+        --         { weight = 'Black', style = 'Italic' }
+        --     ),
+        -- },
         -- }}}
-    },
-||||||| Stash base
-    font = wezterm.font_with_fallback({
-        'Cartograph CF',
-        --     -- 'Monolisa',
-        --     --[[ "FiraCode NF", ]]
-        'FiraCode Nerd Font',
-        -- 'Hack Nerd Font', -- nerd fonts extracted from there
-        --     -- 'Iosevka',
-        --     --[[ { family = 'JetBrains Mono', weight = 'Medium' }, ]]
-        --     --[[ {family="Iosevka Term SS05", weight = "Regular" }, ]]
-        --     -- { family = "Hack Nerd Font", scale = 0.85 }, -- nerd fonts extracted from there
-        --     -- { family = 'Fira Code Nerd Font',    scale = 0.55 }, -- nerd fonts extracted from there
-        --     -- { family="Symbols Nerd Font Mono", scale=0.5}, -- nerd fonts extracted from there
-        -- 'Victor Mono',
-        -- { family = 'Symbols Nerd Font Mono', scale = 0.75 },
-        --     -- "SF Pro",
-        --     -- "DejaVu Sans Mono",
-        --     -- "ComicMono NF",
-        --     -- "Liga SFMono Nerd Font",
-    }),
-=======
+    -- },
+    -- font = wezterm.font_with_fallback({
+    --     'Cartograph CF',
+    --     --     -- 'Monolisa',
+    --     --     --[[ "FiraCode NF", ]]
+    --     'FiraCode Nerd Font',
+    --     -- 'Hack Nerd Font', -- nerd fonts extracted from there
+    --     --     -- 'Iosevka',
+    --     --     --[[ { family = 'JetBrains Mono', weight = 'Medium' }, ]]
+    --     --     --[[ {family="Iosevka Term SS05", weight = "Regular" }, ]]
+    --     --     -- { family = "Hack Nerd Font", scale = 0.85 }, -- nerd fonts extracted from there
+    --     --     -- { family = 'Fira Code Nerd Font',    scale = 0.55 }, -- nerd fonts extracted from there
+    --     --     -- { family="Symbols Nerd Font Mono", scale=0.5}, -- nerd fonts extracted from there
+    --     -- 'Victor Mono',
+    --     -- { family = 'Symbols Nerd Font Mono', scale = 0.75 },
+    --     --     -- "SF Pro",
+    --     --     -- "DejaVu Sans Mono",
+    --     --     -- "ComicMono NF",
+    --     --     -- "Liga SFMono Nerd Font",
+    -- }),
     --     'Cartograph CF',
     -- font = wezterm.font_with_fallback({
     --     -- 'Monaspace Argon',
@@ -471,7 +468,6 @@ return {
     --         }),
     --     },
     -- },
->>>>>>> Stashed changes
     font_size = 17,
     -- line_height = 1.05,
     cell_width = 1.0,
@@ -483,13 +479,13 @@ return {
     show_update_window = false,
     check_for_updates = false,
     -- window_decorations = "RESIZE",
-    window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
+    -- window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
     -- integrated_title_button_style = 'MacOsNative',
-    integrated_title_button_style = 'Windows',
+    -- integrated_title_button_style = 'Windows',
     -- integrated_title_button_style = 'Gnome',
     integrated_title_button_alignment = 'Left',
     integrated_title_buttons = { 'Close', 'Maximize', 'Hide' },
-    integrated_title_button_color = 'red',
+    -- integrated_title_button_color = 'red',
     window_close_confirmation = 'NeverPrompt',
     audible_bell = 'Disabled',
     window_padding = { left = 0, right = 0, top = 0, bottom = 0 },
@@ -510,15 +506,11 @@ return {
         ['CustomDay'] = CUSTOM_DAY,
         ['CustomNight'] = CUSTOM_NIGHT,
     },
-<<<<<<< Updated upstream
     -- window_background_opacity = 0.8,
     window_background_opacity = 1,
-||||||| Stash base
-    window_background_opacity = 0.8,
-=======
-    window_background_opacity = 0.9,
->>>>>>> Stashed changes
-    text_background_opacity = 0.8,
+    -- window_background_opacity = 0.8,
+    -- window_background_opacity = 0.9,
+    -- text_background_opacity = 0.8,
     macos_window_background_blur = 10,
     tab_bar_style = {
         window_hide = '  ',

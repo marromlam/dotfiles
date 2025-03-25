@@ -16,10 +16,10 @@ return {
     'leoluz/nvim-dap-go', -- Add your own debuggers here
   },
   config = function()
-    local dap = require 'dap'
-    local dapui = require 'dapui'
+    local dap = require('dap')
+    local dapui = require('dapui')
 
-    require('mason-nvim-dap').setup {
+    require('mason-nvim-dap').setup({
       -- Makes a best effort to setup the various debuggers with
       -- reasonable debug configurations
       automatic_setup = true,
@@ -34,7 +34,7 @@ return {
         -- Update this to ensure that you have the debuggers for the langs you want
         'delve',
       },
-    }
+    })
 
     -- Basic debugging keymaps, feel free to change to your liking!
     vim.keymap.set(
@@ -55,7 +55,7 @@ return {
 
     -- Dap UI setup
     -- For more information, see |:help nvim-dap-ui|
-    dapui.setup {
+    dapui.setup({
       -- Set icons to characters that are more likely to work in every terminal.
       --    Feel free to remove or use ones that you like more! :)
       --    Don't feel like these are good choices.
@@ -73,7 +73,7 @@ return {
           disconnect = '⏏',
         },
       },
-    }
+    })
 
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     vim.keymap.set(

@@ -14,58 +14,80 @@
   showBranch = auto
   interactive = auto
 [core]
-  editor = "nvr --remote-wait-silent" # or nvim
-  excludesfile ="~/.dotfiles/git/.gitignore_global"
+  editor = "nvim"
+  excludesfile ="~/.gitignore"
   pager = delta
-  ; pager = delta --line-numbers --decorations --side-by-side --theme='gruvbox' --plus-color="#98971a" --minus-color="#9d0006"
+  autocrlf = input
+  # Make `git rebase` safer on macOS.
+  # More info: <http://www.git-tower.com/blog/make-git-rebase-safe-on-osx/>
+  trustctime = false
+  # Speed up commands involving untracked files such as `git status`.
+  # https://git-scm.com/docs/git-update-index#_untracked_cache
+  untrackedCache = true
 [format]
   pretty = format:%C(yellow)%h %Cblue%>(15)%ad %Cgreen%<(15)%aN%Cred%d %Creset%s
 [alias]
+  # View abbreviated SHA, description, and history graph of the latest 20 commits.
+  l = log --pretty=oneline -n 20 --graph --abbrev-commit
+  # View the current working tree status using the short format.
+  s = status -s
+  # Show the diff between the latest commit and the current state.
+  d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
+  # `git di $number` shows the diff between the state `$number` revisions ago and the current state.
+  di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
+  # Pull in remote changes for the current repository and all its submodules.
+  pl = pull --recurse-submodules
+  # Commit all changes.
+  ca = !git add -A && git commit -av
+  # Switch to a branch, creating it if necessary.
+  br = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
   pr = "!f() { git fetch upstream refs/pull/$1/head:pr/$1; } ; f"
-  fix = "!nvim `git diff --name-only | uniq`"
+  # Show verbose output about tags, branches or remotes
+  tags = tag -l
+  branches = branch --all
+  remotes = remote --verbose
+
+  fix='$EDITOR `git diff --name-only | uniq`'
   # List all aliases.  Stolen from here: https://twitter.com/TrevorBramble/status/774292970681937920
   aliases = "!git config -l | grep ^alias | cut -c 7- | sort"
   # Destroy all local changes and reset to HEAD.
   fuckit = reset --hard HEAD
   fall = fetch --all
+  # Destroy all local changes and reset to HEAD.
+  hreset = reset --hard HEAD
   # Reset previous commit, but keep all the associated changes. Useful for avoiding nasty git merge commits.
   uncommit = reset --soft HEAD^
   reset-up = reset --hard $(git upstream)
   sl = log --oneline --decorate -20
   new = checkout -b
   expunge = "!f() { git branch -d $1 && git push origin --delete $1; }; f"
+  # Remove branches that have already been merged with main.
+  # a.k.a. ‘delete merged’
+  dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+  # Show the user email for the current repository.
+  whoami = config user.email
+[branch]
+  # Show most recently changed branches first.
+  sort = -committerdate
+[diff]
+  colorMoved = default
+  navigate = true  # use n and N to move between diff sections
+  renames = copies # Detect copies as well as renames.
 [delta]
-  ; features = line-numbers
-  features = zebra-dark
-  line-numbers = true
-  ; line-numbers-left-format = ""
-  ; line-numbers-right-format = "│ "
-  line-numbers-minus-style = "#444444"
-  line-numbers-zero-style = "#444444"
-  line-numbers-plus-style = "#444444"
-  line-numbers-left-format = "{nm:>4}┊"
-  line-numbers-right-format = "{np:>4}│"
-  line-numbers-left-style = blue
-  line-numbers-right-style = blue
-  side-by-side = true
-  syntax-theme = gruvbox-dark
-  theme = gruvbox-dark
-  blame-palette = "#202020 #222222 #444444"
-  plus-color="#98971a"
-  minus-color="#9d0006"
-  ; file-decoration-style = none
-  hunk-header-style=omit
-; [delta "decorations"]
-  ; commit-decoration-style = bold yellow box ul
-  ; file-style = bold yellow ul
-; [interactive]
-  ; diffFilter = delta --color-only --syntax-theme=gruvbox
+  features = line-numbers decorations
+
+[delta "decorations"]
+  commit-decoration-style = bold yellow box ul
+  file-style = bold yellow ul
+[interactive]
+  diffFilter = delta --color-only --syntax-theme=gruvbox
 [push]
   default = current
-[push]
   followTags = true
 [merge]
   conflictstyle = diff3
+  # Include summaries of merged commits in newly created merge commit messages
+  log = true
 [pull]
   rebase = true
 [rebase]
@@ -75,8 +97,16 @@
 [gitsh]
   prompt = "\n%D %c(%b%#)%w ➜"
 [rerere]
-  enabled = true
-[hub]
-  protocol = ssh
+  enabled = false
+[help]
+  # Automatically correct and execute mistyped commands.
+  autocorrect = 1
+# URL shorthands
+[url "git@gist.github.com:"]
+  insteadOf = "gst:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
+[url "git://gist.github.com/"]
+  insteadOf = "gist:"
 [init]
   defaultBranch = main

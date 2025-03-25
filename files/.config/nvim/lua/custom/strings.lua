@@ -61,7 +61,7 @@ end
 ---@param chunks Chunks
 ---@return string
 local function chunks_to_string(chunks)
-  if not chunks or not vim.tbl_islist(chunks) then return '' end
+  if not chunks or not vim.islist(chunks) then return '' end
   local strings = mrl.fold(function(acc, item)
     local text, hl = unpack(item)
     if not falsy(text) then
@@ -95,7 +95,7 @@ local function component(opts)
   if opts.cond ~= nil and falsy(opts.cond) then return end
 
   local item = opts[1]
-  if not vim.tbl_islist(item) then
+  if not vim.islist(item) then
     error(
       fmt(
         'component options are required but got %s instead',
@@ -105,7 +105,8 @@ local function component(opts)
   end
 
   if not opts.priority then opts.priority = 10 end
-  local before, after = opts.before or '', opts.after or padding
+  -- local before, after = opts.before or '', opts.after or padding
+  local before, after = '', ''
 
   local item_str = chunks_to_string(item)
   if vim.api.nvim_strwidth(item_str) == 0 then return end
@@ -129,6 +130,7 @@ end
 -------------------------------------------------------------------------------
 -- statusline render utils {{{
 -------------------------------------------------------------------------------
+
 local function sum_lengths(list)
   return mrl.fold(
     function(acc, item) return acc + (item.length or 0) end,
