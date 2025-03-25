@@ -59,7 +59,7 @@ mrl.ui.icons = {
     diff = '',
     repo = '',
     logo = '󰊢',
-    branch = '',
+    branch = '', -- '',
   },
   documents = {
     file = '',

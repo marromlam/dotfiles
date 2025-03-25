@@ -1,8 +1,6 @@
 local icons = mrl.ui.icons.lsp
 local border = mrl.ui.current.border
 
-
-
 return { -- LSP Configuration & Plugins
   {
     'neovim/nvim-lspconfig',
@@ -199,9 +197,14 @@ return { -- LSP Configuration & Plugins
         callback = function(event)
           vim.lsp.buf.clear_references()
           -- try to clear the highlights when the LSP detaches
-          pcall(function()
-            vim.api.nvim_clear_autocmds({ group = 'kickstart-lsp-highlight', buffer = event.buf, })
-          end)
+          pcall(
+            function()
+              vim.api.nvim_clear_autocmds({
+                group = 'kickstart-lsp-highlight',
+                buffer = event.buf,
+              })
+            end
+          )
         end,
       })
 
@@ -210,11 +213,13 @@ return { -- LSP Configuration & Plugins
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend(
-        'force',
-        capabilities,
-        require('cmp_nvim_lsp').default_capabilities()
-      )
+      if vim.g.use_cmp then
+        capabilities = vim.tbl_deep_extend(
+          'force',
+          capabilities,
+          require('cmp_nvim_lsp').default_capabilities()
+        )
+      end
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -301,6 +306,14 @@ return { -- LSP Configuration & Plugins
       { '<leader>cs', '<cmd>SymbolsOutline<cr>', desc = 'Symbols Outline' },
     },
     config = true,
+  },
+  {
+    'zeioth/garbage-day.nvim',
+    dependencies = 'neovim/nvim-lspconfig',
+    event = 'VeryLazy',
+    opts = {
+      -- your options here
+    },
   },
 }
 

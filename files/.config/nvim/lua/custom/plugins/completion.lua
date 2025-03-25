@@ -1,7 +1,63 @@
+local highlight, ui = mrl.highlight, mrl.ui
+local fn = vim.fn
+local border = ui.current.border
+
 return {
+  {
+    'saghen/blink.cmp',
+    event = 'InsertEnter',
+    cond = not vim.g.use_cmp,
+    disable = vim.g.use_cmp,
+    dependencies = { 'rafamadriz/friendly-snippets' },
+    version = '*',
+    init = function()
+      highlight.plugin('blink', {
+        { BlinkCmpMenuBorder = { link = 'PickerBorder' } },
+        { BlinkCmpDocBorder = { link = 'PickerBorder' } },
+        { BlinkCmpMenu = { link = 'Normal' } },
+      })
+    end,
+    opts = {
+      keymap = { preset = 'enter' },
+      appearance = {
+        nerd_font_variant = 'mono',
+        use_nvim_cmp_as_default = true,
+      },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        providers = {
+          markdown = {
+            name = 'RenderMarkdown',
+            module = 'render-markdown.integ.blink',
+            fallbacks = { 'lsp' },
+          },
+        },
+      },
+      signature = { window = { border = border } },
+      completion = {
+        menu = { border = border },
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 500,
+          window = { border = border },
+        },
+        list = {
+          selection = {
+            auto_insert = function(ctx)
+              return ctx.mode == 'cmdline' and false or true
+            end,
+          },
+        },
+      },
+    },
+    opts_extend = { 'sources.default' },
+  },
+
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
+    cond = vim.g.use_cmp,
+    disable = not vim.g.use_cmp,
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       {
@@ -27,7 +83,7 @@ return {
           },
         },
       },
-      'saadparwaiz1/cmp_luasnip',
+      'saadparwaiz1/cmp_luasnip', -- for autocompletion
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
@@ -36,13 +92,16 @@ return {
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-buffer', -- source for text in buffer
       'hrsh7th/cmp-nvim-lsp-signature-help',
-      'saadparwaiz1/cmp_luasnip', -- for autocompletion
-      -- "rafamadriz/friendly-snippets", -- useful snippets
       'onsails/lspkind.nvim', -- vs-code like pictograms
       -- { 'hrsh7th/cmp-emoji' },
-      -- {'petertriho/cmp-git'},
-      { 'petertriho/cmp-git', opts = { filetypes = { 'gitcommit', 'NeogitCommitMessage' } } },
-      { 'abecodes/tabout.nvim', opts = { ignore_beginning = false, completion = false } },
+      {
+        'petertriho/cmp-git',
+        opts = { filetypes = { 'gitcommit', 'NeogitCommitMessage' } },
+      },
+      {
+        'abecodes/tabout.nvim',
+        opts = { ignore_beginning = false, completion = false },
+      },
     },
     config = function()
       -- See `:help cmp`

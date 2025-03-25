@@ -6,7 +6,8 @@ return {
     disable = false,
     ft = { 'markdown', 'rst' },
   },
-  -- { '3rd/image.nvim', ft = { 'markdown', 'neorg', 'org' }, opts = {} },
+
+  { '3rd/image.nvim', ft = { 'markdown', 'neorg', 'org' }, opts = {} },
 
   -- syntax highlighting for log files
   {
@@ -17,7 +18,7 @@ return {
 
   {
     'raivivek/vim-snakemake',
-    lazy = false,
+    ft = 'snakemake',
   },
 
   -- syntax highlighting for kitty conf file
@@ -52,10 +53,10 @@ return {
     end,
   },
 
-  {
-    'tpope/vim-surround',
-    event = 'InsertEnter',
-  },
+  -- {
+  --   'tpope/vim-surround',
+  --   event = 'InsertEnter',
+  -- },
 
   {
     'chrisbra/csv.vim',
@@ -86,5 +87,3 @@ return {
     end,
   },
 }
-
--- vim: fdm=marker
