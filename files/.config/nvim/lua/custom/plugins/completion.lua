@@ -93,6 +93,7 @@ return {
       'hrsh7th/cmp-buffer', -- source for text in buffer
       'hrsh7th/cmp-nvim-lsp-signature-help',
       'onsails/lspkind.nvim', -- vs-code like pictograms
+      'kristijanhusak/vim-dadbod-completion',
       -- { 'hrsh7th/cmp-emoji' },
       {
         'petertriho/cmp-git',
@@ -177,6 +178,7 @@ return {
           { name = 'nvim_lsp' },
           { name = 'nvim_lsp_signature_help' },
           { name = 'luasnip' },
+          { name = 'dadbod-completion' },
           { name = 'buffer' }, -- text within current buffer
           { name = 'path' },
           { name = 'rg', keyword_length = 3 },
