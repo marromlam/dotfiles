@@ -58,6 +58,7 @@ local identifiers = {
     ['dapui_.*'] = '',
     ['dap-repl'] = '',
     ['toggleterm'] = '',
+    ['Avante.*'] = icons.misc.chat,
   }),
   names = mrl.p_table({
     ['fzf'] = 'FZF',
@@ -76,6 +77,7 @@ local identifiers = {
     ['dap-repl'] = 'Debugger REPL',
     ['Diffview.*'] = 'Diff view',
     ['neotest.*'] = 'Testing',
+    ['Avante.*'] = 'avante',
 
     ['log'] = function(fname, _) return fmt('Log(%s)', fs.basename(fname)) end,
 
@@ -131,6 +133,9 @@ end
 local function special_buffers(ctx)
   if ctx.preview then return 'preview' end
   if ctx.buftype == 'quickfix' then return 'Quickfix List' end
+  if ctx.filetype == 'AvanteInput' then return 'Avante' end
+  if ctx.filetype == 'AvanteSelectedFiles' then return 'Avante' end
+  if ctx.filetype == 'Avante' then return 'Avante' end
   if ctx.buftype == 'terminal' and falsy(ctx.filetype) then
     return ('Terminal(%s)'):format(fn.fnamemodify(vim.env.SHELL, ':t'))
   end
@@ -179,7 +184,7 @@ end
 --- @param ctx StatuslineContext
 --- @return {env: string?, dir: string?, parent: string?, fname: string}
 local function filename(ctx)
-  local buf, ft = ctx.bufnum, ctx.filetype
+  local buf, ft = ctx.bufnum, ctx.filetype -- luacheck: ignore
   local special_buf = special_buffers(ctx)
   if special_buf then return { fname = special_buf } end
 
@@ -385,7 +390,6 @@ local function git_updates() run_task_on_interval(10000, update_git_status) end
 --  Utility functions
 ----------------------------------------------------------------------------------------------------
 
---- @param ctx StatuslineContext
 local function is_plain(ctx)
   local decor = decorations.get({
     ft = ctx.filetype,
@@ -396,14 +400,10 @@ local function is_plain(ctx)
   return is_plain_ft or is_plain_bt or ctx.preview
 end
 
---- @param ctx StatuslineContext
---- @param icon string | nil
 local function is_modified(ctx, icon)
   return ctx.filetype == 'help' and '' or ctx.modified and (icon or '✎') or ''
 end
 
---- @param ctx StatuslineContext
---- @param icon string | nil
 local function is_readonly(ctx, icon)
   return ctx.readonly and ' ' .. (icon or '') or ''
 end
@@ -644,7 +644,7 @@ function mrl.ui.statusline.render()
     {
       {
         { icons.git.mod, 'StGitModified' },
-        { space, 'StSeparator' },
+        { space, 'StGitModified' },
         { status.changed, 'StTitle' },
         { space, 'StSeparator' },
       },
@@ -654,7 +654,7 @@ function mrl.ui.statusline.render()
     {
       {
         { icons.git.remove, 'StGitDelete' },
-        { space, 'StSeparator' },
+        { space, 'StGitDelete' },
         { status.removed, 'StTitle' },
         { space, 'StSeparator' },
       },
@@ -664,7 +664,7 @@ function mrl.ui.statusline.render()
     {
       {
         { icons.git.add, 'StGitAdd' },
-        { space, 'StSeparator' },
+        { space, 'StGitAdd' },
         { status.added, 'StTitle' },
         { space, 'StSeparator' },
       },

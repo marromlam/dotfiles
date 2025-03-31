@@ -7,7 +7,7 @@ return { -- LSP Configuration & Plugins
     event = { 'BufReadPre' },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+      { 'williamboman/mason.nvim', config = true },
       { 'williamboman/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
 
@@ -233,7 +233,8 @@ return { -- LSP Configuration & Plugins
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        -- pyright = {},
+        ruff = {},
         -- pylsp = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -314,6 +315,107 @@ return { -- LSP Configuration & Plugins
     opts = {
       -- your options here
     },
+  },
+  {
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'LspAttach',
+    priority = 1000,
+    dependencies = {
+      'mfussenegger/nvim-lint',
+    },
+    config = function()
+      require('lint').try_lint()
+      require('tiny-inline-diagnostic').setup({
+        -- "modern", "classic", "minimal", "powerline", "simple"
+        preset = 'simple',
+        transparent_bg = false, -- Set the background of the diagnostic to transparent
+        hi = {
+          error = 'DiagnosticError', -- Highlight group for error messages
+          warn = 'DiagnosticWarn', -- Highlight group for warning messages
+          info = 'DiagnosticInfo', -- Highlight group for informational messages
+          hint = 'DiagnosticHint', -- Highlight group for hint or suggestion messages
+          arrow = 'NonText', -- Highlight group for diagnostic arrows
+          -- Background color for diagnostics
+          -- Can be a highlight group or a hexadecimal color (#RRGGBB)
+          background = 'CursorLine',
+          -- Color blending option for the diagnostic background
+          -- Use "None" or a hexadecimal color (#RRGGBB) to blend with another color
+          mixing_color = 'None',
+        },
+
+        options = {
+          show_source = true,
+          -- Use icons defined in the diagnostic configuration
+          use_icons_from_diagnostic = false,
+
+          -- Set the arrow icon to the same color as the first diagnostic severity
+          set_arrow_to_diag_color = false,
+
+          -- Add messages to diagnostics when multiline diagnostics are enabled
+          -- If set to false, only signs will be displayed
+          add_messages = true,
+
+          -- Time (in milliseconds) to throttle updates while moving the cursor
+          -- Increase this value for better performance if your computer is slow
+          -- or set to 0 for immediate updates and better visual
+          throttle = 20,
+
+          -- Minimum message length before wrapping to a new line
+          softwrap = 30,
+
+          -- Configuration for multiline diagnostics
+          -- Can either be a boolean or a table with the following options:
+          --  multilines = {
+          --      enabled = false,
+          --      always_show = false,
+          -- }
+          -- If it set as true, it will enable the feature with this options:
+          --  multilines = {
+          --      enabled = true,
+          --      always_show = false,
+          -- }
+          multilines = {
+            enabled = false,
+            always_show = false,
+          },
+          -- Display all diagnostic messages on the cursor line
+          show_all_diags_on_cursorline = false,
+          -- Disable diagnostics in Insert and Visual modes
+          enable_on_insert = false,
+          enable_on_select = false,
+          overflow = {
+            mode = 'wrap',
+            padding = 0,
+          },
+          -- Configuration for breaking long messages into separate lines
+          break_line = {
+            enabled = false,
+            after = 30,
+          },
+
+          -- Custom format function for diagnostic messages
+          -- Example:
+          -- format = function(diagnostic)
+          --     return diagnostic.message .. " [" .. diagnostic.source .. "]"
+          -- end
+          format = nil,
+          virt_texts = {
+            -- Priority for virtual text display
+            priority = 2048,
+          },
+          -- Filter diagnostics by severity
+          severity = {
+            vim.diagnostic.severity.ERROR,
+            vim.diagnostic.severity.WARN,
+            vim.diagnostic.severity.INFO,
+            vim.diagnostic.severity.HINT,
+          },
+          -- Events to attach diagnostics to buffers
+          overwrite_events = nil,
+        },
+        disabled_ft = {}, -- List of filetypes to disable the plugin
+      })
+    end,
   },
 }
 

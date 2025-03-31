@@ -94,6 +94,7 @@ mrl.ui.icons = {
     code = '',
     telescope = '',
     gear = '',
+    chat = '󰭻',
     package = '',
     list = '',
     sign_in = '',

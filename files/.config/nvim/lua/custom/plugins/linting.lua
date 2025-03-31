@@ -1,6 +1,6 @@
 return {
   'mfussenegger/nvim-lint',
-  events = { 'BufWritePost', 'BufReadPost', 'InsertLeave' },
+  events = { 'BufWritePost', 'BufReadPost', 'InsertLeave', 'LspAttach' },
   keys = {
     {
       '<leader>ll',

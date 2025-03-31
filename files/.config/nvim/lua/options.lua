@@ -218,4 +218,6 @@ vim.g.netrw_winsize = 25
 --
 vim.opt.isfname:append('@-@')
 
+vim.diagnostic.config({ virtual_text = false })
+
 -- vim: fdm=marker
