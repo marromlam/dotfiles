@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+if command -v jq &> /dev/null; then
+  notifications=$(gh api notifications | jq length)
+else
+  notifications=$(gh api notifications | grep -o 'unread' | wc -l)
+fi
+
+if (( notifications > 0 )); then
+  echo -n '#[fg=colour7]#[default]'
+  echo -n "#[bg=colour7,fg=colour0,bold] $notifications#[default]"
+  echo -n '#[fg=colour7]#[default]'
+fi
+
+
+# vim: ft=bash
