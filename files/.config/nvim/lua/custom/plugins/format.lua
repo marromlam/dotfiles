@@ -2,8 +2,6 @@ return {
   { -- Autoformat
     'stevearc/conform.nvim',
     -- lazy = false,
-    cond = false,
-    disable = true,
     event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
     cmd = { 'ConformInfo' },
     keys = {
