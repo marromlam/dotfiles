@@ -7,14 +7,92 @@ local function general_overrides(dim_factor)
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
   highlight.all({
-    ---------------------------------------------------------------------------
-    -- Native
-    ---------------------------------------------------------------------------
-    { VertSplit = { fg = { from = 'Comment' } } },
-    { StatusLine = { fg = { from = 'Normal' }, bg = bg_color } },
-    { Statusline = { fg = { from = 'Normal' }, bg = bg_color } },
     -- { PanelSt = { link = 'StatusLine' } },
-    -- Neotree
+    { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
+    -- Status line {{{
+    -- Search count
+    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
+    -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
+    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
+    -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
+    { StSeparator = { fg = 'NONE', bg = 'NONE' } },
+    {
+      StSearchCount = {
+        fg = { from = 'Normal', attr = 'bg' },
+        bg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    -- { StSeparator = { bg = '#00aaff', fg = bg_color } },
+    { StModified = { fg = '#ffaaff', bg = bg_color } },
+    { StTitle = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
+    { StFaded = { fg = { from = 'Comment', attr = 'fg' }, bg = bg_color } },
+    -- { StGit = { fg = '#ff0000', bg = '#00ff00' } },
+    {
+      StBranch = {
+        fg = { from = 'DiagnosticInfo', attr = 'fg' },
+        bg = bg_color,
+      },
+    },
+    {
+      StGitAdd = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = bg_color },
+    },
+    {
+      StGitDelete = {
+        fg = { from = 'GitSignsDelete', attr = 'fg' },
+        bg = bg_color,
+      },
+    },
+    {
+      StGitModified = {
+        fg = { from = 'DiagnosticWarn', attr = 'fg' },
+        bg = bg_color,
+      },
+    },
+    {
+      StInfo = { fg = { from = 'DiagnosticInfo', attr = 'fg' }, bg = bg_color },
+    },
+    {
+      StWarn = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = bg_color },
+    },
+    {
+      StError = {
+        fg = { from = 'DiagnosticError', attr = 'fg' },
+        bg = bg_color,
+      },
+    },
+    {
+      StFilename = {
+        fg = { from = 'Normal', attr = 'fg' },
+        bg = bg_color,
+        bold = true,
+      },
+    },
+    {
+      StEnv = {
+        fg = { from = 'DiagnosticError', attr = 'fg' },
+        bg = bg_color,
+        bold = true,
+        italic = true,
+      },
+    },
+    {
+      StDirectory = {
+        fg = { from = 'Comment', attr = 'fg' },
+        bg = bg_color,
+        italic = true,
+      },
+    },
+    -- { StFilename = { fg = '#0000ff', bg = bg_color } },
+    {
+      StParent = {
+        fg = { from = 'DiagnosticWarn', attr = 'fg' },
+        bg = bg_color,
+        italic = true,
+      },
+    },
+    -- }}}
+    -- Neotree {{{
+    { NeoTreeStatusLine = { link = 'Statusline' } },
     { NeoTreeNormal = { bg = bg_color, fg = { from = 'Normal' } } },
     { NeoTreeNormalNC = { bg = bg_color, fg = { from = 'Normal' } } },
     { NeoTreeCursorLine = { bg = bg_color2 } },
@@ -22,7 +100,6 @@ local function general_overrides(dim_factor)
     { NeoTreeWinSeparatorNC = { fg = { from = 'Normal', attr = 'bg' } } },
     -- { NeoTreeCursorLine = { link = 'Visual' } },
     { NeoTreeRootName = { underline = true } },
-    { NeoTreeStatusLine = { link = 'PanelSt' } },
     { NeoTreeTabActive = { bg = bg_color, bold = true } },
     { NeoTreeTabInactive = { bg = bg_color, fg = { from = 'Comment' } } },
     {
@@ -34,44 +111,6 @@ local function general_overrides(dim_factor)
     { NeoTreeDirectoryIcon = { link = 'WarningMsg' } },
     { NeoTreeTabSeparatorActive = { bg = bg_color, fg = bg_color } },
     { NeoTreeTabSeparatorInactive = { bg = bg_color, fg = bg_color } },
-    -- Status line {{{
-    -- Search count
-    { StSearchCount = { fg = '#333333', bg = '#dddddd' } },
-    { StSeparator = { fg = '#00aaff', bg = bg_color } },
-    { StModified = { fg = '#ffaaff', bg = bg_color } },
-    { StTitle = { fg = { from = 'Normal' }, bg = bg_color } },
-    { StFaded = { fg = { from = 'Comment' }, bg = bg_color } },
-    { StGit = { fg = '#ff0000', bg = '#00ff00' } },
-    { StBranch = { fg = { from = 'DiagnosticInfo' }, bg = bg_color } },
-    { StGitAdd = { fg = { from = 'GitSignsAdd' }, bg = bg_color } },
-    { StGitDelete = { fg = { from = 'GitSignsDelete' }, bg = bg_color } },
-    { StGitModified = { fg = { from = 'DiagnosticWarn' }, bg = bg_color } },
-    { StInfo = { fg = { from = 'DiagnosticInfo' }, bg = bg_color } },
-    { StWarn = { fg = { from = 'DiagnosticWarn' }, bg = bg_color } },
-    { StError = { fg = { from = 'DiagnosticError' }, bg = bg_color } },
-    { Statusline = { fg = bg_color, bg = bg_color } },
-    { StatusLine = { fg = bg_color, bg = bg_color } },
-    { StSeparator = { fg = '#00ffff', bg = bg_color } },
-    { StFilename = { fg = { from = 'Normal' }, bg = bg_color, bold = true } },
-    {
-      StEnv = {
-        fg = { from = 'DiagnosticError' },
-        bg = bg_color,
-        bold = true,
-        italic = true,
-      },
-    },
-    {
-      StDirectory = { fg = { from = 'Comment' }, bg = bg_color, italic = true },
-    },
-    -- { StFilename = { fg = '#0000ff', bg = bg_color } },
-    {
-      StParent = {
-        fg = { from = 'DiagnosticWarn' },
-        bg = bg_color,
-        italic = true,
-      },
-    },
     -- }}}
     -- Symbol Usage {{{
     { SymbolUsageLeft = { fg = bg_color } },
@@ -83,10 +122,12 @@ local function general_overrides(dim_factor)
       },
     },
     -- }}}
+    -- xxx {{{
+    { VertSplit = { fg = { from = 'Comment' } } },
     { WinSeparator = { fg = { from = 'Comment' } } },
     { CursorLine = { bg = { from = 'Normal', alter = dim_factor } } },
     { CursorLineNr = { bg = 'NONE' } },
-    { iCursor = { bg = '#ff00ff' } },
+    { iCursor = { bg = '#00aaff' } },
     { PmenuSbar = { link = 'Normal' } },
     {
       Folded = {
@@ -94,9 +135,8 @@ local function general_overrides(dim_factor)
         bg = { from = 'Normal', alter = is_dark and 0.3 or 0.1 },
       },
     },
-    ---------------------------------------------------------------------------
-    -- Floats
-    ---------------------------------------------------------------------------
+    -- }}}
+    -- Floats {{{
     { NormalFloat = { bg = { from = 'Normal', alter = -0.15 } } },
     {
       FloatBorder = { bg = { from = 'NormalFloat' }, fg = { from = 'Comment' } },
@@ -108,25 +148,21 @@ local function general_overrides(dim_factor)
         bg = { from = 'FloatBorder', attr = 'fg' },
       },
     },
-    ---------------------------------------------------------------------------
-    -- Created highlights
-    ---------------------------------------------------------------------------
+    -- }}}
+    -- Created highlights {{{
     { Dim = { fg = { from = 'Normal', attr = 'bg', alter = dim_factor } } },
     { PickerBorder = { link = 'Normal' } },
     { UnderlinedTitle = { bold = true, underline = true } },
     { StatusColSep = { link = 'Dim' } },
-    ---------------------------------------------------------------------------
     { CodeBlock = { bg = { from = 'Normal', alter = 0.3 } } },
     { markdownCode = { link = 'CodeBlock' } },
     { markdownCodeBlock = { link = 'CodeBlock' } },
-    ---------------------------------------------------------------------------
-    --  Spell
-    ---------------------------------------------------------------------------
+    -- }}}
+    --  Spell {{{
     { SpellBad = { undercurl = true, bg = 'NONE', fg = 'NONE', sp = 'green' } },
     { SpellRare = { undercurl = true } },
-    ---------------------------------------------------------------------------
-    -- Diff
-    ---------------------------------------------------------------------------
+    -- }}}
+    -- Diff {{{
     -- { DiffAdd = { bg = '#26332c', fg = 'NONE', underline = false } },
     -- { DiffDelete = { bg = '#572E33', fg = '#5c6370', underline = false } },
     -- { DiffChange = { bg = '#273842', fg = 'NONE', underline = false } },
@@ -144,9 +180,8 @@ local function general_overrides(dim_factor)
     { diffIsA = { link = 'WarningMsg' } },
     { diffNoEOL = { link = 'WarningMsg' } },
     { diffOnly = { link = 'WarningMsg' } },
-    ---------------------------------------------------------------------------
-    -- colorscheme overrides
-    ---------------------------------------------------------------------------
+    -- }}}
+    -- colorscheme overrides {{{
     { Type = { italic = true, bold = true } },
     { Include = { italic = true, bold = false } },
     { QuickFixLine = { inherit = 'CursorLine', fg = 'NONE', italic = true } },
@@ -155,9 +190,9 @@ local function general_overrides(dim_factor)
     -- if either are specified this can lead to issues when a winhighlight is set
     { SignColumn = { bg = 'NONE' } },
     { EndOfBuffer = { bg = 'NONE' } },
-    ----------------------------------------------------------------------------
-    --  Semantic tokens
-    ----------------------------------------------------------------------------
+    -- }}}
+    --  Semantic tokens {{{
+    --  lsp
     { ['@lsp.type.variable'] = { clear = true } },
     { ['@lsp.type.parameter'] = { italic = true, fg = { from = 'Normal' } } },
     { ['@lsp.typemod.method'] = { link = '@method' } },
@@ -176,9 +211,7 @@ local function general_overrides(dim_factor)
     { ['@lsp.typemod.keyword.injected'] = { link = '@keyword' } },
     { ['@lsp.typemod.string.injected'] = { link = '@string' } },
     { ['@lsp.typemod.variable.injected'] = { link = '@variable' } },
-    ---------------------------------------------------------------------------
     -- Treesitter
-    ---------------------------------------------------------------------------
     { ['@keyword.return'] = { italic = true, fg = { from = 'Keyword' } } },
     { ['@type.qualifier'] = { inherit = '@keyword', italic = true } },
     { ['@variable'] = { clear = true } },
@@ -187,9 +220,8 @@ local function general_overrides(dim_factor)
     { ['@text.diff.add'] = { link = 'DiffAdd' } },
     { ['@text.diff.delete'] = { link = 'DiffDelete' } },
     { ['@text.title.markdown'] = { underdouble = true } },
-    ---------------------------------------------------------------------------
-    -- LSP
-    ---------------------------------------------------------------------------
+    -- }}}
+    -- LSP {{{
     {
       LspReferenceWrite = {
         inherit = 'LspReferenceText',
@@ -247,75 +279,75 @@ local function general_overrides(dim_factor)
     -- { DiagnosticSignHint = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
     -- {DiagnosticSignInfoLine = { bg = mrl.get_hi('SignColumn').bg }},
     -- { DiagnosticSignInfo = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
-    ---------------------------------------------------------------------------
+    -- }}}
     -- FzfLua {{{
-    ---------------------------------------------------------------------------
-    -- FzfLuaNormal	Normal	hls.normal	Main win fg/bg
+    -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
     {
       FzfLuaNormal = {
         bg = { from = 'Normal', attr = 'bg' },
         fg = { from = 'Normal', attr = 'fg' },
       },
     },
-    -- FzfLuaBorder	Normal	hls.border	Main win border
-    -- FzfLuaTitle	FzfLuaNormal	hls.title	Main win title
-    -- FzfLuaBackdrop	*bg=Black	hls.backdrop	Backdrop color
-    -- FzfLuaPreviewNormal	FzfLuaNormal	hls.preview_normal	Builtin preview fg/bg
-    -- FzfLuaPreviewBorder	FzfLuaBorder	hls.preview_border	Builtin preview border
-    -- FzfLuaPreviewTitle	FzfLuaTitle	hls.preview_title	Builtin preview title
+    -- FzfLuaBorder Normal  hls.border  Main win border
+    -- FzfLuaTitle  FzfLuaNormal    hls.title   Main win title
+    -- FzfLuaBackdrop   *bg=Black   hls.backdrop    Backdrop color
+    -- FzfLuaPreviewNormal  FzfLuaNormal    hls.preview_normal  Builtin preview fg/bg
+    -- FzfLuaPreviewBorder  FzfLuaBorder    hls.preview_border  Builtin preview border
+    -- FzfLuaPreviewTitle   FzfLuaTitle hls.preview_title   Builtin preview title
     -- { FzfLuaCursor = { bg = "#ff00ff", fg = "#00ff00"} },
-    -- { FzfLuaCursor = { bg =  "#ff00ff" , fg = { from = 'Normal', attr = 'fg' }}},
+    -- { FzfLuaCursor = { bg =  "#ff00ff" , fg = { from = 'Normal', attr = 'fg' } } },
     -- { FzfLuaCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
-    -- FzfLuaCursor	Cursor	hls.cursor	Builtin preview Cursor
-    -- FzfLuaCursorLine	CursorLine	hls.cursorline	Builtin preview Cursorline
-    -- FzfLuaCursorLineNr	CursorLineNr	hls.cursorlinenr	Builtin preview CursorLineNr
-    -- FzfLuaSearch	IncSearch	hls.search	Builtin preview search matches
-    -- FzfLuaScrollBorderEmpty	FzfLuaBorder	hls.scrollborder_e	Builtin preview border scroll empty
-    -- FzfLuaScrollBorderFull	FzfLuaBorder	hls.scrollborder_f	Builtin preview border scroll full
-    -- FzfLuaScrollFloatEmpty	PmenuSbar	hls.scrollfloat_e	Builtin preview float scroll empty
-    -- FzfLuaScrollFloatFull	PmenuThumb	hls.scrollfloat_f	Builtin preview float scroll full
-    -- FzfLuaHelpNormal	FzfLuaNormal	hls.help_normal	Help win fg/bg
-    -- FzfLuaHelpBorder	FzfLuaBorder	hls.help_border	Help win border
-    -- FzfLuaHeaderBind	*BlanchedAlmond	hls.header_bind	Header keybind
-    -- FzfLuaHeaderText	*Brown1	hls.header_text	Header text
-    -- FzfLuaPathColNr	*CadetBlue1	hls.path_colnr	Path col nr (lines,qf,lsp,diag)
-    -- FzfLuaPathLineNr	*LightGreen	hls.path_linenr	Path line nr (lines,qf,lsp,diag)
-    -- FzfLuaBufName	*LightMagenta	hls.buf_name	Buffer name (lines)
-    -- FzfLuaBufNr	*BlanchedAlmond	hls.buf_nr	Buffer number (all buffers)
-    -- FzfLuaBufFlagCur	*Brown1	hls.buf_flag_cur	Buffer line (buffers)
-    -- FzfLuaBufFlagAlt	*CadetBlue1	hls.buf_flag_alt	Buffer line (buffers)
-    -- FzfLuaTabTitle	*LightSkyBlue1	hls.tab_title	Tab title (tabs)
-    -- FzfLuaTabMarker	*BlanchedAlmond	hls.tab_marker	Tab marker (tabs)
-    -- FzfLuaDirIcon	Directory	hls.dir_icon	Paths directory icon
-    -- FzfLuaDirPart	Comment	hls.dir_part	Path formatters directory hl group
-    -- FzfLuaFilePart	@none	hls.file_part	Path formatters file hl group
-    -- FzfLuaLiveSym	*Brown1	hls.live_sym	LSP live symbols query match
+    -- FzfLuaCursor Cursor  hls.cursor  Builtin preview Cursor
+    -- FzfLuaCursorLine CursorLine  hls.cursorline  Builtin preview Cursorline
+    -- FzfLuaCursorLineNr   CursorLineNr    hls.cursorlinenr    Builtin preview CursorLineNr
+    -- FzfLuaSearch IncSearch   hls.search  Builtin preview search matches
+    -- FzfLuaScrollBorderEmpty  FzfLuaBorder    hls.scrollborder_e  Builtin preview border scroll empty
+    -- FzfLuaScrollBorderFull   FzfLuaBorder    hls.scrollborder_f  Builtin preview border scroll full
+    -- FzfLuaScrollFloatEmpty   PmenuSbar   hls.scrollfloat_e   Builtin preview float scroll empty
+    -- FzfLuaScrollFloatFull    PmenuThumb  hls.scrollfloat_f   Builtin preview float scroll full
+    -- FzfLuaHelpNormal FzfLuaNormal    hls.help_normal Help win fg/bg
+    -- FzfLuaHelpBorder FzfLuaBorder    hls.help_border Help win border
+    -- FzfLuaHeaderBind *BlanchedAlmond hls.header_bind Header keybind
+    -- FzfLuaHeaderText *Brown1 hls.header_text Header text
+    -- FzfLuaPathColNr  *CadetBlue1 hls.path_colnr  Path col nr (lines,qf,lsp,diag)
+    -- FzfLuaPathLineNr *LightGreen hls.path_linenr Path line nr (lines,qf,lsp,diag)
+    -- FzfLuaBufName    *LightMagenta   hls.buf_name    Buffer name (lines)
+    -- FzfLuaBufNr  *BlanchedAlmond hls.buf_nr  Buffer number (all buffers)
+    -- FzfLuaBufFlagCur *Brown1 hls.buf_flag_cur    Buffer line (buffers)
+    -- FzfLuaBufFlagAlt *CadetBlue1 hls.buf_flag_alt    Buffer line (buffers)
+    -- FzfLuaTabTitle   *LightSkyBlue1  hls.tab_title   Tab title (tabs)
+    -- FzfLuaTabMarker  *BlanchedAlmond hls.tab_marker  Tab marker (tabs)
+    -- FzfLuaDirIcon    Directory   hls.dir_icon    Paths directory icon
+    -- FzfLuaDirPart    Comment hls.dir_part    Path formatters directory hl group
+    -- FzfLuaFilePart   @none   hls.file_part   Path formatters file hl group
+    -- FzfLuaLiveSym    *Brown1 hls.live_sym    LSP live symbols query match
     { FzfLuaFzfNormal = { bg = '#ffff00', fg = '#00ff00' } },
     -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
     -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
     { ['@fzf.normal'] = { bg = '#ff0000', fg = '#00ff00' } },
-    -- FzfLuaFzfNormal	FzfLuaNormal	fzf.normal	fzf's fg|bg
-    -- FzfLuaFzfCursorLine	FzfLuaCursorLine	fzf.cursorline	fzf's fg+|bg+
-    -- FzfLuaFzfMatch	Special	fzf.match	fzf's hl+
-    -- FzfLuaFzfBorder	FzfLuaBorder	fzf.border	fzf's border
-    -- FzfLuaFzfScrollbar	FzfLuaFzfBorder	fzf.scrollbar	fzf's scrollbar
-    -- FzfLuaFzfSeparator	FzfLuaFzfBorder	fzf.separator	fzf's separator
-    -- FzfLuaFzfGutter	FzfLuaNormal	fzf.gutter	fzf's gutter (hl bg is used)
-    -- FzfLuaFzfHeader	FzfLuaTitle	fzf.header	fzf's header
-    -- FzfLuaFzfInfo	NonText	fzf.info	fzf's info
-    -- FzfLuaFzfPointer	Special	fzf.pointer	fzf's pointer
-    -- FzfLuaFzfMarker	FzfLuaFzfPointer	fzf.marker	fzf's marker
-    -- FzfLuaFzfSpinner	FzfLuaFzfPointer	fzf.spinner	fzf's spinner
-    -- FzfLuaFzfPrompt	Special	fzf.prompt	fzf's prompt
-    -- FzfLuaFzfQuery	FzfLuaNormal	fzf.query	fzf's header
+    -- FzfLuaFzfNormal  FzfLuaNormal    fzf.normal  fzf's fg|bg
+    -- FzfLuaFzfCursorLine  FzfLuaCursorLine    fzf.cursorline  fzf's fg+|bg+
+    -- FzfLuaFzfMatch   Special fzf.match   fzf's hl+
+    -- FzfLuaFzfBorder  FzfLuaBorder    fzf.border  fzf's border
+    -- FzfLuaFzfScrollbar   FzfLuaFzfBorder fzf.scrollbar   fzf's scrollbar
+    -- FzfLuaFzfSeparator   FzfLuaFzfBorder fzf.separator   fzf's separator
+    -- FzfLuaFzfGutter  FzfLuaNormal    fzf.gutter  fzf's gutter (hl bg is used)
+    -- FzfLuaFzfHeader  FzfLuaTitle fzf.header  fzf's header
+    -- FzfLuaFzfInfo    NonText fzf.info    fzf's info
+    -- FzfLuaFzfPointer Special fzf.pointer fzf's pointer
+    -- FzfLuaFzfMarker  FzfLuaFzfPointer    fzf.marker  fzf's marker
+    -- FzfLuaFzfSpinner FzfLuaFzfPointer    fzf.spinner fzf's spinner
+    -- FzfLuaFzfPrompt  Special fzf.prompt  fzf's prompt
+    -- FzfLuaFzfQuery   FzfLuaNormal    fzf.query   fzf's header
     -- }}}
-    ---------------------------------------------------------------------------
   })
 end
 
 local function set_sidebar_highlight(dim_factor)
   highlight.all({
-    { PanelDarkBackground = { bg = { from = 'Normal', alter = dim_factor } } },
+    {
+      PanelDarkBackground = { bg = { from = 'Normal', alter = dim_factor } },
+    },
     { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
     { PanelBackground = { bg = { from = 'Normal', alter = -0.8 } } },
     { PanelHeading = { inherit = 'PanelBackground', bold = true } },
@@ -331,7 +363,6 @@ local function set_sidebar_highlight(dim_factor)
 end
 
 local sidebar_fts = {
-  'flutterToolsOutline',
   'undotree',
   'Outline',
   'dbui',
@@ -352,38 +383,6 @@ end
 
 local function colorscheme_overrides(dim_factor)
   local overrides = {
-    ['horizon'] = {
-      { Constant = { bold = true } },
-      { NonText = { fg = { from = 'Comment' } } },
-      { TabLineSel = { fg = { from = 'SpecialKey' } } },
-      { ['@variable'] = { fg = { from = 'Normal' } } },
-      { ['@constant.comment'] = { inherit = 'Constant', bold = true } },
-      {
-        ['@constructor.lua'] = {
-          inherit = 'Type',
-          italic = false,
-          bold = false,
-        },
-      },
-      { ['@lsp.type.parameter'] = { fg = { from = 'Normal' } } },
-      { VisibleTab = { bg = { from = 'Normal', alter = 0.4 }, bold = true } },
-      { PanelBackground = { link = 'Normal' } },
-      {
-        PanelWinSeparator = {
-          inherit = 'PanelBackground',
-          fg = { from = 'WinSeparator' },
-        },
-      },
-      {
-        PanelHeading = {
-          bg = 'bg',
-          bold = true,
-          fg = { from = 'Normal', alter = -0.3 },
-        },
-      },
-      { PanelDarkBackground = { bg = { from = 'Normal', alter = -0.25 } } },
-      { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
-    },
     ['github_dark_default'] = {
       { TabLineSel = { link = 'Todo' } },
     },
@@ -415,3 +414,5 @@ mrl.augroup('UserHighlights', {
   pattern = sidebar_fts,
   command = function() on_sidebar_enter() end,
 })
+
+-- vim: foldmethod=marker

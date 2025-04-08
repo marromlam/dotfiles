@@ -20,7 +20,7 @@ vim.g.maplocalleader = '\\' -- Local leader is <Space>
 --------------------------------------------------------------------------------
 -- Global namespace {{{
 --------------------------------------------------------------------------------
-vim.g.use_cmp = true
+vim.g.use_cmp = false
 
 local namespace = {
   ui = {
@@ -68,6 +68,7 @@ require('external_grep')
 -- COLORSCHEME and extra temporal highlights {{{
 --------------------------------------------------------------------------------
 vim.o.background = 'dark' -- or "light"
+vim.opt.termguicolors = true
 vim.cmd([[colorscheme gruvbox]])
 -- vim.cmd([[colorscheme horizon]])
 -- vim.cmd([[colorscheme rose-pine]])

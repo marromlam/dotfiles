@@ -227,16 +227,6 @@ return {
     config = function() require('mini.bufremove').setup() end,
   },
 
-  {
-    'mbbill/undotree',
-    keys = {
-      {
-        '<leader>u',
-        vim.cmd.UndotreeToggle,
-        'Toggle [u]ndotree',
-      },
-    },
-  },
   { 'meznaric/key-analyzer.nvim', opts = {}, cmd = 'KeyAnalyzer' },
 
   {
@@ -246,12 +236,12 @@ return {
     },
   },
 
-{
-   "m4xshen/hardtime.nvim",
-   dependencies = { "MunifTanjim/nui.nvim" },
-   opts = {},
-   lazy = true
-},
+  {
+    'm4xshen/hardtime.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {},
+    lazy = true,
+  },
 
   --- }}}
   ------------------------------------------------------------------------

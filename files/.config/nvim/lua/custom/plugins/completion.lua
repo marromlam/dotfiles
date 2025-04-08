@@ -8,7 +8,10 @@ return {
     event = 'InsertEnter',
     cond = not vim.g.use_cmp,
     disable = vim.g.use_cmp,
-    dependencies = { 'rafamadriz/friendly-snippets' },
+    dependencies = {
+      'rafamadriz/friendly-snippets',
+      'onsails/lspkind.nvim', -- vs-code like pictograms
+    },
     version = '*',
     init = function()
       highlight.plugin('blink', {
