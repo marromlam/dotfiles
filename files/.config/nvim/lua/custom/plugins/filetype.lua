@@ -104,4 +104,18 @@ return {
       })
     end,
   },
+
+  {
+    'marromlam/nvim-docx.nvim',
+    name = 'nvim-docx',
+    dir = '~/Projects/personal/nvim-docx',
+    dev = true,
+    lazy = false,
+    keys = {
+      -- '<S-CR>',
+      '<leader>X',
+      ':ReloadXMLFromZip<CR>',
+      desc = 'Reload MS Word',
+    },
+  },
 }
