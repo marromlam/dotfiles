@@ -84,6 +84,7 @@ au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost 
 vim.cmd([[
 autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
 autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
+FzfLua register_ui_select
 set colorcolumn=81
 ]])
 

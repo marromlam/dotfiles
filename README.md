@@ -1,4 +1,18 @@
-# fictional couscous
+# couscous
+
+<div align=center>
+  <a href="../../commits/main">
+    <img alt="Last commit" src="https://img.shields.io/github/last-commit/KevinNitroG/dotfiles?style=for-the-badge&color=f2cdcd&labelColor=363a4f"/>
+  </a>
+  <img alt="Repo size" src="https://img.shields.io/github/repo-size/KevinNitroG/dotfiles?style=for-the-badge&color=eba0ac&labelColor=363a4f"/>
+</div>
+
+<div align=center>
+  <img alt="macOS" src="https://img.shields.io/badge/MacOS-f0f0f0?logo=apple&logoColor=black&style=for-the-badge"/>
+  <img alt="Windows" src="https://img.shields.io/badge/Windows-74c7ec?style=for-the-badge&logo=windows&logoColor=white"/>
+</div>
+
+## Introduction
 
 Most of my machine configuration is handled with my fictional couscous!
 

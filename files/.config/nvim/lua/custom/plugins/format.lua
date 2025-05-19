@@ -1,5 +1,5 @@
 return {
-  { -- Autoformat
+  {
     'stevearc/conform.nvim',
     -- lazy = false,
     event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
@@ -14,7 +14,9 @@ return {
         desc = '[F]ormat buffer',
       },
     },
-    opts = {
+    config = function()
+      local conform = require('conform')
+      conform.setup({
       notify_on_error = true,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
@@ -57,7 +59,43 @@ return {
         shfmt = {
           prepend_args = { '-i', '2' },
         },
-      },
-    },
-  },
+      }
+      }
+  )
+
+    vim.api.nvim_create_user_command('Format', function(args)
+    local range = nil
+    if args.count ~= -1 then
+        local end_line =
+        vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+        range = {
+        start = { args.line1, 0 },
+        ['end'] = { args.line2, end_line:len() },
+        }
+    end
+    conform.format({
+        async = true,
+        lsp_format = 'fallback',
+        range = range,
+    })
+    end, { range = true })
+
+    vim.api.nvim_create_user_command(
+    'FormatDisable',
+    function(args) vim.g.disable_autoformat = true end,
+    {
+        desc = 'Disable autoformat-on-save',
+    }
+    )
+
+    vim.api.nvim_create_user_command(
+    'FormatEnable',
+    function() vim.g.disable_autoformat = false end,
+    {
+        desc = 'Re-enable autoformat-on-save',
+    }
+    )
+
+  end
+  }
 }
