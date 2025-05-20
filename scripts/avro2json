@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # check if the first argument is -f or --file we set is_printed to True
 # else we set it to False
 if [[ "$1" == "-f" ]] || [[ "$1" == "--file" ]]; then
@@ -13,20 +12,14 @@ fi
 # argument, else the avros are $@ from the first argument
 if [ "$1" == "-f" ] || [ "$1" == "--file" ]; then
     AVROS=${@:2}
-  else
+else
     AVROS=$@
 fi
 
-
-
 python3 -c "import fastavro" || python3 -m pip install fastavro
 
-
-
-
-for var in "$AVROS"
-do
-python3 - <<EOF
+for var in "$AVROS"; do
+    python3 - <<EOF
 from fastavro import reader, json_writer
 from fastavro import parse_schema
 from fastavro.schema import load_schema
@@ -53,7 +46,7 @@ full_json = []
 with BytesIO(open("${var}", "rb").read()) as fo:
     avro_reader = reader(fo)
     for record in avro_reader:
-        if record["content"] is not None:
+        if record.get("content") is not None:
             if is_printed:
                 record["content"] = str(record["content"].hex())[:20] + " ..."
             else:

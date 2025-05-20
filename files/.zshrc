@@ -2,6 +2,7 @@
 
 
 
+source $HOME/.zprofile
 
 # source basuc functions
 source $HOME/.config/zsh/ufunctions.sh
