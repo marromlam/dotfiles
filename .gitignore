@@ -60,6 +60,8 @@ files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/autostart/*
 files/.config/libvirt/storage/*
 files/.config/lazygit/state.yml
+
+zsh/plugins/*
 # 
 files/.config/google-chrome
 files/.config/pulse
