@@ -66,6 +66,8 @@
   dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
   # Show the user email for the current repository.
   whoami = config user.email
+  # diff against the upstream branch
+  dpr = "! args=$@; shift $#; nvim -c \"DiffviewOpen $args\""
 [branch]
   # Show most recently changed branches first.
   sort = -committerdate

@@ -5,6 +5,25 @@ local function browser_open()
   return { action_callback = require('gitlinker.actions').open_in_browser }
 end
 
+local function check_main_or_develop_branch()
+  local main_exists =
+    vim.fn.system('git show-ref --verify --quiet refs/heads/main')
+  if vim.v.shell_error == 0 then
+    print('Main branch exists.')
+    return 'main'
+  end
+
+  local develop_exists =
+    vim.fn.system('git show-ref --verify --quiet refs/heads/develop')
+  if vim.v.shell_error == 0 then
+    print('Develop branch exists.')
+    return 'develop'
+  end
+
+  print('Neither main nor develop branch exists.')
+  return nil
+end
+
 return {
   -----------------------------------------------------------------------------
   -- git signs {{{
@@ -169,10 +188,21 @@ return {
     opts = {
       mappings = nil,
       callbacks = {
-        ['github-work'] = function(url_data) -- Resolve the host for work repositories
+        ['github-work.com'] = function(url_data) -- Resolve the host for work repositories
           url_data.host = 'github.com'
           return require('gitlinker.hosts').get_github_type_url(url_data)
         end,
+        -- callbacks = {
+        --   ["github.com"] = function(url_data)
+        --       local url = require"gitlinker.hosts".get_base_https_url(url_data) ..
+        --         url_data.repo .. "/blob/" .. url_data.rev .. "/" .. url_data.file
+        --       if url_data.lstart then
+        --         url = url .. "#L" .. url_data.lstart
+        --         if url_data.lend then url = url .. "-L" .. url_data.lend end
+        --       end
+        --       return url
+        --     end
+        -- }
       },
     },
   },
@@ -263,6 +293,7 @@ return {
 
   {
     'sindrets/diffview.nvim',
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewToggleFiles' },
   },
   {
     'isakbm/gitgraph.nvim',
@@ -311,6 +342,32 @@ return {
       },
     },
     config = function() require('litee.gh').setup() end,
+  },
+
+  {
+    'jecaro/fugitive-difftool.nvim',
+    dependencies = { 'tpope/vim-fugitive' },
+    keys = {
+      {
+        '<leader>gPR',
+        function()
+          current_branch = vim.fn.system('git rev-parse --abbrev-ref HEAD')
+          current_branch = current_branch:gsub('%s+', '')
+          target_branch = check_main_or_develop_branch()
+
+          -- print('Current branch: ' .. current_branch)
+          -- print('Target branch: ' .. target_branch)
+
+          print(
+            'Git! difftool --name-status '
+              .. target_branch
+              .. '...'
+              .. current_branch
+          )
+        end,
+        desc = 'dddd',
+      },
+    },
   },
 
   -- }}}

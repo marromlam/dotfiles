@@ -49,8 +49,14 @@ return {
     },
   },
   {
+
     'andrewferrier/debugprint.nvim',
-    opts = { create_keymaps = false },
+    opts = { keymaps = false },
+    dependencies = {
+      'echasnovski/mini.hipatterns',
+      'ibhagwan/fzf-lua',
+    },
+    version = '*',
     keys = {
       {
         '<leader>dp',
