@@ -37,7 +37,7 @@ curl -o ${HOME}/tmp/homebrew.sh $REPO_URL/$REPO_BRANCH/homebrew/homebrew.sh
 curl -o ${HOME}/tmp/keys.sh $REPO_URL/$REPO_BRANCH/extra/keys.sh
 curl -o ${HOME}/tmp/dotfiles.sh $REPO_URL/$REPO_BRANCH/extra/dotfiles.sh
 curl -o ${HOME}/tmp/reload_shell $REPO_URL/$REPO_BRANCH/scripts/reload_shell
-curl -o ${HOME}/tmp/preflight_wsl.sh $REPO_URL/$REPO_BRANCH/preflight_wsl.sh
+curl -o ${HOME}/tmp/preflight_wsl.sh $REPO_URL/$REPO_BRANCH/extra/windows/preflight_wsl.sh
 
 # if [[ "$MACHINEOS" == "Mac" ]]; then
 # 	echo "Installing homebrew on macOS (forced=$0)"
