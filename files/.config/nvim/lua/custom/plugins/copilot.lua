@@ -183,6 +183,9 @@ return {
         model = 'deepseek-r1:8b',
         -- model = 'deepseek-r1:1.5b',
       },
+      copilot = {
+        model = 'claude-3.7-sonnet',
+      },
       ---Specify the special dual_boost mode
       ---1. enabled: Whether to enable dual_boost mode. Default to false.
       ---2. first_provider: The first provider to generate response. Default to "openai".
