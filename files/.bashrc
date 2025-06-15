@@ -12,16 +12,16 @@ echo $MACHINEOS
 
 # Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
-	if [[ "$(uname -m)" == "x86_64" ]]; then
-		export HOMEBREW_PREFIX="/usr/local"
-	else
-		export HOMEBREW_PREFIX="/opt/homebrew"
-	fi
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        export HOMEBREW_PREFIX="/usr/local"
+    else
+        export HOMEBREW_PREFIX="/opt/homebrew"
+    fi
 else
-  export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 
-	export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_PREFIX="/opt/homebrew"
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
@@ -33,7 +33,7 @@ source $HOME/.dotfiles/zsh/ufunctions.sh
 
 # variable with current host name
 function whoismyhost() {
-	echo "$(hostname)"
+    echo "$(hostname)"
 }
 
 echo "Connected to $(whoismyhost) with bash"
@@ -45,14 +45,14 @@ echo "Connected to $(whoismyhost) with bash"
 # bind 'TAB: menu-complete'
 
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-	alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
+    alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
 fi
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-	export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
-	export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
 else
-	export VISUAL="nvim"
-	export EDITOR="nvim"
+    export VISUAL="nvim"
+    export EDITOR="nvim"
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
@@ -72,20 +72,19 @@ source $HOME/.dotfiles/zsh/common.sh
 
 # check whether tmux is running or not, and export variable
 if [ -n "$TMUX" ]; then
-	export IS_TMUX=1
+    export IS_TMUX=1
 else
-	if [ -z ${IS_TMUX+x} ]; then
-		export IS_TMUX=0
-	fi
+    if [ -z ${IS_TMUX+x} ]; then
+        export IS_TMUX=0
+    fi
 fi
 
 # Set KITTY_PORT env variable
 if [ $SSH_TTY ] && ! [ -n "$TMUX" ]; then
-	# if [ $SSH_TTY ]; then
-	export KITTY_PORT=$(kitty @ ls 2>/dev/null | grep "[0-9]:/tmp/mykitty" | head -n 1 | cut -d : -f 1 | cut -d \" -f 2)
+    # if [ $SSH_TTY ]; then
+    export KITTY_PORT=$(kitty @ ls 2>/dev/null | grep "[0-9]:/tmp/mykitty" | head -n 1 | cut -d : -f 1 | cut -d \" -f 2)
 fi
 
 # }}}
-
 
 # vim: ft=bash fdm=marker
