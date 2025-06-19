@@ -28,6 +28,11 @@ return {
       },
       sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
+
+        per_filetype = {
+          codecompanion = { 'codecompanion' },
+        },
+
         providers = {
           markdown = {
             name = 'RenderMarkdown',
