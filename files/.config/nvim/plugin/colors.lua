@@ -269,6 +269,10 @@ local function general_overrides(dim_factor)
       },
     },
     ---------------------------------------------------------------------------
+    --- Avante Color Configuration
+    ---------------------------------------------------------------------------
+
+    ---------------------------------------------------------------------------
     --- Diagnostic Signa
     ---------------------------------------------------------------------------
     -- {DiagnosticSignWarnLine = { bg = mrl.get_hi('SignColumn').bg, fg = mrl.get_hi('GitSignsDelete').fg }},
@@ -359,6 +363,57 @@ local function set_sidebar_highlight(dim_factor)
     },
     { PanelStNC = { link = 'PanelWinSeparator' } },
     { PanelSt = { bg = { from = 'Normal', alter = -0.2 } } },
+
+    -- Avanté Panel colors
+    {
+      AvanteSidebarNormal = { link = 'PanelDarkBackground' },
+    },
+    {
+      AvanteTitle = {
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- fg = '#00ff00',
+      },
+    },
+    {
+      AvanteReversedTitle = {
+        fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+      },
+    },
+    {
+      AvanteSubtitle = {
+        -- fg = '#ff0000',
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+      },
+    },
+    {
+      AvanteThirdTitle = {
+        -- fg = '#ff0000',
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+      },
+    },
+    {
+      AvanteReversedSubtitle = { link = 'AvanteReversedTitle' },
+    },
+    {
+      AvanteReversedThirdTitle = { link = 'AvanteReversedTitle' },
+    },
+    {
+      AvanteSidebarWinHorizontalSeparator = {
+        -- bg = '#ff0000',
+        -- fg = '#ff0000',
+        fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+      },
+    },
+    {
+      AvanteSidebarWinSeparator = {
+        -- bg = '#ff0000',
+        -- fg = '#ff0000',
+        fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+      },
+    },
   })
 end
 

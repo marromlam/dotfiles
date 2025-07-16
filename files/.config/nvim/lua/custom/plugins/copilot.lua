@@ -185,7 +185,7 @@ return {
       },
       -- configure copilot provider to use claude as the auto-suggestions
       copilot = {
-        model = 'claude-3.5-sonnet',
+        -- model = 'claude-3.5-sonnet',
       },
       ---Specify the special dual_boost mode
       ---1. enabled: Whether to enable dual_boost mode. Default to false.

@@ -4,7 +4,6 @@
 # this is useful because I have a personal and a work GITHUB_TOKEN§
 # and I don't want to have to think about which one to use
 
-
 # check if the current path is in $HOME/Projects/work
 # if so, use the work token instead of the personal one
 if [[ $PWD == $HOME/Projects/work* ]]; then
@@ -13,7 +12,8 @@ else
     source $HOME/.ssh/personal_token
 fi
 
-$HOMEBREW_PREFIX/bin/gh $@
+unset BROWSER
 
+$HOMEBREW_PREFIX/bin/gh $@
 
 # vim: ft=bash

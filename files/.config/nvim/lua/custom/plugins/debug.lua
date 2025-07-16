@@ -53,6 +53,7 @@ return {
         ensure_installed = {
           -- Update this to ensure that you have the debuggers for the langs you want
           'delve',
+          'debugpy',
         },
       })
 
@@ -82,15 +83,15 @@ return {
         icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
         controls = {
           icons = {
-            pause = '⏸',
-            play = '▶',
-            step_into = '⏎',
-            step_over = '⏭',
-            step_out = '⏮',
-            step_back = 'b',
-            run_last = '▶▶',
-            terminate = '⏹',
-            disconnect = '⏏',
+            pause = '',
+            play = '',
+            step_into = '󱆭',
+            step_over = '',
+            step_out = '󰙣',
+            step_back = '󱆮',
+            run_last = '󰙡',
+            terminate = '',
+            disconnect = '',
           },
         },
       })

@@ -200,4 +200,10 @@ return {
       })
     end,
   },
+
+  {
+    'StanAngeloff/claudius.nvim',
+    opts = {},
+    lazy = false,
+  },
 }

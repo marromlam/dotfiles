@@ -57,7 +57,5 @@
 #=::Send ^!=
 #-::Send ^!-
 
-#If
-
 
 ; vim: fdm=marker
