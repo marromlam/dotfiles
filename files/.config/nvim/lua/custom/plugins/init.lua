@@ -219,11 +219,11 @@ return {
     lazy = false,
   },
 
-  {
-    'marromlam/sailor.vim',
-    event = 'VimEnter',
-    run = './install.sh',
-  },
+  -- {
+  --   'marromlam/sailor.vim',
+  --   event = 'VimEnter',
+  --   run = './install.sh',
+  -- },
 
   {
     'echasnovski/mini.bufremove',

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# macOS free-like command
+mem=$(vm_stat)
+pagesize=$(sysctl -n hw.pagesize)
+
+pages_free=$(echo "$mem" | awk '/Pages free/ {print $3}' | sed 's/\.//')
+pages_active=$(echo "$mem" | awk '/Pages active/ {print $3}' | sed 's/\.//')
+pages_inactive=$(echo "$mem" | awk '/Pages inactive/ {print $3}' | sed 's/\.//')
+pages_speculative=$(echo "$mem" | awk '/Pages speculative/ {print $3}' | sed 's/\.//')
+pages_wired=$(echo "$mem" | awk '/Pages wired down/ {print $4}' | sed 's/\.//')
+pages_compressed=$(echo "$mem" | awk '/Pages occupied by compressor/ {print $5}' | sed 's/\.//')
+
+# Calculate memory in MiB
+free_mb=$(( (pages_free + pages_speculative) * pagesize / 1024 / 1024 ))
+used_mb=$(( (pages_active + pages_inactive + pages_wired + pages_compressed) * pagesize / 1024 / 1024 ))
+total_mb=$(( free_mb + used_mb ))
+
+echo "              total        used        free"
+printf "Mem:      %8d MiB %8d MiB %8d MiB\n" $total_mb $used_mb $free_mb
+
+
+# vim: ft=bash

@@ -446,7 +446,7 @@ function mrl.ui.statusline.render()
 
   local l1 = section:new({
     {
-      { '', 'StSeparator' },
+      { '􀆖  local', 'StSeparator' },
     },
     priority = 1,
     cond = true,
@@ -470,7 +470,7 @@ function mrl.ui.statusline.render()
       path.parent,
       path.file
     )
-    return display({ l1 + l2 }, available_space)
+    -- return display({ l1 + l2 }, available_space)
   end
   -----------------------------------------------------------------------------//
   -- Variables
@@ -536,10 +536,10 @@ function mrl.ui.statusline.render()
       cond = vim.v.hlsearch > 0,
       priority = 1,
     },
-    path.env,
-    path.dir,
-    path.parent,
-    path.file,
+    -- path.env,
+    -- path.dir,
+    -- path.parent,
+    -- path.file,
     {
       {
         { space, 'StSeparator' },

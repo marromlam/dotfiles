@@ -186,6 +186,7 @@ return {
       -- configure copilot provider to use claude as the auto-suggestions
       copilot = {
         -- model = 'claude-3.5-sonnet',
+        model = 'claude-3.7-sonnet',
       },
       ---Specify the special dual_boost mode
       ---1. enabled: Whether to enable dual_boost mode. Default to false.
@@ -328,5 +329,31 @@ return {
         ft = { 'markdown', 'Avante' },
       },
     },
+    config = function()
+      require('avante').setup({
+        -- system_prompt as function ensures LLM always has latest MCP server state
+        -- This is evaluated for every message, even in existing chats
+        system_prompt = function()
+          local hub = require('mcphub').get_hub_instance()
+          return hub and hub:get_active_servers_prompt() or ''
+        end,
+        -- Using function prevents requiring mcphub before it's loaded
+        custom_tools = function()
+          return {
+            require('mcphub.extensions.avante').mcp_tool(),
+          }
+        end,
+      })
+    end,
+  },
+
+  {
+    'ravitemer/mcphub.nvim',
+    lazy = false,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+    build = 'npm install -g mcp-hub@latest', -- Installs `mcp-hub` node binary globally
+    config = function() require('mcphub').setup() end,
   },
 }

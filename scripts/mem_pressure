@@ -1,0 +1,10 @@
+#!/bin/bash
+
+used=$(vm_stat | awk '/Pages active|Pages wired down|Pages occupied by compressor/ {sum += $3} END {print sum}' | sed 's/\.//')
+free=$(vm_stat | awk '/Pages free|Pages speculative/ {sum += $3} END {print sum}' | sed 's/\.//')
+total=$((used + free))
+percent_used=$((100 * used / total))
+
+echo "$percent_used%"
+
+# vim: ft=bash

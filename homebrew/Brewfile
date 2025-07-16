@@ -9,6 +9,7 @@ tap "homebrew/services"
 tap "browsh-org/homebrew-browsh"
 tap "koekeishiya/formulae"
 tap "iina/homebrew-mpv-iina"
+tap 'jayadamsmorgan/yatoro'
 
 # Custom taps tap "koekeishiya/formulae"
 tap "Rigellute/tap"
