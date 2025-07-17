@@ -68,6 +68,18 @@ keybinds clear-defaults=true {
         bind "d" { Detach; }
         bind "|" { NewPane "right"; SwitchToMode "normal"; }
         bind "esc" { SwitchToMode "normal"; }
+        // bind z to zoom pane
+        bind "z" {
+            ToggleFocusFullscreen;
+            SwitchToMode "normal";
+        }
+        // bind 'r' to reload config
+        // bind "r" {
+        //     ReloadConfig;
+        //     SwitchToMode "normal";
+        // }
+        bind "e" { EditScrollback; }
+        bind "f" { Search "up"; }
 
         // rename sessions and windows
         // zellij action rename-session

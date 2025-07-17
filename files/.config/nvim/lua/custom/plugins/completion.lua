@@ -11,6 +11,7 @@ return {
     dependencies = {
       'rafamadriz/friendly-snippets',
       'onsails/lspkind.nvim', -- vs-code like pictograms
+      'Kaiser-Yang/blink-cmp-avante',
     },
     version = '*',
     init = function()
@@ -27,13 +28,20 @@ return {
         use_nvim_cmp_as_default = true,
       },
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { 'avante', 'lsp', 'path', 'snippets', 'buffer' },
 
         per_filetype = {
           codecompanion = { 'codecompanion' },
         },
 
         providers = {
+          avante = {
+            module = 'blink-cmp-avante',
+            name = 'Avante',
+            opts = {
+              -- options for blink-cmp-avante
+            },
+          },
           markdown = {
             name = 'RenderMarkdown',
             module = 'render-markdown.integ.blink',
@@ -201,9 +209,9 @@ return {
     end,
   },
 
-  {
-    'StanAngeloff/claudius.nvim',
-    opts = {},
-    lazy = false,
-  },
+  -- {
+  --   'StanAngeloff/claudius.nvim',
+  --   opts = {},
+  --   lazy = false,
+  -- },
 }

@@ -446,7 +446,7 @@ function mrl.ui.statusline.render()
 
   local l1 = section:new({
     {
-      { '􀆖  local', 'StSeparator' },
+      { '  ' .. vim.g.dev_environ, 'StSeparator' },
     },
     priority = 1,
     cond = true,

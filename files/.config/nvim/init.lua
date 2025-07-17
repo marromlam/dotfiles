@@ -2,6 +2,7 @@
 
 vim.g.os = vim.loop.os_uname().sysname
 vim.g.open_command = vim.g.os == 'Darwin' and 'open' or 'xdg-open'
+vim.g.dev_environ = ''
 
 vim.g.dotfiles = vim.env.DOTFILES or vim.fn.expand('~/.dotfiles')
 vim.g.vim_dir = vim.g.dotfiles .. '/.config/nvim'
