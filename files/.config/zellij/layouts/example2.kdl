@@ -21,7 +21,7 @@ layout {
                 format_left  "#[bg=#303030,fg=white] {mode}#[bg=#303030,fg=white,bold]{session}  #[bg=#303030,fg=#aaaaaa]{datetime} "
                 format_center "{tabs}"
                 // format_right "#[bg=#303030,fg=white] {swap_layout}  "
-                format_right "#[bg=#303030,fg=#aaaaaa] {command_music} #[bg=#303030,fg=#aaaaaa]{command_cpu} #[bg=#303030,fg=#aaaaaa]{command_memo}"
+                format_right "#[bg=#303030,fg=#aaaaaa] {command_music} #[bg=#303030,fg=#aaaaaa]{command_cpu} #[bg=#303030,fg=#aaaaaa]{command_memo} "
                 // format_right "#[bg=#303030,fg=white] {git_branch}  marromlam "
                 format_space  "#[bg=#303030]"
 
@@ -298,9 +298,9 @@ layout {
         children
     }
 
-    tab name="󰎦" focus=true borderless=true    
-    tab name="󰎩"
-    tab name="󰎬"
+    // tab name="󰎦" focus=true borderless=true    
+    // tab name="󰎩"
+    // tab name="󰎬"
 }
 
 // vim: fdm=marker
