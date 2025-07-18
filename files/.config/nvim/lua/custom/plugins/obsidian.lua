@@ -24,6 +24,7 @@ return {
     'ibhagwan/fzf-lua',
   },
   opts = {
+    ui = { enable = false },
     workspaces = {
       {
         name = 'personal',

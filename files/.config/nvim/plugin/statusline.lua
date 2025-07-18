@@ -446,7 +446,7 @@ function mrl.ui.statusline.render()
 
   local l1 = section:new({
     {
-      { '  ' .. vim.g.dev_environ, 'StSeparator' },
+      { '  ' .. vim.g.dev_environ .. ' ', 'StDevEnv' },
     },
     priority = 1,
     cond = true,
@@ -470,7 +470,7 @@ function mrl.ui.statusline.render()
       path.parent,
       path.file
     )
-    -- return display({ l1 + l2 }, available_space)
+    return display({ l1 + l2 }, available_space)
   end
   -----------------------------------------------------------------------------//
   -- Variables
@@ -546,6 +546,7 @@ function mrl.ui.statusline.render()
         { diagnostics.warn.icon, 'StWarn' },
         { space, 'StSeparator' },
         { diagnostics.warn.count, 'StWarn' },
+        { space, 'StSeparator' },
       },
       cond = diagnostics.warn.count,
       priority = 3,
@@ -555,6 +556,7 @@ function mrl.ui.statusline.render()
         { diagnostics.error.icon, 'StError' },
         { space, 'StSeparator' },
         { diagnostics.error.count, 'StError' },
+        { space, 'StSeparator' },
       },
       cond = diagnostics.error.count,
       priority = 1,
@@ -564,6 +566,7 @@ function mrl.ui.statusline.render()
         { diagnostics.info.icon, 'StInfo' },
         { space, 'StSeparator' },
         { diagnostics.info.count, 'StInfo' },
+        { space, 'StSeparator' },
       },
       cond = diagnostics.info.count,
       priority = 4,

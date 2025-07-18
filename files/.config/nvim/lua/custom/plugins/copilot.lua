@@ -155,6 +155,7 @@ return {
 
   {
     'yetone/avante.nvim',
+    dev = true,
     cmd = { 'Avante', 'AvanteAsk' },
     keys = { '<leader>aa', '<leader>aq', '<leader>ae' },
     opts = {
@@ -341,8 +342,12 @@ return {
         ft = { 'markdown', 'Avante' },
       },
     },
-    config = function()
-      require('avante').setup({
+    -- I need to use the previous opts here
+    config = function(_, opts)
+      -- merge opts with the extra config I'm puting here
+      require('avante').setup(vim.tbl_deep_extend('force', opts, {
+        -- Use the options from the opts table
+        --
         -- system_prompt as function ensures LLM always has latest MCP server state
         -- This is evaluated for every message, even in existing chats
         system_prompt = function()
@@ -355,7 +360,7 @@ return {
             require('mcphub.extensions.avante').mcp_tool(),
           }
         end,
-      })
+      }))
     end,
   },
 

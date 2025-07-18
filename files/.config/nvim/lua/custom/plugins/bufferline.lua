@@ -4,6 +4,8 @@ return {
     'akinsho/bufferline.nvim',
     event = 'UIEnter',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    cond = false,
+    disable = true,
     config = function()
       local bufferline = require('bufferline')
       bufferline.setup({
