@@ -340,10 +340,10 @@ return {
     --     -- { family = 'Fira Code Nerd Font',    scale = 0.55 }, -- nerd fonts extracted from there
     --     -- { family="Symbols Nerd Font Mono", scale=0.5}, -- nerd fonts extracted from there
     -- 'Victor Mono',
-    { family = 'Symbols Nerd Font Mono', scale = 0.75 },
-    { family = 'SF Pro', scale = 0.75 },
-    { family = 'SF Mono', scale = 1 },
-    { family = 'Cartograph CF', scale = 0.75 },
+    { family = 'Symbols Nerd Font Mono', scale = 0.9 },
+    { family = 'SF Pro', scale = 0.9 },
+    { family = 'SF Mono', scale = 0.9 },
+    { family = 'Cartograph CF', scale = 0.9 },
     --     -- "SF Pro",
     --     -- "DejaVu Sans Mono",
     --     -- "ComicMono NF",
@@ -469,14 +469,14 @@ return {
   --         }),
   --     },
   -- },
-  font_size = 14,
-  line_height = 1.05,
+  font_size = 12,
+  line_height = 1.0,
   cell_width = 1.0,
   --[[ max_fps = 60, ]]
   --[[ enable_wayland = false, ]]
   pane_focus_follows_mouse = false,
   warn_about_missing_glyphs = false,
-  enable_kitty_graphics = true,
+  enable_kitty_graphics = false,
   show_update_window = false,
   check_for_updates = false,
   -- window_decorations = "RESIZE",
