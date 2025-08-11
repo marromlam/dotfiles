@@ -5,7 +5,7 @@ return {
     {
       '<leader>ll',
       function() require('lint').try_lint() end,
-      desc = 'Trigger linting for current file',
+      desc = 'Try linting for current file',
     },
   },
   config = function()
@@ -17,6 +17,7 @@ return {
       javascriptreact = { 'eslint_d' },
       typescriptreact = { 'eslint_d' },
       python = { 'flake8', 'mypy' },
+      lua = { 'luacheck' },
       dockerfile = { 'hadolint' },
       json = { 'jsonlint' },
       markdown = { 'vale' },

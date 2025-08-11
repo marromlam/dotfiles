@@ -150,4 +150,29 @@ return {
       vim.cmd('colorscheme gruvbox')
     end,
   },
+
+  {
+    'rose-pine/neovim',
+    lazy = false,
+    priority = 1000,
+    name = 'rose-pine',
+    opts = {
+      variant = 'main',
+      dark_variant = 'main',
+      styles = { bold = true, italic = true, transparency = false },
+      groups = {
+        -- border = "pine",
+      },
+      highlight_groups = {
+        StatusLine = { fg = 'iris', bg = 'surface', blend = 10 },
+        StatusLineNC = { fg = 'subtle', bg = 'surface' },
+        SnacksIndent = { fg = 'surface', nocombine = true },
+        SnacksIndentScope = { fg = 'subtle', nocombine = true },
+      },
+    },
+    config = function(_, opts)
+      require('rose-pine').setup(opts)
+      vim.cmd.colorscheme('rose-pine')
+    end,
+  },
 }

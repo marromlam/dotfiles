@@ -39,6 +39,9 @@ vim.opt.fillchars = {
   foldsep = ' ',
 }
 
+-- do not show tabline
+vim.opt.showtabline = 0
+
 vim.opt.nu = true
 vim.opt.relativenumber = true
 

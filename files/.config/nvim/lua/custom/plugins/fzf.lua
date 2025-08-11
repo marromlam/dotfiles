@@ -9,14 +9,31 @@ local fzf_lua = reqcall('fzf-lua') ---@module 'fzf-lua'
 -------------------------------------------------------------------------------
 local function fzf_title(str, icon, icon_hl)
   return {
-    { ' ' },
+    { ' ', 'Bold' },
     { (icon and icon .. ' ' or ''), icon_hl or 'DevIconDefault' },
     { str, 'Bold' },
-    { ' ' },
+    { ' ', 'Bold' },
   }
 end
 
-local file_picker = function(cwd) fzf_lua.files({ cwd = cwd }) end
+local file_picker = function(cwd)
+  fzf_lua.files({
+    cwd = cwd,
+    -- debug = true,
+    actions = {
+      ['ctrl-o'] = {
+        function(_, args)
+          if args.cmd:find('--hidden') then
+            args.cmd = args.cmd:gsub('--hidden', '', 1)
+          else
+            args.cmd = args.cmd .. ' --hidden'
+          end
+          require('fzf-lua').files(args)
+        end,
+      },
+    },
+  })
+end
 
 local function dropdown(opts)
   opts = opts or { winopts = {} }
@@ -62,7 +79,18 @@ local function list_sessions()
         row = 0.5,
       },
       previewer = false,
+      debug = true,
       actions = {
+        ['ctrl-h'] = {
+          function(_, args)
+            if args.cmd:find('--hidden') then
+              args.cmd = args.cmd:gsub('--hidden', '', 1)
+            else
+              args.cmd = args.cmd .. ' --hidden'
+            end
+            require('fzf-lua').files(args)
+          end,
+        },
         ['default'] = function(selected)
           local session = vim
             .iter(sessions)
@@ -204,6 +232,7 @@ return {
     config = function()
       local lsp_kind = require('lspkind')
       local fzf = require('fzf-lua')
+      local actions = require('fzf-lua.actions')
 
       fzf.setup({
         fzf_opts = {
@@ -247,6 +276,17 @@ return {
             ['<c-z>'] = 'toggle-fullscreen', -- FIXME: not working
             ['<c-f>'] = 'preview-page-down',
             ['<c-b>'] = 'preview-page-up',
+            -- toggle hidden files
+            ['<c-h>'] = {
+              function(_, args)
+                if args.cmd:find('--hidden') then
+                  args.cmd = args.cmd:gsub('--hidden', '', 1)
+                else
+                  args.cmd = args.cmd .. ' --hidden'
+                end
+                require('fzf-lua').files(args)
+              end,
+            },
           },
           fzf = {
             ['esc'] = 'abort',
