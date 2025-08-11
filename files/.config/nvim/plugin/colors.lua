@@ -15,6 +15,12 @@ local function general_overrides(dim_factor)
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
+    {
+      StDevEnv = {
+        fg = { from = 'StatusLine' },
+        bg = { from = 'Comment', attr = 'fg' },
+      },
+    },
     { StSeparator = { fg = 'NONE', bg = 'NONE' } },
     {
       StSearchCount = {
@@ -257,6 +263,12 @@ local function general_overrides(dim_factor)
       },
     },
     -- Floating windows
+    { DiagnosticSignWarn = { bg = 'NONE', fg = { from = 'DiagnosticWarn' } } },
+    {
+      DiagnosticSignError = { bg = 'NONE', fg = { from = 'DiagnosticError' } },
+    },
+    { DiagnosticSignHint = { bg = 'NONE', fg = { from = 'DiagnosticHint' } } },
+    { DiagnosticSignInfo = { bg = 'NONE', fg = { from = 'DiagnosticInfo' } } },
     { DiagnosticFloatingWarn = { link = 'DiagnosticWarn' } },
     { DiagnosticFloatingInfo = { link = 'DiagnosticInfo' } },
     { DiagnosticFloatingHint = { link = 'DiagnosticHint' } },
@@ -288,6 +300,18 @@ local function general_overrides(dim_factor)
     -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
     {
       FzfLuaNormal = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaTitle = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaTitle = {
         bg = { from = 'Normal', attr = 'bg' },
         fg = { from = 'Normal', attr = 'fg' },
       },
@@ -353,11 +377,13 @@ local function set_sidebar_highlight(dim_factor)
       PanelDarkBackground = { bg = { from = 'Normal', alter = dim_factor } },
     },
     { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
-    { PanelBackground = { bg = { from = 'Normal', alter = -0.8 } } },
+    { PanelBackground = { bg = { from = 'Normal', alter = dim_factor } } },
     { PanelHeading = { inherit = 'PanelBackground', bold = true } },
     {
       PanelWinSeparator = {
-        inherit = 'PanelBackground',
+        bg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- inherit = 'PanelBackground',
         fg = { from = 'WinSeparator' },
       },
     },
@@ -410,8 +436,12 @@ local function set_sidebar_highlight(dim_factor)
       AvanteSidebarWinSeparator = {
         -- bg = '#ff0000',
         -- fg = '#ff0000',
-        fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- bg = { from = 'PanelDarkBackground', attr = 'bg' },
         bg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- fg = { from = 'PanelDarkBackground', attr = 'bg' },
+        -- inherit = 'PanelBackground',
+        fg = { from = 'WinSeparator' },
       },
     },
   })
@@ -419,19 +449,26 @@ end
 
 local sidebar_fts = {
   'undotree',
+  'diff',
   'Outline',
   'dbui',
   'neotest-summary',
+  'AvanteSidebar',
+  'AvanteInput',
+  'Avante',
+  'AvanteSelectedFiles',
 }
 
 local function on_sidebar_enter()
   vim.opt_local.winhighlight:append({
-    Normal = 'PanelBackground',
-    EndOfBuffer = 'PanelBackground',
+    Normal = 'PanelDarkBackground',
+    -- AvanteSidebarNormal = { link = 'PanelDarkBackground' },
+    EndOfBuffer = 'PanelDarkBackground',
     -- StatusLine = 'PanelSt',
     -- StatusLineNC = 'PanelStNC',
-    SignColumn = 'PanelBackground',
-    VertSplit = 'PanelVertSplit',
+    SignColumn = 'PanelDarkBackground',
+    -- VertSplit = 'PanelVertSplit',
+    -- VertSplit = 'PanelWinSeparator',
     WinSeparator = 'PanelWinSeparator',
   })
 end

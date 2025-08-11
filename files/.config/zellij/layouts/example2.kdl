@@ -13,17 +13,17 @@ layout {
                 // git branch
                 // command_testing_command "git rev-parse --abbrev-ref HEAD"
                 // command_testing_command "sh -c \"echo x\""
-                // command_testing_format "#[bg=#303030,fg=blue] {stdout} "
+                // command_testing_format "#[bg=#151515,fg=blue] {stdout} "
                 // command_testing_interval "0"
                 // command_testing_rendermode "static"
 
 
-                format_left  "#[bg=#303030,fg=white] {mode}#[bg=#303030,fg=white,bold]{session}  #[bg=#303030,fg=#aaaaaa]{datetime} "
+                format_left  "#[bg=#151515,fg=white] {mode}#[bg=#151515,fg=white,bold]{session}  #[bg=#151515,fg=#aaaaaa]{datetime} "
                 format_center "{tabs}"
-                // format_right "#[bg=#303030,fg=white] {swap_layout}  "
-                format_right "#[bg=#303030,fg=#aaaaaa] {command_music} #[bg=#303030,fg=#aaaaaa]{command_cpu} #[bg=#303030,fg=#aaaaaa]{command_memo} "
-                // format_right "#[bg=#303030,fg=white] {git_branch}  marromlam "
-                format_space  "#[bg=#303030]"
+                // format_right "#[bg=#151515,fg=white] {swap_layout}  "
+                format_right "#[bg=#151515,fg=#aaaaaa] {command_music} #[bg=#151515,fg=#aaaaaa]{command_cpu} #[bg=#151515,fg=#aaaaaa]{command_memo} "
+                // format_right "#[bg=#151515,fg=white] {git_branch}  marromlam "
+                format_space  "#[bg=#151515]"
 
 
                 format_hide_on_overlength "true"
@@ -44,23 +44,23 @@ layout {
 
 
 
-                mode_normal  "#[bg=#303030,fg=white]󱂬#[bg=#303030,fg=white] "
-                mode_tmux  "#[bg=#303030,fg=#ffaa00]󱂬#[bg=#303030,fg=white] "
-                mode_locked  "#[bg=#303030,fg=#ff0000]󱂬#[bg=#303030,fg=white] "
-                // mode_normal        "#[bg=#303030,fg=black]│#[bg=#303030,fg=black] NORMAL "
-                // mode_locked        "#[bg=#303030,fg=#303030]│#[bg=red,fg=black]  LOCKED "
-                // mode_resize        "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] RESIZE "
-                // mode_pane          "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] PANE "
-                // mode_tab           "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] TAB "
-                // mode_scroll        "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] SCROLL "
-                // mode_enter_search  "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] ENTER_SEARCH "
-                // mode_search        "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] SEARCH "
-                // mode_rename_tab    "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] RENAME_TAB "
-                // mode_rename_pane   "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] RENAME_PANE "
-                // mode_session       "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] SESSION "
-                // mode_move          "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] MOVE "
-                // mode_prompt        "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] PROMPT "
-                // mode_tmux          "#[bg=#303030,fg=#303030]│#[bg=magenta,fg=black] TMUX "
+                mode_normal  "#[bg=#151515,fg=white]󱂬#[bg=#151515,fg=white] "
+                mode_tmux  "#[bg=#151515,fg=#ffaa00]󱂬#[bg=#151515,fg=white] "
+                mode_locked  "#[bg=#151515,fg=#ff0000]󱂬#[bg=#151515,fg=white] "
+                // mode_normal        "#[bg=#151515,fg=black]│#[bg=#151515,fg=black] NORMAL "
+                // mode_locked        "#[bg=#151515,fg=#151515]│#[bg=red,fg=black]  LOCKED "
+                // mode_resize        "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] RESIZE "
+                // mode_pane          "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] PANE "
+                // mode_tab           "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] TAB "
+                // mode_scroll        "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] SCROLL "
+                // mode_enter_search  "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] ENTER_SEARCH "
+                // mode_search        "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] SEARCH "
+                // mode_rename_tab    "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] RENAME_TAB "
+                // mode_rename_pane   "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] RENAME_PANE "
+                // mode_session       "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] SESSION "
+                // mode_move          "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] MOVE "
+                // mode_prompt        "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] PROMPT "
+                // mode_tmux          "#[bg=#151515,fg=#151515]│#[bg=magenta,fg=black] TMUX "
 
 
                 // left
@@ -69,10 +69,10 @@ layout {
                 // format_center "#[bg=#ff0000,fg=black]{tabs}"
                 // // right
                 // format_right  "#[bg=#ff0000,fg=#6867AF,bold]    {command_kubectx}"
-          // format_left  "#[bg=#303030,fg=black] {command_host_os_icon} {session} {mode}"
+          // format_left  "#[bg=#151515,fg=black] {command_host_os_icon} {session} {mode}"
           // format_center "{tabs}"
-          // format_right "#[bg=#303030,fg=black] {swap_layout} │ {datetime} "
-          // format_space  "#[bg=#303030]"
+          // format_right "#[bg=#151515,fg=black] {swap_layout} │ {datetime} "
+          // format_space  "#[bg=#151515]"
 
                 // format_right  "#[bg=#${colors.base00},fg=#${colors.base0D}]#[bg=#${colors.base0D},fg=#${colors.base01},bold] #[bg=#${colors.base02},fg=#${colors.base05},bold] {session} #[bg=#${colors.base03},fg=#${colors.base05},bold]"
                 // format_space  "#[fg=yellow]-"
@@ -206,8 +206,8 @@ layout {
 
             // tab_normal               "#[fg=#6C7086,bg=#181825] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
             // tab_active               "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
-          // tab_normal "#[bg=#303030,fg=black] #[bg=#303030,fg=black]{name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=#303030,fg=black]"
-          // tab_active "#[bg=black,fg=#303030] #[bg=black,fg=#303030]{name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=black,fg=#303030]"
+          // tab_normal "#[bg=#151515,fg=black] #[bg=#151515,fg=black]{name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=#151515,fg=black]"
+          // tab_active "#[bg=black,fg=#151515] #[bg=black,fg=#151515]{name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=black,fg=#151515]"
           //   tab_fullscreen_indicator "□ "
           //   tab_sync_indicator       "  "
           //   tab_floating_indicator   "󰉈 "
@@ -219,7 +219,7 @@ layout {
                 // formatting for the current active tab
                 // tab_active              "#[fg=blue,bold]{name}#[fg=yellow,bold]{floating_indicator}"
                 // tab_active_fullscreen   "#[fg=yellow,bold]{name}#[fg=yellow,bold]{fullscreen_indicator}"
-                // tab_active_sync         "#[fg=#303030,bold]{name}#[fg=yellow,bold]{sync_indicator}"
+                // tab_active_sync         "#[fg=#151515,bold]{name}#[fg=yellow,bold]{sync_indicator}"
 
                 // separator between the tabs
                 // tab_separator           "#[fg=cyan,bold] "
@@ -233,15 +233,15 @@ layout {
                 // tab_floating_indicator   "󰉈 "
 
         // tabs {{{
-        // tab_normal "#[bg=#303030,fg=#aaaaaa] {name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=#303030,fg=black]"
-        // tab_active "#[bg=#303030,fg=#ffffff] {name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=black,fg=#303030]"
-        tab_normal "#[bg=#303030,fg=#aaaaaa] {index} {sync_indicator}{fullscreen_indicator}"
-        tab_active "#[bg=#303030,fg=#ffffff,bold] {index} {sync_indicator}{fullscreen_indicator}"
-        tab_rename "#[fg=#303030,bg=#aaaaaa] {index}.{name} {sync_indicator}{fullscreen_indicator}"
+        // tab_normal "#[bg=#151515,fg=#aaaaaa] {name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=#151515,fg=black]"
+        // tab_active "#[bg=#151515,fg=#ffffff] {name} {sync_indicator}{fullscreen_indicator}{floating_indicator}#[bg=black,fg=#151515]"
+        tab_normal "#[bg=#151515,fg=#aaaaaa] {index} {sync_indicator}{fullscreen_indicator}"
+        tab_active "#[bg=#151515,fg=#ffffff,bold] {index} {sync_indicator}{fullscreen_indicator}"
+        tab_rename "#[fg=#151515,bg=#aaaaaa] {index}.{name} {sync_indicator}{fullscreen_indicator}"
         // limit tab display count
         tab_display_count         "9"  // limit to showing 3 tabs
-        tab_truncate_start_format "#[fg=#aaaaaa,bg=#303030] 􀁳 "
-        tab_truncate_end_format   "#[fg=#aaaaaa,bg=#303030] 􀁵 "
+        tab_truncate_start_format "#[fg=#aaaaaa,bg=#151515] 􀁳 "
+        tab_truncate_end_format   "#[fg=#aaaaaa,bg=#151515] 􀁵 "
         // tab indicators
         tab_sync_indicator       "󰓦 "
         tab_fullscreen_indicator "󱟱  "
