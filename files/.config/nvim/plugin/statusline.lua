@@ -446,7 +446,7 @@ function mrl.ui.statusline.render()
 
   local l1 = section:new({
     {
-      { '  ' .. vim.g.dev_environ .. ' ', 'StDevEnv' },
+      { '  ' .. vim.g.dev_environ .. '▐', 'StDevEnv' },
     },
     priority = 1,
     cond = true,

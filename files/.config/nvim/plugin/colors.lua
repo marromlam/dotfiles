@@ -17,7 +17,7 @@ local function general_overrides(dim_factor)
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     {
       StDevEnv = {
-        fg = { from = 'StatusLine' },
+        fg = { from = 'StatusLine', attr = 'bg' },
         bg = { from = 'Comment', attr = 'fg' },
       },
     },
@@ -121,6 +121,12 @@ local function general_overrides(dim_factor)
     -- Symbol Usage {{{
     { SymbolUsageLeft = { fg = bg_color } },
     { SymbolUsageRight = { fg = bg_color } },
+    {
+      SymbolUsageRef = {
+        bg = bg_color,
+        fg = { from = 'Comment' },
+      },
+    },
     {
       SymbolUsageContent = {
         bg = bg_color,

@@ -4,8 +4,8 @@ return {
   {
     'projekt0n/github-nvim-theme',
     name = 'github-theme',
-    disabled = true,
-    cond = false,
+    -- disabled = true,
+    -- cond = false,
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function() require('github-theme').setup({}) end,
@@ -14,6 +14,8 @@ return {
   {
     'ellisonleao/gruvbox.nvim',
     lazy = false,
+    cond = false,
+    enabled = false,
     priority = 1000,
     enabled = true,
     config = function()
@@ -154,6 +156,8 @@ return {
   {
     'rose-pine/neovim',
     lazy = false,
+    cond = false,
+    enabled = false,
     priority = 1000,
     name = 'rose-pine',
     opts = {

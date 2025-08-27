@@ -161,28 +161,33 @@ return {
         function() gitlinker.get_buf_range_url('n') end,
         desc = 'gitlinker: copy line to clipboard',
         mode = 'n',
+        silent = true,
       },
       {
         '<localleader>gu',
         function() gitlinker.get_buf_range_url('v') end,
         desc = 'gitlinker: copy range to clipboard',
         mode = 'v',
+        silent = true,
       },
       {
         '<leader>go',
         function() gitlinker.get_repo_url(browser_open()) end,
         desc = 'gitlinker: open in browser',
+        silent = true,
       },
       {
         '<leader>go',
         function() gitlinker.get_buf_range_url('n', browser_open()) end,
         desc = 'gitlinker: open current line in browser',
+        silent = true,
       },
       {
         '<leader>go',
         function() gitlinker.get_buf_range_url('v', browser_open()) end,
         desc = 'gitlinker: open current selection in browser',
         mode = 'v',
+        silent = true,
       },
     },
     opts = {

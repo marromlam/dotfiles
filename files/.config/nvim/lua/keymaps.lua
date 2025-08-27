@@ -1,6 +1,7 @@
 -- TODO: move me to other place
 --
 --
+local noremap_silent = { noremap = true, silent = true }
 -- Commands {{{
 --
 ---Create an nvim command
@@ -225,7 +226,7 @@ vim.keymap.set('n', '<leader>tc', '<cmd>tabclose<CR>')
 vim.keymap.set('n', '<leader>to', '<cmd>tabonly<cr>')
 vim.keymap.set('n', '<leader>tm', '<cmd>tabmove<Space>')
 vim.keymap.set('n', ']t', '<cmd>tabprev<CR>')
-vim.keymap.set('n', '[t', '<cmd>tabnext<CR>')
+vim.keymap.set('n', '[t', '<cmd>tabnext<CR>', noremap_silent)
 -------------------------------------------------------------------------------
 -- ?ie | entire object
 -------------------------------------------------------------------------------
@@ -452,7 +453,7 @@ vim.keymap.set(
   '<Cmd>Reverse<CR>',
   { desc = 'reverse buffer' }
 )
-vim.keymap.set('n', '<C-t>', '<Cmd>Todo<CR>', { desc = 'reverse buffer' })
+vim.keymap.set('n', '<C-x>', '<Cmd>Todo<CR>', { desc = 'reverse buffer' })
 
 -----------------------------------------------------------------------------//
 -- References
@@ -460,14 +461,24 @@ vim.keymap.set('n', '<C-t>', '<Cmd>Todo<CR>', { desc = 'reverse buffer' })
 -- 1.) https://www.reddit.com/r/vim/comments/i2x8xc/i_want_gf_to_create_files_if_they_dont_exist/
 -- 2.) https://github.com/kristijanhusak/neovim-config/blob/5474d932386c3724d2ce02a5963528fe5d5e1015/nvim/lua/partials/mappings.lua#L154
 
-vim.keymap.set('n', '<leader>pp', '<Cmd>Lazy<CR>', { desc = 'Lazy lugins' })
-vim.keymap.set('n', '<leader>pm', '<Cmd>Mason<CR>', { desc = 'Mason util' })
+vim.keymap.set(
+  'n',
+  '<leader>pp',
+  '<Cmd>Lazy<CR>',
+  { desc = 'Lazy lugins', noremap = true, silent = true }
+)
+vim.keymap.set(
+  'n',
+  '<leader>pm',
+  '<Cmd>Mason<CR>',
+  { desc = 'Mason util', noremap = true, silent = true }
+)
 
 vim.keymap.set(
   'n',
   '<leader>bo',
   '<Cmd>:only<CR>',
-  { desc = 'Show this [B]uffer [O]nly' }
+  { desc = 'Show this [B]uffer [O]nly', noremap = true, silent = true }
 )
 
 -- closing buffers
@@ -476,48 +487,48 @@ vim.keymap.set(
   'n',
   '<leader>bD',
   '<Cmd>:bd!<CR>',
-  { desc = 'Force delete buffer' }
+  { desc = 'Force delete buffer', noremap = true, silent = true }
 )
 vim.keymap.set(
   'n',
   '<leader>z',
   '<cmd>%bdelete<CR>',
-  { desc = 'Close All Buffers' }
+  { desc = 'Close All Buffers', noremap = true, silent = true }
 )
 vim.keymap.set(
   'n',
   '<leader>Z',
   '<cmd>%bdelete!<CR>',
-  { desc = 'Force Close All Buffers' }
+  { desc = 'Force Close All Buffers', noremap = true, silent = true }
 )
 -- vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save' })
 vim.keymap.set('n', '<leader>q', ':q<CR>', { desc = 'Quit' })
 -- vim.keymap.set('n', '<leader>W', '<cmd>w!<CR>', { desc = 'Save (force)' })
-vim.keymap.set('n', '<leader>Q', '<cmd>q!<CR>', { desc = 'Quit (force)' })
-
--- naviagate buffers
-vim.keymap.set('n', '<S-l>', ':bnext<CR>', opts)
-vim.keymap.set('n', '<S-h>', ':bprevious<CR>', opts)
-vim.keymap.set('n', '<Tab>', ':bnext<CR>', { desc = 'Go to next buffer' })
 vim.keymap.set(
   'n',
-  '<S-Tab>',
-  ':bprevious<CR>',
-  { desc = 'Go to previous buffer' }
+  '<leader>Q',
+  '<cmd>q!<CR>',
+  { desc = 'Quit (force)', noremap = true, silent = true }
 )
+
+-- naviagate buffers
+vim.keymap.set('n', '<S-l>', ':bnext<CR>', noremap_silent)
+vim.keymap.set('n', '<S-h>', ':bprevious<CR>', noremap_silent)
+vim.keymap.set('n', '<Tab>', ':bnext<CR>', noremap_silent)
+vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', noremap_silent)
 
 -- creating splits
 vim.keymap.set(
   'n',
   '<leader>|',
   '<cmd>vsp<CR>',
-  { desc = 'Create vertical split' }
+  { desc = 'Create vertical split', noremap = true, silent = true }
 )
 vim.keymap.set(
   'n',
   '<leader>-',
   '<cmd>sp<CR>',
-  { desc = 'Create horizontal split' }
+  { desc = 'Create horizontal split', noremap = true, silent = true }
 )
 
 -- resizing
@@ -525,25 +536,25 @@ vim.keymap.set(
   'n',
   '<Up>',
   ':resize -2<CR>',
-  { silent = true, desc = 'resize window up' }
+  { silent = true, desc = 'resize window up', noremap = true }
 )
 vim.keymap.set(
   'n',
   '<Down>',
   ':resize +2<CR>',
-  { silent = true, desc = 'resize window down' }
+  { silent = true, desc = 'resize window down', noremap = true }
 )
 vim.keymap.set(
   'n',
   '<Left>',
   ':vertical resize -2<CR>',
-  { silent = true, desc = 'resize window left' }
+  { silent = true, desc = 'resize window left', noremap = true }
 )
 vim.keymap.set(
   'n',
   '<Right>',
   ':vertical resize +2<CR>',
-  { silent = true, desc = 'resize window right' }
+  { silent = true, desc = 'resize window right', noremap = true }
 )
 
 -- toggle quickfix
