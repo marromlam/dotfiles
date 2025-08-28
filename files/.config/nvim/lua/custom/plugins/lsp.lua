@@ -232,7 +232,27 @@ return { -- LSP Configuration & Plugins
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        basedpyright = {
+          settings = {
+            pyright = {
+              disableOrganizeImports = true, -- Using Ruff
+            },
+            python = {
+              analysis = {
+                ignore = { '*' }, -- Using Ruff
+                typeCheckingMode = 'off', -- Using mypy
+                diagnosticMode = 'openFilesOnly',
+              },
+            },
+            basedpyright = {
+              disableOrganizeImports = true, -- Using Ruff
+              analysis = {
+                ignore = { '*' }, -- Using Ruff
+                typeCheckingMode = 'off', -- Using mypy
+              },
+            },
+          },
+        },
         ruff = {},
         -- pylsp = {},
         -- rust_analyzer = {},
@@ -312,7 +332,14 @@ return { -- LSP Configuration & Plugins
     dependencies = 'neovim/nvim-lspconfig',
     event = 'LspAttach',
     opts = {
-      -- your options here
+      excluded_lsp_clients = {
+        'null-ls',
+        'jdtls',
+        'marksman',
+        'lua_ls',
+        'copilot',
+      },
+      timout = 3000, -- Timeout in milliseconds for the garbage collection
     },
   },
   {

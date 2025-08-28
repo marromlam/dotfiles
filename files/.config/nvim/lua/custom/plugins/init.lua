@@ -214,16 +214,16 @@ return {
     },
   },
 
-  {
-    'fresh2dev/zellij.vim',
-    lazy = false,
-  },
-
   -- {
-  --   'marromlam/sailor.vim',
-  --   event = 'VimEnter',
-  --   run = './install.sh',
+  --   'fresh2dev/zellij.vim',
+  --   lazy = false,
   -- },
+
+  {
+    'marromlam/sailor.vim',
+    event = 'VimEnter',
+    run = './install.sh',
+  },
 
   {
     'echasnovski/mini.bufremove',

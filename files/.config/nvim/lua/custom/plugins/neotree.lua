@@ -10,8 +10,8 @@ return {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
     cmd = { 'Neotree' },
-    -- cond = false,
-    -- disable = true,
+    cond = false,
+    disable = true,
     keys = {
       { '<C-N>', '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' },
       -- { '-',     '<Cmd>Neotree toggle reveal<CR>', desc = 'NeoTree' }

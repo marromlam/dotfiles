@@ -6,7 +6,7 @@ if [[ "$1" == "-f" ]] || [[ "$1" == "--file" ]]; then
     is_printed=False
 else
     is_printed=True
-fi
+i
 
 # if the first argument is -f or --file, the avros are $@ from the second
 # argument, else the avros are $@ from the first argument

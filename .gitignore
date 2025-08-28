@@ -82,6 +82,7 @@ files/.config/chromium/
 files/.config/google-chrome-for-testing/
 files/.config/google-chrome/
 files/.config/libreoffice/
+files/.config/browsh/
 
 # node stuff
 node_modules

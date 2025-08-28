@@ -49,8 +49,8 @@ typeset -A __DOTS
 PLUGIN_DIR=$DOTFILES/zsh/plugins
 
 # Init completions
-autoload -Uz compinit
-compinit
+autoload -Uz compinit && compinit
+eval "$(pixi completion --shell zsh)"
 
 
 # These should be source *BEFORE* setting up hooks

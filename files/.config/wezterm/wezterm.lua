@@ -477,7 +477,6 @@ return {
   pane_focus_follows_mouse = false,
   warn_about_missing_glyphs = false,
   enable_kitty_graphics = false,
-  show_update_window = false,
   check_for_updates = false,
   -- window_decorations = "RESIZE",
   -- window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
