@@ -8,6 +8,12 @@ source $HOME/.zprofile
 source $HOME/.config/zsh/ufunctions.sh
 source $HOME/.config/zsh/zshenv
 
+# Use a minimal prompt in Cursor to avoid command detection issues
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+  PROMPT='%n@%m:%~%# '
+  RPROMPT=''
+  return
+fi
 
 # get current environment name {{{
 
@@ -289,7 +295,7 @@ bindkey '^t' tmux-sessionizer-widget
 # eval "$(direnv hook zsh)"
 # source $(brew --prefix)/opt/autoenv/activate.sh
 
-
+alias docker-cleanup='docker system prune -a --volumes'
 
 
 # }}}

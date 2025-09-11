@@ -536,10 +536,10 @@ function mrl.ui.statusline.render()
       cond = vim.v.hlsearch > 0,
       priority = 1,
     },
-    -- path.env,
-    -- path.dir,
-    -- path.parent,
-    -- path.file,
+    path.env,
+    path.dir,
+    path.parent,
+    path.file,
     {
       {
         { space, 'StSeparator' },

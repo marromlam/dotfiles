@@ -72,15 +72,15 @@ RemoveDesktop(remove_desktop_number, fallback_desktop_number) {
 
 ; RAlt::LAlt
 !+1::MoveCurrentWindowToDesktop(0)
-!@::MoveCurrentWindowToDesktop(1)
-#!::MoveCurrentWindowToDesktop(2)
-+!4::MoveCurrentWindowToDesktop(3)
-+!5::MoveCurrentWindowToDesktop(4)
-+!6::MoveCurrentWindowToDesktop(5)
-+!7::MoveCurrentWindowToDesktop(6)
-+!8::MoveCurrentWindowToDesktop(7)
-+!9::MoveCurrentWindowToDesktop(8)
-+!0::MoveCurrentWindowToDesktop(9)
+!+2::MoveCurrentWindowToDesktop(1)
+!+3::MoveCurrentWindowToDesktop(2)
+!+4::MoveCurrentWindowToDesktop(3)
+!+5::MoveCurrentWindowToDesktop(4)
+!+6::MoveCurrentWindowToDesktop(5)
+!+7::MoveCurrentWindowToDesktop(6)
+!+8::MoveCurrentWindowToDesktop(7)
+!+9::MoveCurrentWindowToDesktop(8)
+!+0::MoveCurrentWindowToDesktop(9)
 
 ; }}}
 
