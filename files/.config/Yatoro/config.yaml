@@ -1,0 +1,23 @@
+ui:
+  frameDelay: 5000000
+
+  artwork:
+    width: 500
+    height: 500
+
+  layout:
+    pages: [nowPlaying, queue, search]
+    cols: 2
+    rows: 2
+
+settings:
+  searchItemLimit: 10
+
+mappings:
+  - key: SPACE
+    modifiers:
+    action: :playPauseToggle<CR>
+  - key: c
+    modifiers:
+      - CTRL
+    action: :quitApplication<CR>
