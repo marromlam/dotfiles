@@ -48,12 +48,15 @@ yabai -m config external_bar all:25:0 \
 
 # Exclude problematic apps from being managed:
 yabai -m rule --add app="^(LuLu|Vimac|Calculator|Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Steam|Alfred|Activity Monitor)$" manage=off
-yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+# yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" manage=off
+yabai -m rule --add app="Finder" manage=off
 yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
 yabai -m rule --add label="Orion" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
 yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
 yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 yabai -m rule --add app="^(Passwords)$" manage=off
+yabai -m rule --add app="^System Preferences$" manage=off
 
 ####     yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 ####     sudo yabai --load-sa
@@ -135,14 +138,22 @@ yabai -m rule --add app="Transmission" manage=off border=off
 yabai -m rule --add app="Terminal" space=5
 
 # Media
-yabai -m rule --add app="Music" space=6
-yabai -m rule --add app="QuickTime Player" space=6
-yabai -m rule --add app="Spotify" space=6
+yabai -m rule --add app="Music" space=5
+yabai -m rule --add app="Podcasts" space=5
+yabai -m rule --add app="QuickTime Player" space=5
+yabai -m rule --add app="Spotify" space=5
 
 # Social
-yabai -m rule --add app="WhatsApp" space=7
-yabai -m rule --add app="Telegram" space=7
-yabai -m rule --add app="Messages" space=7
+yabai -m rule --add app="WhatsApp" space=4
+yabai -m rule --add app="Telegram" space=4
+yabai -m rule --add app="Messages" space=4
+
+# Social
+yabai -m rule --add app="Obsidian" space=6
+
+# Productivity
+yabai -m rule --add app="Things" space=7
+yabai -m rule --add app="Calendar" space=7
 
 # Floating
 yabai -m rule --add app="^System Preferences$" space=9
