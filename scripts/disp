@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Script to preview files of various types
+
+preview_file() {
+    local file="$1"
+    case "${file##*.}" in
+    txt | md | log | cfg | ini | json)
+        # Preview text files
+        bat "$file"
+        ;;
+    jpg | jpeg | png | gif)
+        # Preview images using timg
+        timg -p s "$file"
+        echo ''
+        ;;
+    pdf)
+        # Preview images using timg
+        timg "$file"
+        ;;
+    mp3 | wav | flac)
+        # Preview audio files
+        mpv "$file"
+        ;;
+    mp4 | mkv | avi)
+        # Preview video files
+        mpv "$file"
+        ;;
+    *)
+        echo "Unsupported file type: $file"
+        ;;
+    esac
+}
+
+# Check if at least one argument is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <file1> <file2> ..."
+    exit 1
+fi
+
+# Iterate over provided files and preview them
+for file in "$@"; do
+    if [ -f "$file" ]; then
+        preview_file "$file"
+    else
+        echo "File not found: $file"
+    fi
+done
+
+# vim: ft=bash
