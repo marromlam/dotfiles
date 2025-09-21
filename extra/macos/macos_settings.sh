@@ -8,7 +8,6 @@ sudo scutil --set HostName mb
 # enable install from untrusted developers
 sudo spctl --master-disable
 
-
 # Stop System Preferences from overriding stuff
 osascript -e 'tell application "System Preferences" to quit'
 
@@ -16,8 +15,11 @@ osascript -e 'tell application "System Preferences" to quit'
 sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
+while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+done 2>/dev/null &
 
 # General UI/UX {{{
 
@@ -58,7 +60,7 @@ defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
+# sudo systemsetup -setrestartfreeze on
 
 # Disable smart dashes as they’re annoying when typing code
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
@@ -96,7 +98,7 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 10
 ###############################################################################
 
 # Stop iTunes from responding to the keyboard media keys
-launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+# launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
@@ -151,8 +153,8 @@ defaults write com.apple.dock size-immutable -bool yes
 defaults write com.apple.dock orientation left
 
 # Effects
-defaults write com.apple.dock mineffect suck; killall Dock
-
+defaults write com.apple.dock mineffect suck
+killall Dock
 
 # Save screenshots to the desktop
 defaults write com.apple.screencapture location -string "$HOME/Desktop"
@@ -164,7 +166,6 @@ defaults write com.apple.Dock showhidden -bool yes
 # osascript -e 'tell application "Finder" to set desktop picture to POSIX file "${PWD}/assets/earth_wallpaper.heic"'
 
 # }}}
-
 
 # Activity Monitor {{{
 
@@ -186,16 +187,16 @@ defaults write com.apple.ActivityMonitor SortDirection -int 0
 # Kill affected applications {{{
 
 for app in "Activity Monitor" \
-	"Address Book" \
-	"Calendar" \
-	"cfprefsd" \
-	"Contacts" \
-	"Dock" \
-	"Finder" \
-	"Google Chrome" \
-	"Photos" \
-	"SystemUIServer"; do
-	killall "${app}" &> /dev/null
+    "Address Book" \
+    "Calendar" \
+    "cfprefsd" \
+    "Contacts" \
+    "Dock" \
+    "Finder" \
+    "Google Chrome" \
+    "Photos" \
+    "SystemUIServer"; do
+    killall "${app}" &>/dev/null
 done
 echo "Done. Note that some of these changes require a logout/restart to take effect."
 

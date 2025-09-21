@@ -2,13 +2,14 @@ cask_args appdir: '/Applications', force: true
 
 # Add standard taps
 # tap "homebrew/cask"
-tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
-tap "homebrew/bundle"
-tap "homebrew/services"
+# tap "homebrew/cask-fonts"
+# tap "homebrew/cask-versions"
+# tap "homebrew/bundle"
+# tap "homebrew/services"
 tap "browsh-org/homebrew-browsh"
 tap "koekeishiya/formulae"
 tap "iina/homebrew-mpv-iina"
+tap "iina/mpv-iina"
 tap 'jayadamsmorgan/yatoro'
 
 # Custom taps tap "koekeishiya/formulae"
@@ -39,7 +40,7 @@ brew "tmux"                       # terminal multiplexer
 brew "tree"                       # show a tree
 brew "wget"                       # like curl
 brew "stow"                       # linking files and folders
-brew "exa"                        # like ls but better
+brew "eza"                        # like ls but better
 brew "otree"                      # explore json, yaml and toml
 
 # brew "mosh"                       # similar to ssh
@@ -66,32 +67,32 @@ brew "gd"    # TODO: what is this
 #
 brew "node"
 brew "yarn"
-brew "xmlformat"  # web
-brew "prettier"
+# brew "xmlformat"  # web
+# brew "prettier"
 # npm install fixjson 
 
 brew "gcc"
-brew 'clang-format'               # C-like
+# brew 'clang-format'               # C-like
 
-brew "python"
-brew "pyright"                    # python
-brew "flake8"
-brew "black"
-
-brew "bash"
-brew "shfmt"                      # bash
-brew "bash-language-server"
+# brew "python"
+# brew "pyright"                    # python
+# brew "flake8"
+# brew "black"
+# 
+# brew "bash"
+# brew "shfmt"                      # bash
+# brew "bash-language-server"
 
 brew "texlive"                    # latex
 # cask "mactex-no-gui"            # mactex without crap
-brew "texlab"
-brew "bibtex-tidy"
-brew "latexindent"
+# brew "texlab"
+# brew "bibtex-tidy"
+# brew "latexindent"
 brew "pandoc"
 
 brew "lua"                        # lua
-brew "stylua"
-brew "lua-language-server"
+# brew "stylua"
+# brew "lua-language-server"
 
 
 #brew "mycli"
@@ -103,8 +104,8 @@ brew "pkg-config"
 brew "readline"
 #brew "readydocker"
 brew "rlue/utils/timer"
-brew "spotify-tui"
-brew "spotifyd"
+# brew "spotify-tui"
+# brew "spotifyd"
 #brew "tmuxinator"
 #brew "tmuxinator-fzf-start"
 # brew "sshfs"                    # mount ssh volumes
@@ -160,6 +161,7 @@ cask "keycastr"                    # cast keys on screen
 
 # cask "microsoft-teams"
 # cask "microsoft-office"
+cask 'domzilla-caffeine'
 
 
 
@@ -171,3 +173,5 @@ cask "font-iosevka"
 cask "font-sf-mono-nerd-font"
 cask "font-fira-code-nerd-font"
 cask "font-hack-nerd-font"
+cask "font-symbols-only-nerd-font"
+cask "font-sf-pro"
