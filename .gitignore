@@ -21,6 +21,7 @@ files/.config/spotify-tui/.spotify_token_cache.json
 files/.config/spotify-tui/client.yml
 files/.config/spotifyd/spotifyd.conf
 .DS_Store
+__pycache__
 *.un~
 files/.config/nvim/.netrwhist
 files/.config/wslu
