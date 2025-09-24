@@ -4,3 +4,9 @@ matplotlib
 numpy
 scipy
 click
+roman
+
+# pymupdf
+PyMuPDF
+fitz
+inkscape-figures

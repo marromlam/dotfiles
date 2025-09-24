@@ -44,7 +44,7 @@ return {
         highlight = {
           -- enable = true,
           enable = false,
-          disable = { 'tex' },
+          disable = { 'tex', 'latex' },
           -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
           --  If you are experiencing weird indenting issues, add the language to
           --  the list of additional_vim_regex_highlighting and disabled languages for indent.
@@ -53,7 +53,7 @@ return {
         -- indent = { enable = true, disable = { 'ruby', 'tex' } },
         incremental_selection = {
           enable = true,
-          disable = { 'tex' },
+          disable = { 'tex', 'latex' },
           keymaps = {
             init_selection = '<C-space>',
             node_incremental = '<C-space>',
