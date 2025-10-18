@@ -44,11 +44,12 @@ return {
         highlight = {
           -- enable = true,
           enable = false,
-          disable = { 'tex', 'latex' },
+          disable = { 'tex', 'latex', 'applescript' },
           -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
           --  If you are experiencing weird indenting issues, add the language to
           --  the list of additional_vim_regex_highlighting and disabled languages for indent.
           -- additional_vim_regex_highlighting = { 'ruby', 'tex' },
+          additional_vim_regex_highlighting = { 'applescript' },
         },
         -- indent = { enable = true, disable = { 'ruby', 'tex' } },
         incremental_selection = {
