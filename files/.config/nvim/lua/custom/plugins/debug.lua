@@ -114,6 +114,8 @@ return {
   },
   {
     'rest-nvim/rest.nvim',
+    cond = false,
+    disable = true,
     cmd = { 'Rest' },
     dependencies = {
       'nvim-treesitter/nvim-treesitter',

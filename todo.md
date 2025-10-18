@@ -1,3 +1,1 @@
-
-
-- [] Check what is the contour cli utility
+- [ ] Check what is the contour cli utility

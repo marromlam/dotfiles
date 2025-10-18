@@ -175,6 +175,14 @@ case `uname` in
 esac
 
 
+# # USGC BASH PROMPT
+# if [[ $- == *i* ]]; then
+#   export CLICOLOR=1
+#   export LSCOLORS=GxFxCxDxBxegedabagaced
+#   export PS1="\[$(tput setaf 7)\]❬\h❭ \[$(tput setaf 2)\]\W\[$(tput setaf 1)\] ●\[$(tput sgr0)\] "
+# fi
+
+
 # test if ~/.wsl exists and source zsh/windows.sh if it does
 if [[ -f ~/.wsl ]]; then
   source "$HOME/.config/zsh/windows.sh"

@@ -10,3 +10,4 @@ roman
 PyMuPDF
 fitz
 inkscape-figures
+CairoSVG

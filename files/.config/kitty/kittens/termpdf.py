@@ -1,5 +1,6 @@
-from kittens.tui.handler import result_handler
 import os
+
+from kittens.tui.handler import result_handler
 
 
 def main(args):
@@ -19,8 +20,8 @@ def handle_result(args, result, target_window_id, boss):
         [
             " ",  # this is intended, so it is not saved in history
             termpdf_cmd,
-            "--invert-colors",
-            "--transparent",
+            # "--invert-colors",
+            # "--transparent",
             f"--page-number {page}" if len(args) > 2 else "",
             os.path.expanduser(args[1]),
         ]

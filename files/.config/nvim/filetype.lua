@@ -3,6 +3,8 @@ if not vim.filetype then return end
 vim.filetype.add({
   extension = {
     lock = 'yaml',
+    scpt = 'applescript',
+    applescript = 'applescript',
   },
   filename = {
     ['NEOGIT_COMMIT_EDITMSG'] = 'NeogitCommitMessage',

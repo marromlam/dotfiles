@@ -70,6 +70,13 @@ source $HOME/.dotfiles/zsh/common.sh
 # source local config file, if exists
 # [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
+# USGC BASH PROMPT
+if [[ $- == *i* ]]; then
+    export CLICOLOR=1
+    export LSCOLORS=GxFxCxDxBxegedabagaced
+    export PS1="\[$(tput setaf 7)\]❬\h❭ \[$(tput setaf 2)\]\W\[$(tput setaf 1)\] ●\[$(tput sgr0)\] "
+fi
+
 # check whether tmux is running or not, and export variable
 if [ -n "$TMUX" ]; then
     export IS_TMUX=1

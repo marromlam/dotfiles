@@ -140,4 +140,53 @@ return {
       desc = 'Reload MS Word',
     },
   },
+
+  ------------------------------------------------------------------------
+  --- LaTeX {{{
+  ------------------------------------------------------------------------
+
+  {
+    -- vimtex
+    'lervag/vimtex',
+    ft = { 'tex' },
+    config = function() require('custom.config.vimtex').config() end,
+  },
+
+  {
+    'marromlam/tex-kitty',
+    ft = 'tex',
+    dir = '/Users/marcos/Projects/personal/tex-kitty',
+    dev = true,
+    dependencies = { 'lervag/vimtex' },
+    config = function()
+      require('tex-kitty').setup({
+        tex_kitty_preview = 1,
+      })
+    end,
+  },
+
+  {
+    'marromlam/livetex.nvim',
+    ft = 'tex',
+    dir = '/Users/marcos/Projects/personal/livetex.nvim',
+    dev = true,
+    dependencies = { 'lervag/vimtex' },
+    config = function()
+      require('livetex').setup({
+        engine = 'pdflatex', -- or "lualatex"
+        fmt = 'fastfmt.fmt', -- path to your precompiled preamble
+        -- out_dir = '/dev/shm/livetex', -- RAM disk for fast output
+        out_dir = '/Users/marcos/tmp/livetex', -- or any writable path
+        live = true,
+        reload_cmd = '', -- auto reload PDF
+        -- reload_cmd = 'osascript -e \'tell application "Skim" to revert front document\'', -- auto reload PDF
+        debounce_ms = 600,
+        show_spinner = true,
+        pdf_target = 'same', -- (default) copy next to .tex
+      })
+    end,
+  },
+
+  -- }}}
+  ------------------------------------------------------------------------
 }
