@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# This script patches all fonts in the specified folder using the Nerd Fonts
+# patcher Docker image.
+# Usage: patch-font <path-to-font-folder>
+
+# NOTE: The logic here was taken from:
+# https://tech.serhatteker.com/post/2023-04/patch-berkeley-mono-font-with-nerd-fonts/
+
+set -euo pipefail
+
+# Check if argument is provided
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <path-to-font-folder>"
+    exit 1
+fi
+
+# Resolve absolute path (handles ~ or relative paths)
+FONT_DIR=$(realpath "$1")
+OUT_DIR="$FONT_DIR/patched"
+
+# Create output directory if it doesn’t exist
+mkdir -p "$OUT_DIR"
+
+echo "Patching fonts from: $FONT_DIR"
+echo "Output will be in:   $OUT_DIR"
+echo
+sleep 5
+
+docker run --rm \
+    -v "$FONT_DIR":/in \
+    -v "$OUT_DIR":/out \
+    nerdfonts/patcher \
+    --progressbars \
+    --mono \
+    --adjust-line-height \
+    --fontawesome \
+    --fontawesomeext \
+    --fontlogos \
+    --octicons \
+    --codicons \
+    --powersymbols \
+    --pomicons \
+    --powerline \
+    --powerlineextra \
+    --material \
+    --weather
+
+echo
+echo "Patching complete!"
+
+# vim: ft=bash

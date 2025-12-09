@@ -117,7 +117,7 @@ function set-prompt() {
   # local current_eviron="%F{red}% ⏣ ◣♯⚕i⚯ 🮤 	🭑  	🭔 ⚎ ⚈ ♨ ♞ 🬅 🬖 ❖ $(get_env)"
   local current_eviron=" $(get_env)"
   local placeholder="(%F{red}%{$__DOTS[ITALIC_ON]%}…%{$__DOTS[ITALIC_OFF]%}%f)"
-  local top_left="%B%F{blue} %1~%f%b${_git_status_prompt:-$placeholder}"
+  local top_left="%B%F{blue}%1~%f%b${_git_status_prompt:-$placeholder}"
   local top_right="${vim_mode}${current_eviron}${execution_time}%F{240}%*%f"
   local bottom_left="%(1j.%F{cyan}%j✦%f .)%(?.${dots_prompt_icon}.${dots_prompt_failure_icon})"
 

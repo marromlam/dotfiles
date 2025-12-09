@@ -89,3 +89,7 @@ files/.config/browsh/
 node_modules
 package-lock.sjon
 package.sjon
+
+
+# other stuff
+files/.config/pdftex-figures/roots

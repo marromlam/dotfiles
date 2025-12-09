@@ -5,51 +5,49 @@
 CONDA_PREFIX=/opt/conda
 export CONDA_ORIGIN=/opt/conda
 
-
 function __boostrap_conda() {
-  # create a boostrap installer for conda taking into account
-  # the operating system
-  if [[ "$OSTYPE" == "linux-gnu" ]]; then
-      CONDA_OS="Linux"
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
-      CONDA_OS="MacOSX"
-  elif [[ "$OSTYPE" == "cygwin" ]]; then
-      CONDA_OS="Windows"
-  elif [[ "$OSTYPE" == "msys" ]]; then
-      CONDA_OS="Windows"
-  elif [[ "$OSTYPE" == "win32" ]]; then
-      CONDA_OS="Windows"
-  elif [[ "$OSTYPE" == "freebsd"* ]]; then
-      CONDA_OS="Linux"
-  else
-      echo "Unknown OS: $OSTYPE"
-      exit 1
-  fi
+    # create a boostrap installer for conda taking into account
+    # the operating system
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        CONDA_OS="Linux"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        CONDA_OS="MacOSX"
+    elif [[ "$OSTYPE" == "cygwin" ]]; then
+        CONDA_OS="Windows"
+    elif [[ "$OSTYPE" == "msys" ]]; then
+        CONDA_OS="Windows"
+    elif [[ "$OSTYPE" == "win32" ]]; then
+        CONDA_OS="Windows"
+    elif [[ "$OSTYPE" == "freebsd"* ]]; then
+        CONDA_OS="Linux"
+    else
+        echo "Unknown OS: $OSTYPE"
+        exit 1
+    fi
 
-  # download the boostrap installer
-  CONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-$CONDA_OS-x86_64.sh"
-  CONDA_INSTALLER="$HOME/miniconda.sh"
-  wget $CONDA_URL -O $CONDA_INSTALLER
+    # download the boostrap installer
+    CONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-$CONDA_OS-x86_64.sh"
+    CONDA_INSTALLER="$HOME/miniconda.sh"
+    wget $CONDA_URL -O $CONDA_INSTALLER
 
-  # install conda, withoud prompting the user
-  # and without adding the conda path to the .bashrc
-  sudo mkdir -p /opt
-  sudo chown -R $(whoami) /opt
-  bash $CONDA_INSTALLER -b -p $CONDA_ORIGIN
-  conda config --append channels conda-forge
-  conda config --append channels conda-forge
+    # install conda, withoud prompting the user
+    # and without adding the conda path to the .bashrc
+    sudo mkdir -p /opt
+    sudo chown -R $(whoami) /opt
+    bash $CONDA_INSTALLER -b -p $CONDA_ORIGIN
+    conda config --append channels conda-forge
 }
 
 function conda() {
-  # check if the conda prefix exists
-  # if it does not exist, then install conda
-  if [[ ! -d "$CONDA_PREFIX" ]]; then
-      __boostrap_conda
-  fi
-  source $CONDA_PREFIX/bin/activate
-  unset -f __boostrap_conda
-  # unset -f conda
-  conda $@
+    # check if the conda prefix exists
+    # if it does not exist, then install conda
+    if [[ ! -d "$CONDA_PREFIX" ]]; then
+        __boostrap_conda
+    fi
+    source $CONDA_PREFIX/bin/activate
+    unset -f __boostrap_conda
+    # unset -f conda
+    conda $@
 }
 
 # vim: ft=bash
