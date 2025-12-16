@@ -155,7 +155,9 @@ return {
 
   {
     'yetone/avante.nvim',
-    dev = true,
+    -- dev = true,
+    disable = true,
+    cond = false,
     cmd = { 'Avante', 'AvanteAsk' },
     keys = { '<leader>aa', '<leader>aq', '<leader>ae' },
     opts = {
