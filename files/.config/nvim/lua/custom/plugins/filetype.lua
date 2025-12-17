@@ -157,6 +157,8 @@ return {
     ft = 'tex',
     dir = '/Users/marcos/Projects/personal/tex-kitty',
     dev = true,
+    cond = false,
+    disable = true,
     dependencies = { 'lervag/vimtex' },
     config = function()
       require('tex-kitty').setup({
@@ -170,6 +172,8 @@ return {
     ft = 'tex',
     dir = '/Users/marcos/Projects/personal/livetex.nvim',
     dev = true,
+    cond = false,
+    disable = true,
     dependencies = { 'lervag/vimtex' },
     config = function()
       require('livetex').setup({
