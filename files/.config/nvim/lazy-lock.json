@@ -76,6 +76,7 @@
   "sidekick.nvim": { "branch": "main", "commit": "c2bdf8cfcd87a6be5f8b84322c1b5052e78e302e" },
   "snacks.nvim": { "branch": "main", "commit": "fe7cfe9800a182274d0f868a74b7263b8c0c020b" },
   "sonarlint.nvim": { "branch": "main", "commit": "02c5d3ca44d8885eefc5430f685d21945c342ef3" },
+  "sonarqube.nvim": { "branch": "master", "commit": "811bf8f46e0aa5ed9c9b5783aaf6f87640df553a" },
   "symbol-usage.nvim": { "branch": "main", "commit": "e07c07dfe7504295a369281e95a24e1afa14b243" },
   "symbols-outline.nvim": { "branch": "master", "commit": "564ee65dfc9024bdde73a6621820866987cbb256" },
   "tiny-inline-diagnostic.nvim": { "branch": "main", "commit": "d9d12d4bfb9a4c5b8b8bdf7f612551df6972946c" },

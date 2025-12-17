@@ -446,35 +446,14 @@ return { -- LSP Configuration & Plugins
   },
 
   {
-    url = 'https://gitlab.com/schrieveslaach/sonarlint.nvim',
-    ft = { 'python', 'cpp', 'java' },
+    'iamkarasik/sonarqube.nvim',
+    lazy = false,
     event = 'LspAttach',
     dependencies = {
-      'williamboman/mason.nvim',
+      'nvim-lua/mason.nvim',
     },
-    config = function()
-      local mason_path = os.getenv('MASON')
-      require('sonarlint').setup({
-        server = {
-          cmd = {
-            'sonarlint-language-server',
-            -- Ensure that sonarlint-language-server uses stdio channel
-            '-stdio',
-            '-analyzers',
-            -- paths to the analyzers you need, using those for python and java in this example
-            vim.fn.expand('$MASON/share/sonarlint-analyzers/sonarpython.jar'),
-            vim.fn.expand('$MASON/share/sonarlint-analyzers/sonarcfamily.jar'),
-            vim.fn.expand('$MASON/share/sonarlint-analyzers/sonarjava.jar'),
-          },
-        },
-        filetypes = {
-          'python',
-        },
-      })
-    end,
+    config = function() require('sonarqube').setup({}) end,
   },
-  -- TODO: there is this new pluging whic probably is better
-  -- https://github.com/iamkarasik/sonarqube.nvim
 
   -- return {
   --   {

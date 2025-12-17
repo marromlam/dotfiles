@@ -1,7 +1,6 @@
 return {
   {
     'nvim-lua/plenary.nvim',
-    lazy = false,
   },
   {
     'jghauser/fold-cycle.nvim',
@@ -99,47 +98,14 @@ return {
       },
     },
   },
-  -- NEEDED? §{
-  -- NEEDED? §  'lvimuser/lsp-inlayhints.nvim',
-  -- NEEDED? §  event = 'LspAttach',
-  -- NEEDED? §  init = function()
-  -- NEEDED? §    vim.api.nvim_create_augroup('LspAttach_inlayhints', {})
-  -- NEEDED? §    vim.api.nvim_create_autocmd('LspAttach', {
-  -- NEEDED? §      group = 'LspAttach_inlayhints',
-  -- NEEDED? §      callback = function(args)
-  -- NEEDED? §        if not (args.data and args.data.client_id) then
-  -- NEEDED? §          return
-  -- NEEDED? §        end
-
-  -- NEEDED? §        local bufnr = args.buf
-  -- NEEDED? §        local client = vim.lsp.get_client_by_id(args.data.client_id)
-  -- NEEDED? §        require('lsp-inlayhints').on_attach(client, bufnr)
-  -- NEEDED? §      end,
-  -- NEEDED? §    })
-  -- NEEDED? §  end,
-  -- NEEDED? §  opts = {
-  -- NEEDED? §    inlay_hints = {
-  -- NEEDED? §      highlight = 'Comment',
-  -- NEEDED? §      labels_separator = ' ⏐ ',
-  -- NEEDED? §      parameter_hints = { prefix = '󰊕' },
-  -- NEEDED? §      type_hints = { prefix = '=> ', remove_colon_start = true },
-  -- NEEDED? §    },
-  -- NEEDED? §  },
-  -- NEEDED? §},
-  -- },
-  -- }}}
-  ------------------------------------------------------------------------
-
   {
     'tpope/vim-repeat',
-    disable = false,
     keys = { '.' },
   },
 
   {
     'noahfrederick/vim-skeleton',
     event = 'BufNewFile',
-    disable = false,
     config = function()
       vim.g.skeleton_template_dir = vim.fn.expand('~/.config/nvim')
         .. '/templates'
@@ -227,19 +193,7 @@ return {
     lazy = true,
   },
 
-  {
-    'stevearc/oil.nvim',
-    ---@module 'oil'
-    ---@type oil.SetupOpts
-    opts = {},
-    cond = false,
-    disable = true,
-    -- Optional dependencies
-    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
-    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
-    lazy = false,
-  },
+
 
   {
     'will133/vim-dirdiff',
