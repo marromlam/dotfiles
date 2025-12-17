@@ -1,7 +1,7 @@
 [include]
   path = ~/.gitconfig.local
-[includeIf "gitdir:~/Projects/work/"]
-  path = ~/Projects/work/.gitconfig.work
+[includeIf "gitdir:~/Workspaces/work/"]
+  path = ~/Workspaces/work/.gitconfig.work
 [status]
   submoduleSummary = true
 [commit]
@@ -75,6 +75,21 @@
   colorMoved = default
   navigate = true  # use n and N to move between diff sections
   renames = copies # Detect copies as well as renames.
+[diff]
+  tool = icdiff
+[difftool]
+  prompt = false
+# [difftool "icdiff"]
+#   cmd = icdiff --line-numbers $LOCAL $REMOTE
+[difftool "icdiff"]
+    cmd = icdiff --line-numbers --cols=$(tput cols) --head=5000 $LOCAL $REMOTE | less -R
+
+
+
+
+
+
+
 [delta]
   features = line-numbers decorations
 

@@ -164,6 +164,8 @@ local function dir_env(directory)
     [vim.g.dotfiles] = '$DOTFILES',
     [vim.g.projects_directory .. '/personal/dotfiles'] = '$DOTFILES',
     [vim.g.work_directory] = '$WORK',
+    ['~/Workspaces/work/'] = '$WORK',
+    ['/home/marcos/Workspaces/work/'] = '$WORK',
     [vim.env.VIMRUNTIME] = '$VIMRUNTIME',
     [vim.g.projects_directory] = '$PROJECTS',
     ['/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',

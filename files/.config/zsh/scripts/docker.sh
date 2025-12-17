@@ -117,3 +117,7 @@ showipc() {
     echo -e "  \033[1mIP Address:\033[0m" $(docker inspect -f "{{.NetworkSettings.Networks.${network}.IPAddress}}" $container) "\n"
   fi
 }
+
+
+
+alias docker-cleanup='docker system prune -a --volumes'

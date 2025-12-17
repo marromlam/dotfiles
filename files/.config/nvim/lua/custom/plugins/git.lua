@@ -259,6 +259,11 @@ return {
         desc = '[git] Get diff from left',
       },
       {
+        '<leader>gH',
+        '<cmd>0Gclog<cr>',
+        desc = '[git] Get history for current file',
+      },
+      {
         '<leader>gl',
         '<cmd>diffget //3<cr>',
         desc = '[git] Get diff from right',
@@ -340,6 +345,8 @@ return {
   {
     'ldelossa/gh.nvim',
     lazy = false,
+    cond = false,
+    disabled = true,
     dependencies = {
       {
         'ldelossa/litee.nvim',
@@ -376,6 +383,16 @@ return {
   },
 
   -- }}}
+
+  {
+    -- 'marromlam/git-worktree.nvim',
+    'ThePrimeagen/git-worktree.nvim',
+    -- dev = true,
+    -- dir = '~/Workspaces/personal/git-worktree.nvim',
+
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    lazy = false,
+  },
 }
 
 -- vim: fdm=marker

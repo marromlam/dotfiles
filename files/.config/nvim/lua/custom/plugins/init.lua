@@ -232,6 +232,8 @@ return {
     ---@module 'oil'
     ---@type oil.SetupOpts
     opts = {},
+    cond = false,
+    disable = true,
     -- Optional dependencies
     dependencies = { { 'echasnovski/mini.icons', opts = {} } },
     -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons

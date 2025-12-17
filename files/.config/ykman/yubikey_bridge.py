@@ -7,35 +7,34 @@ import sys
 YKMA_BIN = "/home/linuxbrew/.linuxbrew/bin/ykman"
 
 
-def getMessage():
+def getMessage() -> str:
     rawLength = sys.stdin.buffer.read(4)
     if len(rawLength) == 0:
         sys.exit(0)
-    messageLength = struct.unpack('@I', rawLength)[0]
-    message = sys.stdin.buffer.read(messageLength).decode('utf-8')
+    messageLength: int = struct.unpack("@I", rawLength)[0]
+    message: str = sys.stdin.buffer.read(messageLength).decode("utf-8")
     return json.loads(message)
 
 
-def encodeMessage(messageContent):
-    encodedContent = json.dumps(messageContent).encode('utf-8')
-    encodedLength = struct.pack('@I', len(encodedContent))
-    return {'length': encodedLength, 'content': encodedContent}
+def encodeMessage(messageContent: dict) -> dict:
+    encodedContent = json.dumps(messageContent).encode("utf-8")
+    encodedLength = struct.pack("@I", len(encodedContent))
+    return {"length": encodedLength, "content": encodedContent}
 
 
-def sendMessage(encodedMessage):
-    sys.stdout.buffer.write(encodedMessage['length'])
-    sys.stdout.buffer.write(encodedMessage['content'])
+def sendMessage(encodedMessage: dict):
+    sys.stdout.buffer.write(encodedMessage["length"])
+    sys.stdout.buffer.write(encodedMessage["content"])
     sys.stdout.buffer.flush()
 
 
-def getOtpCode(key):
+def getOtpCode(key: str) -> str:
     result = run(f'{YKMA_BIN} oath accounts code "{key}"')
     # result = run(f'ls')
     return result.strip().split(" ")[-1]
 
 
-def handleGenerateOtpMessage(receivedMessage):
-
+def handleGenerateOtpMessage(receivedMessage: dict):
     responseMessage = {
         "type": "otpResponse",
         "target": receivedMessage["target"],

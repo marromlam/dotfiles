@@ -11,9 +11,9 @@ local function general_overrides(dim_factor)
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
     -- Status line {{{
     -- Search count
-    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
+    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color2 } },
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
-    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
+    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color2 } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     {
       StDevEnv = {

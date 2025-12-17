@@ -4,6 +4,10 @@
 
 preview_file() {
     local file="$1"
+    # get just the filename without path
+    local filename=$(basename "$file")
+    # get just the filename without extension
+    local filename_no_ext="${filename%.*}"
     case "${file##*.}" in
     txt | md | log | cfg | ini | json)
         # Preview text files
@@ -12,6 +16,15 @@ preview_file() {
     jpg | jpeg | png | gif)
         # Preview images using timg
         timg -p s "$file"
+        echo ''
+        ;;
+    docx)
+        # Convert docx to pdf and preview using timg
+        rm -rf "$HOME/tmp/disp/_soffice/*"
+        soffice --headless --convert-to 'pdf:writer_pdf_Export:{"PageRange":{"type":"string","value":"1"}}' "$file" --outdir $HOME/tmp/disp/_soffice/ >/dev/null 2>&1
+        pdf_file="$HOME/tmp/disp/soffice.pdf"
+        mv "$HOME/tmp/disp/_soffice/$filename_no_ext.pdf" "$pdf_file"
+        timg -p q "$pdf_file"
         echo ''
         ;;
     pdf)

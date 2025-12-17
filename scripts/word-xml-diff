@@ -1,0 +1,31 @@
+FILEA=$1
+FILEB=$2
+
+CURR_DIR=$(pwd)
+rm -rf /tmp/wordA /tmp/wordB /tmp/modifiedA.docx /tmp/modifiedB.docx
+unzip "$FILEA" -d /tmp/wordA
+unzip "$FILEB" -d /tmp/wordB
+
+# Format all files containing 'xml' in their name with xmlformat
+find /tmp/wordA -name "*xml*" -type f -exec xmlformat -i {} \;
+find /tmp/wordB -name "*xml*" -type f -exec xmlformat -i {} \;
+
+# now launch neovim with the following command
+# DirDiff /tml/wordA /tmp/wordB
+nvim -c "DirDiff /tmp/wordA /tmp/wordB"
+
+# after you finish, you can rezip the files if needed
+cd /tmp/wordA && zip -r ../modifiedA.docx *
+cd /tmp/wordB && zip -r ../modifiedB.docx *
+
+# cp modified files back to current directory
+cd "$CURR_DIR"
+cp /tmp/modifiedA.docx .
+cp /tmp/modifiedB.docx .
+
+
+# cleanup
+# rm -rf /tmp/wordA /tmp/wordB
+# echo "Modified files are saved as modifiedA.docx and modifiedB.docx in /tmp directory"
+
+# vim: ft=bash

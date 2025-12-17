@@ -6,7 +6,7 @@
 
 # check if the current path is in $HOME/Projects/work
 # if so, use the work token instead of the personal one
-if [[ $PWD == $HOME/Projects/work* ]]; then
+if [[ $PWD == $HOME/Workspaces/work* ]]; then
     source $HOME/.ssh/work_token
 else
     source $HOME/.ssh/personal_token

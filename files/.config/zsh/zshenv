@@ -1,5 +1,5 @@
 export DOTFILES=$HOME/.dotfiles
-export PROJECTS_DIR=$HOME/projects
+export PROJECTS_DIR=$HOME/Workspaces
 export PERSONAL_PROJECTS_DIR=$PROJECTS_DIR/personal
 export TMPDIR=$HOME/tmp
 export VIRTUAL_ENV_DISABLE_PROMPT=1

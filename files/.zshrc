@@ -1,4 +1,6 @@
 # zsh shell config file
+# add some fancy text with mr zshrc
+
 
 
 
@@ -7,13 +9,7 @@ source $HOME/.zprofile
 # source basuc functions
 source $HOME/.config/zsh/ufunctions.sh
 source $HOME/.config/zsh/zshenv
-
-# Use a minimal prompt in Cursor to avoid command detection issues
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-  PROMPT='%n@%m:%~%# '
-  RPROMPT=''
-  return
-fi
+source $HOME/.config/zsh/conda.sh
 
 # get current environment name {{{
 
@@ -38,6 +34,14 @@ function get_env {
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # }}}
+
+
+# Use a minimal prompt in Cursor to avoid command detection issues
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+  PROMPT='%n@%m:%~%# '
+  RPROMPT=''
+  return
+fi
 
 
 # Plugins {{{
@@ -231,47 +235,14 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 # }}}
 
 
-# pyenv stuff {{{
-
-#   eval "$(pyenv init -)"
-#   if which pyenv-virtualenv-init > /dev/null; then 
-#     eval "$(pyenv virtualenv-init -)"
-#   fi
-
-# }}}
 
 
-# autoinit {{{
-
-# if [[ -n $ZSH_INIT_COMMAND ]]; then
-#   echo "Running: $ZSH_INIT_COMMAND"
-#   eval "$ZSH_INIT_COMMAND"
-# fi
-
-# }}}
 
 
 # zsh keybindings {{{
 
 # bindkey -v # enables vi mode
 bindkey -e # emacs
-#
-# export KEYTIMEOUT=1
-# bindkey ‘^R’ history-incremental-search-backward
-# bindkey '^P' up-history
-# bindkey '^N' down-history
-# bindkey '^U' autosuggest-accept
-
-
-# bindkey -s '^o' 'nvim $(fzf)^M'
-# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
-# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
-# bindkey -s '^G' '$($HOME/.dotfiles/scripts/rgfzf)^M'
-# bindkey -M '^f' fzf-history-widget
-rgfzf-widget() ${HOME}/.dotfiles/scripts/rgfzf
-zle -N rgfzf-widget
-bindkey '^g' rgfzf-widget
-
 # }}}
 
 
@@ -282,7 +253,6 @@ source $HOME/.config/zsh/aliases.sh
 
 # common settings for bash and zsh
 source $HOME/.config/zsh/common.sh
-source $HOME/.config/zsh/conda.sh
 source $HOME/.config/zsh/tmux_aliases.sh
 source $HOME/.config/zsh/scripts/fzf.sh
 source $HOME/.config/zsh/scripts/docker.sh
@@ -291,17 +261,11 @@ source $HOME/.config/zsh/scripts/docker.sh
 # source local config file, if exists
 [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
 
-
-tmux-sessionizer-widget() ${HOME}/.dotfiles/scripts/tmux-sessionizer
-zle -N tmux-sessionizer-widget
-bindkey '^t' tmux-sessionizer-widget
-
-# bindkey -s '^t' "^u^M"
-
-
 # auto activate environment on .aa-env file
 # eval "$(direnv hook zsh)"
 # source $(brew --prefix)/opt/autoenv/activate.sh
+export DIRENV_LOG_FORMAT=""
+eval "$(asdf exec direnv hook zsh)"
 
 alias docker-cleanup='docker system prune -a --volumes'
 

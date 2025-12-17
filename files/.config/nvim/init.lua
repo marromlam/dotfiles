@@ -7,7 +7,8 @@ vim.g.dev_environ = ''
 vim.g.dotfiles = vim.env.DOTFILES or vim.fn.expand('~/.dotfiles')
 vim.g.vim_dir = vim.g.dotfiles .. '/.config/nvim'
 
-vim.g.projects_directory = vim.fn.expand('~/Projects')
+-- vim.g.projects_directory = vim.fn.expand('~/Projects')
+vim.g.projects_directory = vim.fn.expand('~/Workspaces/')
 vim.g.personal_directory = vim.g.projects_directory .. '/personal'
 vim.g.work_directory = vim.g.projects_directory .. '/work'
 
@@ -102,10 +103,12 @@ endfunction
 nnoremap <leader>gF :call GoToColumnInFile(expand("<cWORD>"))<CR>
 ]])
 
-vim.cmd([[
-set diffopt+=inline:char
-]])
-
+-- enable if neovim >= 0.12
+if vim.fn.has('nvim-0.12') == 1 then
+  vim.cmd([[
+  set diffopt+=inline:char
+  ]])
+end
 -- }}}
 --------------------------------------------------------------------------------
 

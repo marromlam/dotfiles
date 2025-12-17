@@ -1,0 +1,22 @@
+if [ $# -ne 2 ]; then
+  echo "Usage: gwnb <new-branch-name> <base-branch>"
+  return 1
+fi
+
+new_branch=$1
+base_branch=$2
+
+# Ensure base branch exists locally
+git fetch origin "$base_branch" --quiet
+
+# Create worktree and new branch
+# git worktree add "$new_branch" "$base_branch"
+# Create a new worktree with a new branch based on the base branch
+git worktree add "$new_branch" -b "$new_branch" "$base_branch" || return 1
+
+# Navigate into the new worktree and set up the new branch
+cd "$new_branch" || exit
+# git switch -c "$new_branch"
+
+
+# vim: ft=bash

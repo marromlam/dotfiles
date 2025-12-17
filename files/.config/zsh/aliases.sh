@@ -4,15 +4,12 @@
 
 if [[ "$(uname)" == "Darwin" ]]; then
     alias clc="clear && printf '\e[3J'" # clear terminal window and clean history
-        # ls does not work on macos as it uses a BSD version
-        alias ls='eza --icons'
-        # alias ll="ls -lrth" # show list of directory
-        alias ll="eza -lr --icons" # show list of directory
+    alias ls='eza --icons'
+    alias ll="eza -lr --icons" # show list of directory
 else
     alias clc="/bin/clear && printf '\e[3J'" # clear terminal window and clean history
-        alias ls='eza --icons'
-        # alias ls="ls --color=auto"
-        alias ll="eza -lr --icons" # show list of directory
+    alias ls='eza --icons'
+    alias ll="eza -lr --icons" # show list of directory
 fi
 
 # }}}
@@ -287,7 +284,7 @@ select_partition() {
 # Docker {{{
 
 dcu(){
-    docker-service
+    # docker-service
     docker compose up -d
 }
 

@@ -233,23 +233,21 @@ return { -- LSP Configuration & Plugins
         -- clangd = {},
         -- gopls = {},
         basedpyright = {
+          on_attach = function(client, bufnr)
+            -- Disable diagnostics from basedpyright
+            client.server_capabilities.diagnosticProvider = false
+          end,
           settings = {
-            pyright = {
-              disableOrganizeImports = true, -- Using Ruff
-            },
             python = {
               analysis = {
-                ignore = { '*' }, -- Using Ruff
-                typeCheckingMode = 'off', -- Using mypy
+                typeCheckingMode = 'off',
                 diagnosticMode = 'openFilesOnly',
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
               },
             },
             basedpyright = {
-              disableOrganizeImports = true, -- Using Ruff
-              analysis = {
-                ignore = { '*' }, -- Using Ruff
-                typeCheckingMode = 'off', -- Using mypy
-              },
+              disableOrganizeImports = true,
             },
           },
         },
@@ -295,6 +293,9 @@ return { -- LSP Configuration & Plugins
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'flake8',
+        'mypy',
+        'black',
+        'sonarlint-language-server',
       })
       require('mason-tool-installer').setup({
         ensure_installed = ensure_installed,
@@ -472,6 +473,8 @@ return { -- LSP Configuration & Plugins
       })
     end,
   },
+  -- TODO: there is this new pluging whic probably is better
+  -- https://github.com/iamkarasik/sonarqube.nvim
 
   -- return {
   --   {

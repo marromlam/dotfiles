@@ -1,4 +1,4 @@
-DOCKER_DISTRO="Ubuntu"
+DOCKER_DISTRO="Ubuntu-24.04"
 DOCKER_DIR=/mnt/wsl/shared-docker
 export DOCKER_SOCK="$DOCKER_DIR/docker.sock"
 export DOCKER_HOST="unix://$DOCKER_SOCK"

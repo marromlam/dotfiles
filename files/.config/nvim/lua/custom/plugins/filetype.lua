@@ -130,7 +130,7 @@ return {
   {
     'marromlam/nvim-docx.nvim',
     name = 'nvim-docx',
-    dir = '~/Projects/personal/nvim-docx',
+    dir = '~/Workspaces/personal/nvim-docx',
     dev = true,
     lazy = false,
     keys = {

@@ -3,10 +3,10 @@
 # WARNING: Do no install on a non-WSL system, it will break your xdg-open!
 
 # Skip installation if not on WSL
-if [ ! -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
-	echo "Not on WSL"
-	exit 0
-fi
+# if [ ! -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+# 	echo "Not on WSL"
+# 	exit 0
+# fi
 
 # Skip installation if xdg-open is already installed
 if [ -f $HOMEBREW_PREFIX/Cellar/xdg-open/xdg_open_wsl.py ]; then
