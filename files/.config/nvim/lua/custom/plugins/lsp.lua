@@ -7,8 +7,8 @@ return { -- LSP Configuration & Plugins
     event = { 'BufReadPre' },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true },
-      { 'williamboman/mason-lspconfig.nvim', opts = {} },
+      { 'mason-org/mason.nvim', config = true },
+      { 'mason-org/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
 
       -- Useful status updates for LSP.
@@ -450,7 +450,7 @@ return { -- LSP Configuration & Plugins
     lazy = false,
     event = 'LspAttach',
     dependencies = {
-      'nvim-lua/mason.nvim',
+      'mason-org/mason.nvim',
     },
     config = function() require('sonarqube').setup({}) end,
   },

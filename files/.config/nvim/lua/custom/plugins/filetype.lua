@@ -131,6 +131,8 @@ return {
     'marromlam/nvim-docx.nvim',
     name = 'nvim-docx',
     dir = '~/Workspaces/personal/nvim-docx',
+    disable = true,
+    cond = false,
     dev = true,
     lazy = false,
     keys = {
