@@ -33,6 +33,10 @@ require('lazy').setup({
   diff = {
     cmd = 'diffview.nvim',
   },
+  checker = {
+    enabled = true,
+    notify = false,
+  },
 
   dev = {
     path = '/Users/marcos/Projects/personal/',

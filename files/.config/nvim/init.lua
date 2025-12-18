@@ -1,5 +1,10 @@
 -- Init lua
 
+-- Enable vim.loader for faster startup (Folke's pattern)
+if vim.loader then
+  vim.loader.enable()
+end
+
 vim.g.os = vim.loop.os_uname().sysname
 vim.g.open_command = vim.g.os == 'Darwin' and 'open' or 'xdg-open'
 vim.g.dev_environ = ''
