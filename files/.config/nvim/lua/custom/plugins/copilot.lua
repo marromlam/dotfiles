@@ -324,7 +324,6 @@ return {
       'stevearc/dressing.nvim',
       'nvim-lua/plenary.nvim',
       'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons',
       'zbirenbaum/copilot.lua',
       {
         'HakonHarnes/img-clip.nvim', -- support for image pasting
@@ -340,8 +339,7 @@ return {
         'MeanderingProgrammer/render-markdown.nvim',
         dependencies = {
           'nvim-treesitter/nvim-treesitter',
-          'nvim-tree/nvim-web-devicons',
-        }, -- if you prefer nvim-web-devicons
+        },
         opts = { file_types = { 'markdown', 'Avante' } },
         ft = { 'markdown', 'Avante' },
       },

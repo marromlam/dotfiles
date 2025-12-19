@@ -172,7 +172,6 @@ return {
     dependencies = {
       'nvim-lua/plenary.nvim',
       'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons',
       {
         'ten3roberts/window-picker.nvim',
         name = 'window-picker',

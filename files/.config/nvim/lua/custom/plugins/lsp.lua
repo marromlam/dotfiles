@@ -490,7 +490,11 @@ return { -- LSP Configuration & Plugins
   --     },
   --   },
   --   {
-  --     "smjonas/inc-rename.nvim",
+  {
+    'smjonas/inc-rename.nvim',
+    cmd = 'IncRename',
+    config = true,
+  },
   --     opts = { hl_group = "Visual", preview_empty_name = true },
   --     keys = {
   --       {

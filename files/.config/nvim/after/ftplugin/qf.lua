@@ -6,21 +6,30 @@ vim.opt_local.signcolumn = 'yes'
 vim.opt_local.buflisted = false
 vim.opt_local.winfixheight = true
 
-map(
+vim.keymap.set(
   'n',
   'dd',
   mrl.list.qf.delete,
-  { desc = '[qf] delete current quickfix entry', buffer = 0 }
+  { buffer = 0, desc = '[qf] delete current quickfix entry' }
 )
-map(
+vim.keymap.set(
   'v',
   'd',
   mrl.list.qf.delete,
-  { desc = '[qf] delete selected quickfix entry', buffer = 0 }
+  { buffer = 0, desc = '[qf] delete selected quickfix entry' }
 )
-
-map('n', 'H', ':colder<CR>', { buffer = 0 })
-map('n', 'L', ':cnewer<CR>', { buffer = 0 })
+vim.keymap.set(
+  'n',
+  'H',
+  ':colder<CR>',
+  { buffer = 0, desc = '[qf] older quickfix list' }
+)
+vim.keymap.set(
+  'n',
+  'L',
+  ':cnewer<CR>',
+  { buffer = 0, desc = '[qf] newer quickfix list' }
+)
 
 -- force quickfix to open beneath all other splits
 vim.cmd.wincmd('J')

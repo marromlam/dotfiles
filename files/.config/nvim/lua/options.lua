@@ -1,3 +1,17 @@
+-- Make all keymaps silent by default (Folke's pattern)
+local keymap_set = vim.keymap.set
+vim.keymap.set = function(mode, lhs, rhs, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  return keymap_set(mode, lhs, rhs, opts)
+end
+
+-- Disable unused providers (Folke's pattern)
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+
 -- Message output on vim actions {{{
 vim.opt.shortmess = {
   t = true, -- truncate file messages at start
@@ -100,9 +114,7 @@ vim.opt.conceallevel = 2
 vim.opt.breakindent = true
 vim.opt.breakindentopt = 'sbr'
 vim.opt.linebreak = true -- lines wrap at words rather than random characters
--- vim.opt.signcolumn = "yes:1"
 vim.opt.signcolumn = 'yes'
--- vim.opt.signcolumn = "no"
 vim.opt.ruler = false
 vim.opt.cmdheight = 0
 vim.opt.showbreak = [[↪ ]] -- Options include -> '…', '↳ ', '→','↪ '
@@ -152,10 +164,8 @@ vim.opt.guicursor = {
   'a:blinkon0',
 }
 vim.opt.cursorlineopt = { 'both' }
--- vim.opt.cursorline = true
 
 -- Title
--- vim.opt.titleold = vim.fn.fnamemodify(vim.loop.os_getenv('SHELL'), ':t')
 vim.opt.title = true
 vim.opt.titlelen = 70
 
@@ -180,7 +190,7 @@ vim.opt.jumpoptions = { 'stack' } -- make the jumplist behave like a browser sta
 -- Backup and swaps
 vim.opt.backup = false
 vim.opt.undofile = true
-vim.opt.undodir = os.getenv('HOME') .. '/.vim/undodir'
+vim.opt.undodir = vim.fn.stdpath('state') .. '/undo'
 vim.opt.swapfile = false
 
 -- Match and search
@@ -190,7 +200,6 @@ vim.opt.wrapscan = true -- Searches wrap around the end of the file
 vim.opt.scrolloff = 9
 vim.opt.sidescrolloff = 10
 vim.opt.sidescroll = 1
------------------------------------------------------------------------------//
 
 -- }}}
 
@@ -210,17 +219,36 @@ vim.opt.spellcapcheck = '' -- don't check for capital letters at start of senten
 vim.opt.mouse = 'a'
 vim.opt.mousefocus = true
 vim.opt.mousemoveevent = true
-vim.opt.mousescroll = { 'ver:1', 'hor:6' }
------------------------------------------------------------------------------//
--- Allow project local vimrc files example, .nvim.lua or .nvimrc see :h exrc
--- netrw {{{
+vim.opt.mousescroll = 'ver:1,hor:4'
+-- Netrw {{{
 vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 -- }}}
---
+
 vim.opt.isfname:append('@-@')
 
+-- Diagnostics
 vim.diagnostic.config({ virtual_text = false })
 
--- vim: fdm=marker
+-- Custom filetype detection (Folke's pattern)
+vim.filetype.add({
+  extension = {
+    overlay = 'dts',
+    keymap = 'dts',
+  },
+  filename = {
+    Caddyfile = 'caddy',
+  },
+  pattern = {
+    ['.*'] = {
+      function(path, bufnr)
+        local content = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1] or ''
+        if content:match('^%w+ %d+ %d%d:%d%d:') then
+          return 'log'
+        end
+      end,
+      { priority = -math.huge },
+    },
+  },
+})

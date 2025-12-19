@@ -1,5 +1,19 @@
 return {
   {
+    'folke/twilight.nvim',
+    opts = {
+      -- Dim inactive code
+    },
+  },
+  {
+    'folke/ts-comments.nvim',
+    opts = {
+      langs = {
+        dts = '// %s',
+      },
+    },
+  },
+  {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,

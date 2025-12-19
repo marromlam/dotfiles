@@ -1,8 +1,5 @@
---- Copilot are you working?  I'm working, I'm working.
----
----
-local fn, api, v, env, cmd, fmt =
-  vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
+local fn, api, v, fmt =
+  vim.fn, vim.api, vim.v, string.format
 
 -- colors {{{
 
@@ -18,15 +15,9 @@ function mrl.get_hi(name, id)
 end
 
 -- }}}
-
---------------------------------------------------------------------------------
--- checkers {{{
 --------------------------------------------------------------------------------
 
--- }}}
---------------------------------------------------------------------------------
-
--- commands {{{
+-- Commands {{{
 function mrl.command(name, rhs, opts)
   opts = opts or {}
   api.nvim_create_user_command(name, rhs, opts)
@@ -132,29 +123,7 @@ function mrl.has(feature) return fn.has(feature) > 0 end
 -- }}}
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
--- resize {{{
---------------------------------------------------------------------------------
-
---- Autosize horizontal split to match its minimum content
---- https://vim.fandom.com/wiki/Automatically_fitting_a_quickfix_window_height
----@param min_height number
----@param max_height number
-function mrl.adjust_split_height(min_height, max_height)
-  vim.api.nvim_win_set_height(
-    0,
-    math.max(math.min(vim.fn.line('$'), max_height), min_height)
-  )
-end
-
--- }}}
---------------------------------------------------------------------------------
----
----
----
----
----
-
+-- Functional utilities {{{
 function mrl.fold(callback, list, accum)
   accum = accum or {}
   for k, v in pairs(list) do
@@ -176,7 +145,7 @@ function mrl.map(callback, list)
 end
 
 --------------------------------------------------------------------------------
--- Autcommand group {{{
+-- Autocommand group {{{
 --------------------------------------------------------------------------------
 
 local autocmd_keys =
@@ -276,10 +245,8 @@ end
 
 -- }}}
 -------------------------------------------------------------------------------
----
----
----
 
+-- Window utilities {{{
 --- Autosize horizontal split to match its minimum content
 --- https://vim.fandom.com/wiki/Automatically_fitting_a_quickfix_window_height
 ---@param min_height number
@@ -290,8 +257,10 @@ function mrl.adjust_split_height(min_height, max_height)
     math.max(math.min(fn.line('$'), max_height), min_height)
   )
 end
+-- }}}
+--------------------------------------------------------------------------------
 
--- strings {{{
+-- String utilities {{{
 
 ---Truncate a string to a maximum length
 ---@param str string
@@ -304,5 +273,3 @@ function mrl.truncate(str, max_len)
     or str
 end
 -- }}}
-
--- vim: fdm=marker
