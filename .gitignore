@@ -94,3 +94,4 @@ package.sjon
 # other stuff
 files/.config/pdftex-figures/roots
 files/.config/browsh/firefox_profile
+files/.config/kitty/kitty.conf.bak
