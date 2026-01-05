@@ -41,17 +41,25 @@ return {
   -- },
 
   {
-    'Bekaboo/dropbar.nvim',
-    event = { 'BufReadPre', 'BufNewFile' },
-    -- cond = false,
-    -- disable = true,
-    keys = {
-      {
-        '<leader>wp',
-        function() require('dropbar.api').pick() end,
-        desc = 'winbar: pick',
-      },
-    },
+    'SmiteshP/nvim-navic',
+    event = 'LspAttach',
+    config = function()
+      require('nvim-navic').setup({
+        highlight = true,
+        separator = ' › ',
+        depth_limit = 5,
+        depth_limit_indicator = '..',
+      })
+      -- Attach navic to LSP clients
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client.server_capabilities.documentSymbolProvider then
+            require('nvim-navic').attach(client, args.buf)
+          end
+        end,
+      })
+    end,
   },
 
   {

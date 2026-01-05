@@ -1,4 +1,21 @@
-if not mrl or not mrl.ui.statusline.enable then return end
+if
+  not mrl
+  or not mrl.ui
+  or not mrl.ui.statusline
+  or not mrl.ui.statusline.enable
+then
+  return
+end
+
+-- Wait for icons to be available
+if not mrl.ui.icons then
+  vim.schedule(function()
+    if mrl and mrl.ui and mrl.ui.icons then
+      dofile(vim.fn.expand('<sfile>:p'))
+    end
+  end)
+  return
+end
 
 mrl.ui.statusline = {}
 
@@ -90,14 +107,13 @@ local identifiers = {
   }),
 }
 
-local function get_ft_icon_hl_name(hl) return hl .. hls.statusline end
-
 --- @param buf number
 --- @param opts { default: boolean }
 --- @return string, string?
 local function get_buffer_icon(buf, opts)
   local path = api.nvim_buf_get_name(buf)
   if fn.isdirectory(path) == 1 then return '', nil end
+  -- Use mini.icons if available (mocks nvim-web-devicons API)
   local ok, devicons = pcall(require, 'nvim-web-devicons')
   if not ok then return '', nil end
   local name, ext = fn.fnamemodify(path, ':t'), fn.fnamemodify(path, ':e')
@@ -150,11 +166,11 @@ local function with_sep(path)
   return (not falsy(path) and path:sub(-1) ~= sep) and path .. sep or path
 end
 
---- Replace the directory path with an identifier if it matches a commonly visited
---- directory of mine such as my projects directory or my work directory
---- since almost all my project directories are nested underneath one of these paths
---- this should match often and reduce the unnecessary boilerplate in my path as
---- I know where these directories are generally
+--- Replace the directory path with an identifier if it matches a commonly
+--- visited directory of mine such as my projects directory or my work directory
+--- since almost all my project directories are nested underneath one of these
+--- paths this should match often and reduce the unnecessary boilerplate in my
+--- path as I know where these directories are generally
 ---@param directory string
 ---@return string directory
 ---@return string custom_dir
@@ -168,6 +184,9 @@ local function dir_env(directory)
     ['/home/marcos/Workspaces/work/'] = '$WORK',
     [vim.env.VIMRUNTIME] = '$VIMRUNTIME',
     [vim.g.projects_directory] = '$PROJECTS',
+    ['/home/marcos/Projects/'] = '$WORKSPACES',
+    ['/home/marcos/Projects/personal/dotfiles/'] = '$DOTFILES',
+    ['~/Projects/personal/dotfiles/'] = '$DOTFILES',
     ['/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
     ['~/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
     [vim.env.HOME] = '~',
@@ -192,7 +211,7 @@ local function filename(ctx)
 
   local path = api.nvim_buf_get_name(buf)
   if falsy(path) then return { fname = '' } end
-  --- add ":." to the expansion i.e. to make the directory path relative to the current vim directory
+
   local parts = vim.split(path, sep)
   local fname = table.remove(parts)
 
@@ -207,8 +226,8 @@ local function filename(ctx)
 
   local dir = with_sep(table.concat(parts, sep))
   local new_dir, env = dir_env(dir)
-  local segment = not falsy(env) and env .. new_dir or dir
-  if strwidth(segment) > math.floor(vim.o.columns / 3) then
+  local max_dir_width = math.floor(vim.o.columns / 3)
+  if strwidth(env .. new_dir) > max_dir_width then
     new_dir = fn.pathshorten(new_dir)
   end
 
@@ -251,22 +270,80 @@ local function stl_file(ctx)
   }
 end
 
+--- Get navic breadcrumb for statusline
+--- @param ctx StatuslineContext
+--- @return table?
+local function get_navic_breadcrumb(ctx)
+  local ok, navic_module = pcall(require, 'custom.navic')
+  if not ok then return nil end
+
+  -- Check availability for the buffer we're rendering
+  if not navic_module.is_available(ctx.bufnum) then return nil end
+
+  -- navic.get_location() uses current buffer context, so call without bufnr
+  -- In statusline render, we're rendering for ctx.bufnum, so we need to be in
+  -- that context
+  -- But since navic.get_location() doesn't take bufnr, we'll call it directly
+  local ok_navic, navic = pcall(require, 'nvim-navic')
+  if not ok_navic then return nil end
+
+  local location = navic.get_location()
+  if not location or location == '' then return nil end
+
+  -- Extract text identifiers from navic's formatted string
+  -- Format: %#NavicIconsFunction#󰊕 %*%#NavicText#test_linear_fit%*
+  -- Extract content between # and %*, filter to keep only text identifiers
+  local parts = {}
+  for content in location:gmatch('%%#[^#]*#([^%%]*)%%%*') do
+    if content and content ~= '' then
+      local text = content:match('^%s*(.-)%s*$')
+      -- Keep only identifier-like text (alphanumeric + underscore, length > 1)
+      -- This filters out single-character icons
+      if text and text ~= '' and text:match('^[%w_]+$') and #text > 1 then
+        table.insert(parts, text)
+      end
+    end
+  end
+
+  if #parts == 0 then return nil end
+
+  -- Join with separator
+  local breadcrumb_text = table.concat(parts, ' › ')
+
+  return {
+    {
+      { '::', 'StFaded' },
+      { breadcrumb_text, 'StFaded' },
+      { space, 'StSeparator' },
+    },
+    priority = 4,
+  }
+end
+
 local function diagnostic_info(context)
   local diagnostics = vim.diagnostic.get(context.bufnum)
   local severities = vim.diagnostic.severity
   local lsp_icons = mrl.ui.icons.lsp
+  if vim.tbl_isempty(diagnostics) then
+    return {
+      error = { count = 0, icon = lsp_icons.error },
+      warn = { count = 0, icon = lsp_icons.warn },
+      info = { count = 0, icon = lsp_icons.info },
+      hint = { count = 0, icon = lsp_icons.hint },
+    }
+  end
+
   local result = {
     error = { count = 0, icon = lsp_icons.error },
     warn = { count = 0, icon = lsp_icons.warn },
     info = { count = 0, icon = lsp_icons.info },
     hint = { count = 0, icon = lsp_icons.hint },
   }
-  if vim.tbl_isempty(diagnostics) then return result end
-  return vim.iter(diagnostics):fold(result, function(accum, item)
+  for _, item in ipairs(diagnostics) do
     local severity = severities[item.severity]:lower()
-    accum[severity].count = accum[severity].count + 1
-    return accum
-  end)
+    result[severity].count = result[severity].count + 1
+  end
+  return result
 end
 
 local function debugger()
@@ -348,12 +425,12 @@ local function run_task_on_interval(interval, task)
 end
 
 --- Check if in a git repository
---- NOTE: This check is incredibly naive and depends on the fact that I use a
---- rooter function to and am always at the root of a repository
+---@param win_id number?
 ---@return boolean
 local function is_git_repo(win_id)
   win_id = win_id or api.nvim_get_current_win()
-  return vim.uv.fs_stat(fmt('%s/.git', fn.getcwd(win_id)))
+  local cwd = fn.getcwd(win_id)
+  return cwd and vim.uv.fs_stat(cwd .. '/.git') ~= nil
 end
 
 -- Use git and the native job API to first get the head of the repo
@@ -365,17 +442,20 @@ local function update_git_status()
   local result = {}
   fn.jobstart('git rev-list --count --left-right @{upstream}...HEAD', {
     stdout_buffered = true,
-    on_stdout = function(_, data, _)
+    on_stdout = function(_, data)
       for _, item in ipairs(data) do
         if item and item ~= '' then table.insert(result, item) end
       end
     end,
-    on_exit = function(_, code, _)
-      if code > 0 and not result or not result[1] then return end
-      local parts = vim.split(result[1], '\t')
-      if parts and #parts > 1 then
-        local formatted = { behind = parts[1], ahead = parts[2] }
-        vim.g.git_statusline_updates = formatted
+    on_exit = function(_, code)
+      if code == 0 and result[1] then
+        local parts = vim.split(result[1], '\t')
+        if #parts == 2 then
+          vim.g.git_statusline_updates = {
+            behind = parts[1],
+            ahead = parts[2],
+          }
+        end
       end
     end,
   })
@@ -440,7 +520,7 @@ function mrl.ui.statusline.render()
 
   local plain = is_plain(ctx)
   local file_modified = is_modified(ctx, icons.misc.pencil)
-  local focused = vim.g.vim_in_focus or true
+  local focused = vim.g.vim_in_focus ~= false
 
   ----------------------------------------------------------------------------//
   -- Setup
@@ -454,7 +534,7 @@ function mrl.ui.statusline.render()
     cond = true,
   })
 
-  -- filename {{{
+  -- Filename components
   local path = stl_file(ctx)
   local readonly_component =
     { { { is_readonly(ctx), 'StFaded' } }, priority = 1 }
@@ -478,7 +558,6 @@ function mrl.ui.statusline.render()
   -- Variables
   -----------------------------------------------------------------------------//
 
-  -- local mode, mode_hl = stl_mode()
   local lnum, col = unpack(api.nvim_win_get_cursor(curwin))
   col = col + 1 -- this should be 1-indexed, but isn't by default
   local line_count = api.nvim_buf_line_count(ctx.bufnum)
@@ -489,11 +568,6 @@ function mrl.ui.statusline.render()
   local ahead = updates.ahead and tonumber(updates.ahead) or 0
   local behind = updates.behind and tonumber(updates.behind) or 0
 
-  -----------------------------------------------------------------------------//
-  -- local ok, noice = pcall(require, 'noice')
-  -- local noice_mode = ok and noice.api.status.mode.get() or ''
-  -- local has_noice_mode = ok and noice.api.status.mode.has() or false
-  -----------------------------------------------------------------------------//
   local lazy_ok, lazy = pcall(require, 'lazy.status')
   local pending_updates = lazy_ok and lazy.updates() or nil
   local has_pending_updates = lazy_ok and lazy.has_updates() or false
@@ -501,27 +575,33 @@ function mrl.ui.statusline.render()
   -- LSP
   -----------------------------------------------------------------------------//
   local diagnostics = diagnostic_info(ctx)
-  local lsp_clients = vim
-    .iter(ipairs(stl_lsp_clients(ctx)))
-    :map(function(_, client)
-      return {
+  -- Build LSP clients list (optimized: replaced vim.iter with simple loop)
+  local lsp_clients_list = stl_lsp_clients(ctx)
+  local lsp_clients = {}
+  for idx, client in ipairs(lsp_clients_list) do
+    local component_opts = {
+      {
         {
-          {
-            -- client.name == 'GitHub Copilot' and icons.misc.copilot .. ' ' or client.name,
-            client.name == 'copilot' and icons.misc.copilot .. ' '
-              or client.name,
-            'StFaded',
-          },
-          { space, 'StSeparator' },
-          { '', 'StFaded' },
+          client.name == 'copilot' and icons.misc.copilot .. ' ' or client.name,
+          'StFaded',
         },
-        priority = client.priority,
-      }
-    end)
-    :totable()
-  table.insert(lsp_clients[1][1], 1, { icons.misc.clippy .. ': ', 'StTitle' })
-  lsp_clients[1].id = LSP_COMPONENT_ID -- the unique id of the component
-  lsp_clients[1].click = 'v:lua.mrl.ui.statusline.lsp_client_click'
+        { space, 'StSeparator' },
+        { '', 'StFaded' },
+      },
+      priority = client.priority,
+    }
+    -- Add icon prefix and click handler to first client
+    if idx == 1 and #lsp_clients_list > 0 then
+      table.insert(
+        component_opts[1],
+        1,
+        { icons.misc.clippy .. ': ', 'StTitle' }
+      )
+      component_opts.id = LSP_COMPONENT_ID
+      component_opts.click = 'v:lua.mrl.ui.statusline.lsp_client_click'
+    end
+    table.insert(lsp_clients, component_opts)
+  end
   -----------------------------------------------------------------------------//
   -- Left section
   -----------------------------------------------------------------------------//
@@ -531,8 +611,6 @@ function mrl.ui.statusline.render()
       cond = ctx.modified,
       priority = 1,
     },
-    -- readonly_component ,
-    -- { { { mode, mode_hl } }, priority = 0 },
     {
       { { search_count(), 'StSearchCount' } },
       cond = vim.v.hlsearch > 0,
@@ -542,6 +620,7 @@ function mrl.ui.statusline.render()
     path.dir,
     path.parent,
     path.file,
+    get_navic_breadcrumb(ctx),
     {
       {
         { space, 'StSeparator' },
@@ -733,7 +812,19 @@ vim.g.qf_disable_statusline = 1
 -- set the statusline
 vim.o.statusline = '%{%v:lua.mrl.ui.statusline.render()%}'
 
-mrl.augroup('CustomStatusline', {
+-- Helper to safely call augroup
+local function augroup(name, ...)
+  local args = { ... }
+  if mrl and mrl.augroup then
+    return mrl.augroup(name, unpack(args))
+  else
+    vim.schedule(function()
+      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
+    end)
+  end
+end
+
+augroup('CustomStatusline', {
   event = 'FocusGained',
   command = function() vim.g.vim_in_focus = true end,
 }, {
