@@ -1,16 +1,22 @@
 if not mrl then return end
 
--- local lsp, fs, fn, api, fmt = vim.lsp, vim.fs, vim.fn, vim.api, string.format
-local diagnostic = vim.diagnostic
-local L, S = vim.lsp.log_levels, vim.diagnostic.severity
--- local M = vim.lsp.protocol.Metho
+-- Wait for icons to be available
+if not mrl.ui or not mrl.ui.icons or not mrl.ui.icons.lsp then
+  vim.schedule(function()
+    if mrl and mrl.ui and mrl.ui.icons and mrl.ui.icons.lsp then
+      -- Re-source this file
+      dofile(vim.fn.expand('<sfile>:p'))
+    end
+  end)
+  return
+end
 
+-- Optimized: Cache severity constants and icons lookup
+local S = vim.diagnostic.severity
 local icons = mrl.ui.icons.lsp
--- local border = mrl.ui.current.border
 
--- Diagnostics
--------------------------------------------------------------------------------
-diagnostic.config({
+-- Diagnostics configuration (optimized for startup time)
+vim.diagnostic.config({
   underline = true,
   update_in_insert = false,
   severity_sort = true,
@@ -29,29 +35,4 @@ diagnostic.config({
       [S.ERROR] = 'DiagnosticSignErrorLine',
     },
   },
-  -- virtual_text = false and {
-  --   severity = { min = S.WARN },
-  --   spacing = 1,
-  --   prefix = function(d)
-  --     local level = diagnostic.severity[d.severity]
-  --     return icons[level:lower()]
-  --   end,
-  -- },
-  -- float = {
-  --   -- max_width = max_width,
-  --   -- max_height = max_height,
-  --   border = border,
-  --   title = {
-  --     { '  ', 'DiagnosticFloatTitleIcon' },
-  --     { 'Problems  ', 'DiagnosticFloatTitle' },
-  --   },
-  --   focusable = true,
-  --   scope = 'cursor',
-  --   source = 'if_many',
-  --   prefix = function(diag)
-  --     local level = diagnostic.severity[diag.severity]
-  --     local prefix = fmt('%s ', icons[level:lower()])
-  --     return prefix, 'Diagnostic' .. level:gsub('^%l', string.upper)
-  --   end,
-  -- },
 })

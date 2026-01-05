@@ -1,5 +1,18 @@
 if not mrl then return end
 
+-- Helper to safely call augroup, deferring if not available yet
+local function augroup(name, ...)
+  local args = { ... }
+  if mrl and mrl.augroup then
+    return mrl.augroup(name, unpack(args))
+  else
+    -- Defer until augroup is available
+    vim.schedule(function()
+      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
+    end)
+  end
+end
+
 local fn, api, v, env, cmd, fmt =
   vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
 
@@ -30,7 +43,7 @@ local function hl_search()
   if col < p_start or col > p_end then stop_hl() end
 end
 
-mrl.augroup('VimrcIncSearchHighlight', {
+augroup('VimrcIncSearchHighlight', {
   event = { 'CursorMoved' },
   command = function() hl_search() end,
 }, {
@@ -88,7 +101,7 @@ local function hl_search()
   if col < p_start or col > p_end then stop_hl() end
 end
 
-mrl.augroup('VimrcIncSearchHighlight', {
+augroup('VimrcIncSearchHighlight', {
   event = { 'CursorMoved' },
   command = function() hl_search() end,
 }, {
@@ -131,7 +144,7 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
 
 -- }}}
 
-mrl.augroup('UpdateVim', {
+augroup('UpdateVim', {
   event = { 'FocusLost' },
   pattern = { '*' },
   command = 'silent! wall',
@@ -289,7 +302,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
 -- }}}
 
 -- Cursorline only in active window (Folke's pattern)
-vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
+vim.api.nvim_create_autocmd({ 'InsertLeave', 'WinEnter' }, {
   callback = function()
     if vim.w.auto_cursorline then
       vim.wo.cursorline = true
@@ -297,12 +310,64 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "WinEnter" }, {
     end
   end,
 })
-vim.api.nvim_create_autocmd({ "InsertEnter", "WinLeave" }, {
+vim.api.nvim_create_autocmd({ 'InsertEnter', 'WinLeave' }, {
   callback = function()
     if vim.wo.cursorline then
       vim.w.auto_cursorline = true
       vim.wo.cursorline = false
     end
+  end,
+})
+
+-- Copy pyrightconfig.json to git repo root
+local function copy_pyrightconfig()
+  local buf_path = api.nvim_buf_get_name(api.nvim_get_current_buf())
+  if buf_path == '' then return end
+
+  -- Find git root using vim.fs.find (more efficient)
+  local git_root_file = vim.fs.find('.git', {
+    path = vim.fs.dirname(buf_path),
+    upward = true,
+  })[1]
+
+  -- If no .git found, skip
+  if not git_root_file then return end
+
+  local git_root = vim.fs.dirname(git_root_file)
+
+  -- Source and destination paths
+  local source = vim.g.vim_dir .. '/../pyright/pyrightconfig.json'
+  local dest = git_root .. '/pyrightconfig.json'
+
+  -- Check if source exists
+  if fn.filereadable(source) ~= 1 then return end
+
+  -- Copy file if destination doesn't exist or is different
+  local should_copy = false
+  if fn.filereadable(dest) ~= 1 then
+    should_copy = true
+  else
+    -- Compare file contents (simple check)
+    local source_content = fn.readfile(source)
+    local dest_content = fn.readfile(dest)
+    if
+      table.concat(source_content, '\n') ~= table.concat(dest_content, '\n')
+    then
+      should_copy = true
+    end
+  end
+
+  if should_copy then fn.writefile(fn.readfile(source), dest) end
+end
+
+augroup('CopyPyrightConfig', {
+  event = { 'BufEnter' },
+  pattern = { '*.py' },
+  command = function()
+    -- Only run once per buffer to avoid excessive copying
+    if vim.b.pyrightconfig_copied then return end
+    vim.b.pyrightconfig_copied = true
+    copy_pyrightconfig()
   end,
 })
 

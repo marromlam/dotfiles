@@ -10,11 +10,23 @@ if not mrl then return end
 -- }}}
 --------------------------------------------------------------------------------
 
+-- Helper to safely call augroup, deferring if not available yet
+local function augroup(name, ...)
+  local args = { ... }
+  if mrl and mrl.augroup then
+    return mrl.augroup(name, unpack(args))
+  else
+    vim.schedule(function()
+      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
+    end)
+  end
+end
+
 local fn = vim.fn
 local ignore_buftype = { 'quickfix', 'nofile', 'help', 'terminal' }
 local ignore_filetype = { 'gitcommit', 'gitrebase', 'svn', 'hgcommit' }
 
-mrl.augroup('LastPlace', {
+augroup('LastPlace', {
   event = { 'BufWinEnter', 'FileType' },
   command = function()
     if vim.tbl_contains(ignore_buftype, vim.bo.buftype) then return end

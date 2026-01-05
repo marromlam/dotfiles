@@ -14,7 +14,8 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
-local icons = mrl.ui.icons
+-- Ensure icons are available, use defaults if not
+local icons = mrl.ui and mrl.ui.icons or nil
 
 require('lazy').setup({
   { import = 'custom.plugins' },
@@ -68,7 +69,7 @@ require('lazy').setup({
   },
 
   ui = {
-    border = 'rounded',
+    border = 'single',
     backdrop = 100,
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table

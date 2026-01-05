@@ -1,4 +1,17 @@
 if not mrl then return end
+
+-- Helper to safely call augroup, deferring if not available yet
+local function augroup(name, ...)
+  local args = { ... }
+  if mrl and mrl.augroup then
+    return mrl.augroup(name, unpack(args))
+  else
+    vim.schedule(function()
+      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
+    end)
+  end
+end
+
 local highlight = mrl.highlight
 
 local function general_overrides(dim_factor)
@@ -504,7 +517,7 @@ local function user_highlights()
   colorscheme_overrides(dim_factor)
 end
 
-mrl.augroup('UserHighlights', {
+augroup('UserHighlights', {
   event = 'ColorScheme',
   command = function() user_highlights() end,
 }, {

@@ -1,5 +1,17 @@
 if not mrl then return end
 
+-- Helper to safely call augroup, deferring if not available yet
+local function augroup(name, ...)
+  local args = { ... }
+  if mrl and mrl.augroup then
+    return mrl.augroup(name, unpack(args))
+  else
+    vim.schedule(function()
+      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
+    end)
+  end
+end
+
 local fn, fs, api = vim.fn, vim.fs, vim.api
 
 -------------------------------------------------------------------------------
@@ -20,7 +32,9 @@ local function get_lsp_root(buf)
 
   for _, client in pairs(clients) do
     local filetypes = client.config.filetypes
-    if filetypes and vim.tbl_contains(filetypes, vim.bo[buf].ft) then return client.config.root_dir, client.name end
+    if filetypes and vim.tbl_contains(filetypes, vim.bo[buf].ft) then
+      return client.config.root_dir, client.name
+    end
   end
 end
 
@@ -47,4 +61,4 @@ local function set_root_directory(args)
   fn.chdir(root)
 end
 
-mrl.augroup('FindProjectRoot', { event = 'BufEnter', command = set_root_directory })
+augroup('FindProjectRoot', { event = 'BufEnter', command = set_root_directory })

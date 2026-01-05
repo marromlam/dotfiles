@@ -1,8 +1,9 @@
-local fn, env, ui, reqcall = vim.fn, vim.env, mrl.ui, mrl.require_for_later_call
+local fn, env, ui = vim.fn, vim.env, mrl.ui
 local icons, lsp_hls = ui.icons, ui.lsp.highlights
 local prompt = icons.misc.telescope .. '  '
 
-local fzf_lua = reqcall('fzf-lua') ---@module 'fzf-lua'
+-- Lazy-load fzf-lua only when needed
+local function fzf_lua() return require('fzf-lua') end
 
 -------------------------------------------------------------------------------
 -- fzf-lua helpers {{{
@@ -17,7 +18,7 @@ local function fzf_title(str, icon, icon_hl)
 end
 
 local file_picker = function(cwd)
-  fzf_lua.files({
+  fzf_lua().files({
     cwd = cwd,
     -- debug = true,
     actions = {
@@ -79,7 +80,6 @@ local function list_sessions()
         row = 0.5,
       },
       previewer = false,
-      debug = true,
       actions = {
         ['ctrl-h'] = {
           function(_, args)
@@ -117,289 +117,303 @@ mrl.fzf = { dropdown = dropdown, cursor_dropdown = cursor_dropdown }
 -- }}}
 -------------------------------------------------------------------------------
 
+-- Setup flag to ensure config only runs once when needed
+local fzf_setup_done = false
+local function ensure_fzf_setup()
+  if fzf_setup_done then return end
+  fzf_setup_done = true
+
+  local lsp_kind = require('lspkind')
+  local fzf = require('fzf-lua')
+
+  fzf.setup({
+    fzf_opts = {
+      ['--info'] = 'inline', -- hidden OR inline:⏐
+      ['--reverse'] = false,
+      ['--layout'] = 'default',
+      ['--scrollbar'] = icons.separators.right_block,
+      ['--ellipsis'] = icons.misc.ellipsis,
+      ['--pointer'] = '▸',
+      ['--marker'] = '◆',
+      ['--prompt'] = '󰍉 ',
+      ['--separator'] = ' ',
+    },
+    fzf_colors = {
+      --   ['fg'] = { 'fg', 'CursorLine' },
+      --   ['bg'] = { 'bg', 'Normal' },
+      --   ['hl'] = { 'fg', 'Comment' },
+      --   ['fg+'] = { 'fg', 'Normal' },
+      --   ['bg+'] = { 'bg', 'PmenuSel' },
+      --   ['hl+'] = { 'fg', 'Statement', 'italic' },
+      --   ['info'] = { 'fg', 'Comment', 'italic' },
+      --   ['prompt'] = { 'fg', 'Underlined' },
+      --   ['pointer'] = { 'fg', 'Exception' },
+      --   ['marker'] = { 'fg', '@character' },
+      --   ['spinner'] = { 'fg', 'DiagnosticOk' },
+      --   ['header'] = { 'fg', 'Comment' },
+      ['gutter'] = { 'bg', 'Normal' },
+      --   ['separator'] = { 'fg', 'Comment' },
+    },
+    previewers = {
+      builtin = { toggle_behavior = 'extend' },
+    },
+    winopts = {
+      backdrop = 100,
+      border = ui.border.rectangle,
+    },
+    keymap = {
+      builtin = {
+        ['<c-e>'] = 'toggle-preview',
+        ['<c-f>'] = 'preview-page-down',
+        ['<c-b>'] = 'preview-page-up',
+        -- toggle hidden files
+        ['<c-h>'] = {
+          function(_, args)
+            if args.cmd:find('--hidden') then
+              args.cmd = args.cmd:gsub('--hidden', '', 1)
+            else
+              args.cmd = args.cmd .. ' --hidden'
+            end
+            require('fzf-lua').files(args)
+          end,
+        },
+      },
+      fzf = {
+        ['esc'] = 'abort',
+        ['ctrl-q'] = 'select-all+accept',
+      },
+    },
+    -- customize prompts {{{
+    highlights = {
+      prompt = icons.misc.telescope .. '  ',
+      winopts = { title = fzf_title('Highlights') },
+    },
+    helptags = {
+      prompt = icons.misc.telescope .. '  ',
+      winopts = { title = fzf_title('Help', '󰋖') },
+    },
+    oldfiles = dropdown({
+      cwd_only = true,
+      winopts = { title = fzf_title('History', '') },
+    }),
+    files = dropdown({
+      winopts = { title = fzf_title('Files', '') },
+    }),
+    buffers = dropdown({
+      fzf_opts = { ['--delimiter'] = ' ', ['--with-nth'] = '-1..' },
+      winopts = { title = fzf_title('Buffers', '󰈙') },
+    }),
+    keymaps = dropdown({
+      winopts = { title = fzf_title('Keymaps', ''), width = 0.7 },
+    }),
+    registers = cursor_dropdown({
+      winopts = { title = fzf_title('Registers', ''), width = 0.6 },
+    }),
+    grep = {
+      prompt = ' ',
+      winopts = { title = fzf_title('Grep', '󰈭') },
+      -- See: https://github.com/ibhagwan/fzf-lua/discussions/1288#discussioncomment-9844613
+      -- RIPGREP_CONFIG_PATH = vim.env.RIPGREP_CONFIG_PATH
+      rg_opts = '--column --hidden --line-number --no-heading --color=always --smart-case --max-columns=4096 -e',
+      fzf_opts = {
+        ['--keep-right'] = '',
+      },
+    },
+    lsp = {
+      cwd_only = true,
+      symbols = {
+        symbol_style = 1,
+        symbol_icons = lsp_kind.symbols,
+        symbol_hl = function(s) return lsp_hls[s] end,
+      },
+      code_actions = cursor_dropdown({
+        winopts = { title = fzf_title('Code Actions', '󰌵', '@type') },
+      }),
+    },
+    jumps = dropdown({
+      winopts = {
+        title = fzf_title('Jumps', ''),
+        preview = { hidden = 'nohidden' },
+      },
+    }),
+    changes = dropdown({
+      prompt = '',
+      winopts = {
+        title = fzf_title('Changes', '⟳'),
+        preview = { hidden = 'nohidden' },
+      },
+    }),
+    diagnostics = dropdown({
+      winopts = {
+        title = fzf_title('Diagnostics', '', 'DiagnosticError'),
+      },
+    }),
+    git = {
+      files = dropdown({
+        path_shorten = false, -- this doesn't use any clever strategy unlike telescope so is somewhat useless
+        cmd = 'git ls-files --others --cached --exclude-standard',
+        winopts = { title = fzf_title('Git Files', '') },
+      }),
+      branches = dropdown({
+        winopts = {
+          title = fzf_title('Branches', ''),
+          height = 0.3,
+          row = 0.4,
+        },
+      }),
+      status = {
+        prompt = '',
+        preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
+        winopts = { title = fzf_title('Git Status', '') },
+      },
+      bcommits = {
+        prompt = '',
+        preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
+        winopts = { title = fzf_title('', 'Buffer Commits') },
+      },
+      commits = {
+        prompt = '',
+        preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
+        winopts = { title = fzf_title('', 'Commits') },
+      },
+      icons = {
+        ['M'] = { icon = icons.git.mod, color = 'yellow' },
+        ['D'] = { icon = icons.git.remove, color = 'red' },
+        ['A'] = { icon = icons.git.staged, color = 'green' },
+        ['R'] = { icon = icons.git.rename, color = 'yellow' },
+        ['C'] = { icon = icons.git.conflict, color = 'yellow' },
+        ['T'] = { icon = icons.git.mod, color = 'magenta' },
+        ['?'] = { icon = icons.git.untracked, color = 'magenta' },
+      },
+    },
+  })
+
+  mrl.command('SessionList', list_sessions)
+end
+
+-- Wrapper functions that ensure setup runs before calling fzf-lua
+local function wrap_fzf_call(fn)
+  return function(...)
+    ensure_fzf_setup()
+    return fn(...)
+  end
+end
+
 return {
   {
     'ibhagwan/fzf-lua',
     cmd = 'FzfLua',
-    dependencies = {},
     keys = {
       {
         '<c-p>',
-        fzf_lua.git_files,
+        wrap_fzf_call(function() fzf_lua().git_files() end),
         desc = 'fzf: [f]ind [f]iles',
       },
       {
         '<leader>fa',
-        '<Cmd>FzfLua<CR>',
+        function()
+          ensure_fzf_setup()
+          vim.cmd('FzfLua')
+        end,
         desc = 'fzf: [f]ind [a]ll builtins',
       },
       {
         '<leader>ff',
-        file_picker,
+        wrap_fzf_call(file_picker),
         desc = 'fzf: [f]ind [f]iles',
       },
       {
         '<leader>fb',
-        fzf_lua.grep_curbuf,
+        wrap_fzf_call(function() fzf_lua().grep_curbuf() end),
         desc = 'fzf: [f]ind in current [b]uffer',
       },
       {
         '<leader>fr',
-        fzf_lua.resume,
+        wrap_fzf_call(function() fzf_lua().resume() end),
         desc = 'fzf: [f]ind [r]esume',
       },
       {
         '<leader>fva',
-        fzf_lua.autocmds,
+        wrap_fzf_call(function() fzf_lua().autocmds() end),
         desc = 'fzf: fin [a]utocommands',
       },
       {
         '<leader>fvh',
-        fzf_lua.highlights,
+        wrap_fzf_call(function() fzf_lua().highlights() end),
         desc = 'fzf: find Highlights',
       },
       {
         '<leader>fvk',
-        fzf_lua.keymaps,
+        wrap_fzf_call(function() fzf_lua().keymaps() end),
         desc = 'fzf: find Keymaps',
       },
       {
         '<leader>fle',
-        fzf_lua.diagnostics_workspace,
+        wrap_fzf_call(function() fzf_lua().diagnostics_workspace() end),
         desc = 'fzf: Lsp workspace Diagnostics',
       },
       {
         '<leader>fld',
-        fzf_lua.lsp_document_symbols,
+        wrap_fzf_call(function() fzf_lua().lsp_document_symbols() end),
         desc = 'fzf: Lsp document Symbols',
       },
       {
         '<leader>fls',
-        fzf_lua.lsp_live_workspace_symbols,
+        wrap_fzf_call(function() fzf_lua().lsp_live_workspace_symbols() end),
         desc = 'fzf: workspace symbols',
       },
       {
         '<leader>f?',
-        fzf_lua.help_tags,
+        wrap_fzf_call(function() fzf_lua().help_tags() end),
         desc = 'fzf: find ?help',
       },
       {
         '<leader>fh',
-        fzf_lua.oldfiles,
+        wrap_fzf_call(function() fzf_lua().oldfiles() end),
         desc = 'fzf: Most (f)recently used files',
       },
       {
         '<leader>fgb',
-        fzf_lua.git_branches,
+        wrap_fzf_call(function() fzf_lua().git_branches() end),
         desc = 'fzf: [g]it [b]ranches',
       },
       {
         '<leader>fgc',
-        fzf_lua.git_commits,
+        wrap_fzf_call(function() fzf_lua().git_commits() end),
         desc = 'fzf: [g]it [c]ommits',
       },
       {
         '<leader>fgB',
-        fzf_lua.git_bcommits,
+        wrap_fzf_call(function() fzf_lua().git_bcommits() end),
         desc = 'fzf: [b]uffer commits',
       },
       {
         '<leader>fo',
-        fzf_lua.buffers,
+        wrap_fzf_call(function() fzf_lua().buffers() end),
         desc = 'fzf: find [o]pen buffers',
       },
       {
         '<leader>fs',
-        fzf_lua.live_grep,
+        wrap_fzf_call(function() fzf_lua().live_grep() end),
         desc = 'fzf: [f] with live[g]rep',
       },
       {
         '<localleader>p',
-        fzf_lua.registers,
+        wrap_fzf_call(function() fzf_lua().registers() end),
         desc = 'fzf: [f]ind registers',
       },
       {
         '<leader>fd',
-        function() file_picker(vim.env.DOTFILES) end,
+        wrap_fzf_call(function() file_picker(vim.env.DOTFILES) end),
         desc = 'fzf: [f]ind [d]otfiles',
       },
       {
         '<leader>fc',
-        function() file_picker(vim.g.vim_dir) end,
+        wrap_fzf_call(function() file_picker(vim.g.vim_dir) end),
         desc = 'fzf: [f]ind nvim [c]onfig',
       },
     },
-    config = function()
-      local lsp_kind = require('lspkind')
-      local fzf = require('fzf-lua')
-      local actions = require('fzf-lua.actions')
-
-      fzf.setup({
-        fzf_opts = {
-          ['--info'] = 'inline', -- hidden OR inline:⏐
-          ['--reverse'] = false,
-          ['--layout'] = 'default',
-          ['--scrollbar'] = icons.separators.right_block,
-          ['--ellipsis'] = icons.misc.ellipsis,
-          ['--pointer'] = '▸',
-          ['--marker'] = '◆',
-          ['--prompt'] = '󰍉 ',
-          ['--separator'] = ' ',
-        },
-        fzf_colors = {
-          --   ['fg'] = { 'fg', 'CursorLine' },
-          --   ['bg'] = { 'bg', 'Normal' },
-          --   ['hl'] = { 'fg', 'Comment' },
-          --   ['fg+'] = { 'fg', 'Normal' },
-          --   ['bg+'] = { 'bg', 'PmenuSel' },
-          --   ['hl+'] = { 'fg', 'Statement', 'italic' },
-          --   ['info'] = { 'fg', 'Comment', 'italic' },
-          --   ['prompt'] = { 'fg', 'Underlined' },
-          --   ['pointer'] = { 'fg', 'Exception' },
-          --   ['marker'] = { 'fg', '@character' },
-          --   ['spinner'] = { 'fg', 'DiagnosticOk' },
-          --   ['header'] = { 'fg', 'Comment' },
-          ['gutter'] = { 'bg', 'Normal' },
-          --   ['separator'] = { 'fg', 'Comment' },
-        },
-        previewers = {
-          builtin = { toggle_behavior = 'extend' },
-        },
-        winopts = {
-          backdrop = 100,
-          border = ui.border.rectangle,
-        },
-        keymap = {
-          builtin = {
-            ['<c-/>'] = 'toggle-help', -- FIXME: not working
-            ['<c-e>'] = 'toggle-preview',
-            ['<c-z>'] = 'toggle-fullscreen', -- FIXME: not working
-            ['<c-f>'] = 'preview-page-down',
-            ['<c-b>'] = 'preview-page-up',
-            -- toggle hidden files
-            ['<c-h>'] = {
-              function(_, args)
-                if args.cmd:find('--hidden') then
-                  args.cmd = args.cmd:gsub('--hidden', '', 1)
-                else
-                  args.cmd = args.cmd .. ' --hidden'
-                end
-                require('fzf-lua').files(args)
-              end,
-            },
-          },
-          fzf = {
-            ['esc'] = 'abort',
-            ['ctrl-q'] = 'select-all+accept',
-          },
-        },
-        -- customize prompts {{{
-        highlights = {
-          prompt = icons.misc.telescope .. '  ',
-          winopts = { title = fzf_title('Highlights') },
-        },
-        helptags = {
-          prompt = icons.misc.telescope .. '  ',
-          winopts = { title = fzf_title('Help', '󰋖') },
-        },
-        oldfiles = dropdown({
-          cwd_only = true,
-          winopts = { title = fzf_title('History', '') },
-        }),
-        files = dropdown({
-          winopts = { title = fzf_title('Files', '') },
-        }),
-        buffers = dropdown({
-          fzf_opts = { ['--delimiter'] = ' ', ['--with-nth'] = '-1..' },
-          winopts = { title = fzf_title('Buffers', '󰈙') },
-        }),
-        keymaps = dropdown({
-          winopts = { title = fzf_title('Keymaps', ''), width = 0.7 },
-        }),
-        registers = cursor_dropdown({
-          winopts = { title = fzf_title('Registers', ''), width = 0.6 },
-        }),
-        grep = {
-          prompt = ' ',
-          winopts = { title = fzf_title('Grep', '󰈭') },
-          -- See: https://github.com/ibhagwan/fzf-lua/discussions/1288#discussioncomment-9844613
-          -- RIPGREP_CONFIG_PATH = vim.env.RIPGREP_CONFIG_PATH
-          rg_opts = '--column --hidden --line-number --no-heading --color=always --smart-case --max-columns=4096 -e',
-          fzf_opts = {
-            ['--keep-right'] = '',
-          },
-        },
-        lsp = {
-          cwd_only = true,
-          symbols = {
-            symbol_style = 1,
-            symbol_icons = lsp_kind.symbols,
-            symbol_hl = function(s) return lsp_hls[s] end,
-          },
-          code_actions = cursor_dropdown({
-            winopts = { title = fzf_title('Code Actions', '󰌵', '@type') },
-          }),
-        },
-        jumps = dropdown({
-          winopts = {
-            title = fzf_title('Jumps', ''),
-            preview = { hidden = 'nohidden' },
-          },
-        }),
-        changes = dropdown({
-          prompt = '',
-          winopts = {
-            title = fzf_title('Changes', '⟳'),
-            preview = { hidden = 'nohidden' },
-          },
-        }),
-        diagnostics = dropdown({
-          winopts = {
-            title = fzf_title('Diagnostics', '', 'DiagnosticError'),
-          },
-        }),
-        git = {
-          files = dropdown({
-            path_shorten = false, -- this doesn't use any clever strategy unlike telescope so is somewhat useless
-            cmd = 'git ls-files --others --cached --exclude-standard',
-            winopts = { title = fzf_title('Git Files', '') },
-          }),
-          branches = dropdown({
-            winopts = {
-              title = fzf_title('Branches', ''),
-              height = 0.3,
-              row = 0.4,
-            },
-          }),
-          status = {
-            prompt = '',
-            preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
-            winopts = { title = fzf_title('Git Status', '') },
-          },
-          bcommits = {
-            prompt = '',
-            preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
-            winopts = { title = fzf_title('', 'Buffer Commits') },
-          },
-          commits = {
-            prompt = '',
-            preview_pager = 'delta --width=$FZF_PREVIEW_COLUMNS',
-            winopts = { title = fzf_title('', 'Commits') },
-          },
-          icons = {
-            ['M'] = { icon = icons.git.mod, color = 'yellow' },
-            ['D'] = { icon = icons.git.remove, color = 'red' },
-            ['A'] = { icon = icons.git.staged, color = 'green' },
-            ['R'] = { icon = icons.git.rename, color = 'yellow' },
-            ['C'] = { icon = icons.git.conflict, color = 'yellow' },
-            ['T'] = { icon = icons.git.mod, color = 'magenta' },
-            ['?'] = { icon = icons.git.untracked, color = 'magenta' },
-          },
-        },
-      })
-
-      mrl.command('SessionList', list_sessions)
-    end,
+    -- No config - setup happens lazily when first called
   },
 }
 

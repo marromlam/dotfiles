@@ -8,7 +8,6 @@ local fmt, falsy = string.format, mrl.falsy
 local M = {}
 
 local CLICK_END = '%X'
-local padding = ' '
 
 --------------------------------------------------------------------------------
 -- Components {{{
@@ -105,7 +104,6 @@ local function component(opts)
   end
 
   if not opts.priority then opts.priority = 10 end
-  -- local before, after = opts.before or '', opts.after or padding
   local before, after = '', ''
 
   local item_str = chunks_to_string(item)
@@ -156,7 +154,7 @@ end
 
 --- Take the lowest priority items out of the statusline if we don't have
 --- space for them.
---- TODO: currently this doesn't account for if an item that has a lower
+--- Note: Currently this doesn't account for if an item that has a lower
 --- priority could be fit in instead
 --- @param statusline table
 --- @param space number

@@ -19,12 +19,13 @@ return {
     priority = 1000,
     enabled = true,
     config = function()
+      -- Setup basic colorscheme first (fast path)
       require('gruvbox').setup({
         contrast = 'hard',
         palette_overrides = {
           dark0_hard = '#0E1018',
         },
-        terminal_colors = true, -- add neovim terminal colors
+        terminal_colors = true,
         undercurl = true,
         underline = true,
         bold = true,
@@ -40,9 +41,8 @@ return {
         invert_signs = false,
         invert_tabline = false,
         invert_intend_guides = false,
-        inverse = true, -- invert background for search, diffs, statuslines and errors
+        inverse = true,
         overrides = {
-
           NormalFloat = { fg = '#ebdbb2', bg = '#504945' },
           Comment = { fg = '#81878f', italic = true, bold = true },
           Define = { link = 'GruvboxPurple' },
@@ -64,81 +64,52 @@ return {
           CocPumShortcut = { fg = '#fe8019' },
           CocPumDetail = { fg = '#fe8019' },
           DiagnosticVirtualTextWarn = { fg = '#dfaf87' },
-          -- fold
           Folded = { fg = '#fe8019', bg = '#0E1018', italic = true },
-          SignColumn = { bg = '#fe8019' },
-          -- new git colors
-          DiffAdd = {
-            bold = true,
-            reverse = false,
-            fg = '',
-            bg = '#2a4333',
-          },
-          DiffChange = {
-            bold = true,
-            reverse = false,
-            fg = '',
-            bg = '#333841',
-          },
-          DiffDelete = {
-            bold = true,
-            reverse = false,
-            fg = '#442d30',
-            bg = '#442d30',
-          },
-          DiffText = {
-            bold = true,
-            reverse = false,
-            fg = '',
-            bg = '#213352',
-          },
-
-          -- SignColumn = { bg = '#0E1018' },
           SignColumn = { bg = '#2d2021' },
-          StGitAdd = {
-            fg = mrl.get_hi('GitSignsAdd').fg,
-            bg = mrl.get_hi('Statusline').bg,
-          },
-          NormalFloat = {
-            fg = mrl.get_hi('NormalFloat').fg,
-            bg = mrl.get_hi('Normal').bg,
-            -- bg = "#191724",
-          },
-          FloatBorder = {
-            fg = mrl.get_hi('FloatBorder').fg,
-            bg = mrl.get_hi('Normal').bg,
-            -- bg = "#191724",
-          },
-
-          SymbolUsageRounding = {
-            fg = mrl.get_hi('CursorLine').bg,
-            italic = true,
-          },
-          SymbolUsageContent = {
-            bg = mrl.get_hi('CursorLine').bg,
-            fg = mrl.get_hi('Comment').fg,
-            italic = true,
-          },
-          SymbolUsageRef = {
-            fg = mrl.get_hi('Function').fg,
-            bg = mrl.get_hi('CursorLine').bg,
-            italic = true,
-          },
-          SymbolUsageDef = {
-            fg = mrl.get_hi('Type').fg,
-            bg = mrl.get_hi('CursorLine').bg,
-            italic = true,
-          },
-          SymbolUsageImpl = {
-            fg = mrl.get_hi('@keyword').fg,
-            bg = mrl.get_hi('CursorLine').bg,
-            italic = true,
-          },
+          DiffAdd = { bold = true, reverse = false, fg = '', bg = '#2a4333' },
+          DiffChange = { bold = true, reverse = false, fg = '', bg = '#333841' },
+          DiffDelete = { bold = true, reverse = false, fg = '#442d30', bg = '#442d30' },
+          DiffText = { bold = true, reverse = false, fg = '', bg = '#213352' },
           StLine = { bg = '#ff0000' },
         },
         dim_inactive = false,
         transparent_mode = false,
       })
+
+      -- Defer expensive highlight lookups (after colorscheme is applied)
+      vim.schedule(function()
+        vim.api.nvim_set_hl(0, 'StGitAdd', {
+          fg = mrl.get_hi('GitSignsAdd').fg,
+          bg = mrl.get_hi('Statusline').bg,
+        })
+        vim.api.nvim_set_hl(0, 'NormalFloat', {
+          fg = mrl.get_hi('NormalFloat').fg,
+          bg = mrl.get_hi('Normal').bg,
+        })
+        vim.api.nvim_set_hl(0, 'FloatBorder', {
+          fg = mrl.get_hi('FloatBorder').fg,
+          bg = mrl.get_hi('Normal').bg,
+        })
+        local cursor_bg = mrl.get_hi('CursorLine').bg
+        local comment_fg = mrl.get_hi('Comment').fg
+        vim.api.nvim_set_hl(0, 'SymbolUsageRounding', { fg = cursor_bg, italic = true })
+        vim.api.nvim_set_hl(0, 'SymbolUsageContent', { bg = cursor_bg, fg = comment_fg, italic = true })
+        vim.api.nvim_set_hl(0, 'SymbolUsageRef', {
+          fg = mrl.get_hi('Function').fg,
+          bg = cursor_bg,
+          italic = true,
+        })
+        vim.api.nvim_set_hl(0, 'SymbolUsageDef', {
+          fg = mrl.get_hi('Type').fg,
+          bg = cursor_bg,
+          italic = true,
+        })
+        vim.api.nvim_set_hl(0, 'SymbolUsageImpl', {
+          fg = mrl.get_hi('@keyword').fg,
+          bg = cursor_bg,
+          italic = true,
+        })
+      end)
 
       -- require("gruvbox").setup({
       --     contrast = "hard",

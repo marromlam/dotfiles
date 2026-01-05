@@ -2,6 +2,9 @@
 -- Styles
 ----------------------------------------------------------------------------------------------------
 
+-- mrl.p_table is defined in tools.lua, which is loaded before this file in
+-- init.lua
+
 mrl.ui.palette = {
   green = '#98c379',
   dark_green = '#10B981',
@@ -320,4 +323,4 @@ function mrl.ui.decorations.set_colorcolumn(bufnr, fn)
 end
 
 ----------------------------------------------------------------------------------------------------
-mrl.ui.current = { border = mrl.ui.border.line }
+mrl.ui.current = { border = 'single' } -- Use square borders everywhere

@@ -278,20 +278,20 @@ return {
         sidebar_header = {
           enabled = true, -- true, false to enable/disable the header
           align = 'center', -- left, center, right for title
-          rounded = true,
+          rounded = false,
         },
         input = {
           prefix = '▷',
           height = 8, -- Height of the input window in vertical layout
         },
         edit = {
-          border = 'rounded',
+          border = 'single',
           start_insert = true, -- Start insert mode when opening the edit window
         },
         ask = {
           floating = false, -- Open the 'AvanteAsk' prompt in a floating window
           start_insert = true, -- Start insert mode when opening the ask window
-          border = 'rounded',
+          border = 'single',
           ---@type "ours" | "theirs"
           focus_on_apply = 'ours', -- which diff to focus after applying
         },
@@ -368,7 +368,10 @@ return {
 
   {
     'ravitemer/mcphub.nvim',
-    lazy = false,
+    -- Load only when Avante actually uses it (via require() calls in Avante config)
+    -- Since Avante is disabled, this won't load on startup
+    -- If Avante is enabled, mcphub will load lazily when Avante calls require('mcphub')
+    lazy = true, -- Don't load until explicitly required
     dependencies = {
       'nvim-lua/plenary.nvim',
     },
@@ -378,7 +381,58 @@ return {
 
   {
     'folke/sidekick.nvim',
-    lazy = false,
+    keys = {
+      {
+        '<tab>',
+        mode = 'i',
+        function()
+          if not require('sidekick').nes_jump_or_apply() then
+            return '<Tab>'
+          end
+        end,
+        expr = true,
+        desc = 'Goto/Apply Next Edit Suggestion',
+      },
+      {
+        '<leader>aa',
+        function() require('sidekick.cli').toggle() end,
+        desc = 'Sidekick Toggle CLI',
+      },
+      {
+        '<leader>as',
+        function() require('sidekick.cli').select() end,
+        desc = 'Select CLI',
+      },
+      {
+        '<leader>at',
+        function() require('sidekick.cli').send({ msg = '{this}' }) end,
+        mode = { 'x', 'n' },
+        desc = 'Send This',
+      },
+      {
+        '<leader>av',
+        function() require('sidekick.cli').send({ msg = '{selection}' }) end,
+        mode = { 'x' },
+        desc = 'Send Visual Selection',
+      },
+      {
+        '<leader>ap',
+        function() require('sidekick.cli').prompt() end,
+        mode = { 'n', 'x' },
+        desc = 'Sidekick Select Prompt',
+      },
+      {
+        '<c-.>',
+        function() require('sidekick.cli').focus() end,
+        mode = { 'n', 'x', 'i', 't' },
+        desc = 'Sidekick Switch Focus',
+      },
+      {
+        '<leader>ac',
+        function() require('sidekick.cli').toggle({ name = 'claude', focus = true }) end,
+        desc = 'Sidekick Toggle Claude',
+      },
+    },
     opts = {
       -- add any options here
       cli = {
@@ -388,64 +442,5 @@ return {
         },
       },
     },
-  -- stylua: ignore
-  -- use insert mode
-  keys = {
-    {
-      "<tab>",
-      -- just on insert mode
-      mode = "i",
-      function()
-        -- if there is a next edit, jump to it, otherwise apply it if any
-        if not require("sidekick").nes_jump_or_apply() then
-          return "<Tab>" -- fallback to normal tab
-        end
-      end,
-      expr = true,
-      desc = "Goto/Apply Next Edit Suggestion",
-    },
-    {
-      "<leader>aa",
-      function() require("sidekick.cli").toggle() end,
-      desc = "Sidekick Toggle CLI",
-    },
-    {
-      "<leader>as",
-      function() require("sidekick.cli").select() end,
-      -- Or to select only installed tools:
-      -- require("sidekick.cli").select({ filter = { installed = true } })
-      desc = "Select CLI",
-    },
-    {
-      "<leader>at",
-      function() require("sidekick.cli").send({ msg = "{this}" }) end,
-      mode = { "x", "n" },
-      desc = "Send This",
-    },
-    {
-      "<leader>av",
-      function() require("sidekick.cli").send({ msg = "{selection}" }) end,
-      mode = { "x" },
-      desc = "Send Visual Selection",
-    },
-    {
-      "<leader>ap",
-      function() require("sidekick.cli").prompt() end,
-      mode = { "n", "x" },
-      desc = "Sidekick Select Prompt",
-    },
-    {
-      "<c-.>",
-      function() require("sidekick.cli").focus() end,
-      mode = { "n", "x", "i", "t" },
-      desc = "Sidekick Switch Focus",
-    },
-    -- Example of a keybinding to open Claude directly
-    {
-      "<leader>ac",
-      function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end,
-      desc = "Sidekick Toggle Claude",
-    },
-  },
   },
 }

@@ -11,9 +11,11 @@ return {
 
   {
     'rcarriga/nvim-notify',
-    lazy = false,
+    event = 'VeryLazy',
     config = function()
+      ---@type table
       local notify = require('notify')
+      ---@diagnostic disable-next-line: undefined-field
       notify.setup({
         top_down = false,
         render = 'wrapped-compact',
@@ -24,14 +26,12 @@ return {
           end
         end,
       })
-      map(
-        'n',
-        '<leader>nd',
-        function() notify.dismiss({ silent = true, pending = true }) end,
-        {
-          desc = 'dismiss notifications',
-        }
-      )
+      vim.keymap.set('n', '<leader>nd', function()
+        ---@diagnostic disable-next-line: undefined-field
+        notify.dismiss({ silent = true, pending = true })
+      end, {
+        desc = 'dismiss notifications',
+      })
     end,
   },
 
@@ -81,8 +81,10 @@ return {
   {
     'Wansmer/symbol-usage.nvim',
     event = 'LspAttach',
+    ---@diagnostic disable: undefined-field
     config = function()
-      require('symbol-usage').setup({
+      local symbol_usage = require('symbol-usage')
+      symbol_usage.setup({
         vt_position = 'end_of_line',
         text_format = function(symbol)
           local res = {}

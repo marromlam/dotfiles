@@ -1,9 +1,7 @@
 -- Init lua
 
 -- Enable vim.loader for faster startup (Folke's pattern)
-if vim.loader then
-  vim.loader.enable()
-end
+if vim.loader then vim.loader.enable() end
 
 vim.g.os = vim.loop.os_uname().sysname
 vim.g.open_command = vim.g.os == 'Darwin' and 'open' or 'xdg-open'
@@ -47,8 +45,8 @@ _G.mrl = mrl or namespace
 _G.map = vim.keymap.set
 _G.P = vim.print
 
--- If opening from inside neovim terminal, skip
-if vim.env.NVIM then
+-- If opening from inside neovim terminal buffer, skip full config
+if vim.env.NVIM and vim.env.TERM_PROGRAM == 'nvim' then
   return require('lazy').setup({ { 'willothy/flatten.nvim', config = true } })
 end
 

@@ -447,8 +447,7 @@ return { -- LSP Configuration & Plugins
 
   {
     'iamkarasik/sonarqube.nvim',
-    lazy = false,
-    event = 'LspAttach',
+    ft = { 'python' },
     dependencies = {
       'mason-org/mason.nvim',
     },
