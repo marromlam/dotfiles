@@ -1,33 +1,24 @@
 #!/bin/sh
-# ------------------------------------------------------------------------------
-# Functions
-# ------------------------------------------------------------------------------
+# ==============================================================================
+# FZF Helper Functions
+# ==============================================================================
 
-# tm with no sessions open it will create a session called "new".
-# tm irc it will attach to the irc session (if it exists), else it will create it.
-# tm with one session open, it will attach to that session.
-# tm with more than one session open it will let you select the session via fzf.
+# Tmux session manager
+# - With no sessions: creates session called "new"
+# - With argument: attaches to named session (creates if doesn't exist)
+# - With one session: attaches to that session
+# - With multiple sessions: lets you select via fzf
 tm() {
   [[ -n "$TMUX" ]] && change="switch-client" || change="attach-session"
   if [ $1 ]; then
-    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1"); return
+    tmux $change -t "$1" 2>/dev/null || (tmux new-session -d -s $1 && tmux $change -t "$1")
+    return
   fi
-  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) &&  tmux $change -t "$session" || echo "No sessions found."
+  session=$(tmux list-sessions -F "#{session_name}" 2>/dev/null | fzf --exit-0) && \
+    tmux $change -t "$session" || echo "No sessions found."
 }
 
-# Install (one or multiple) selected application(s)
-# using "brew search" as source input
-# mnemonic [B]rew [I]nstall [P]lugin
-# bip() {
-#   local inst=$(brew search | fzf -m)
-#
-#   if [[ $inst ]]; then
-#     for prog in $(echo $inst);
-#     do brew install "$prog"; done;
-#   fi
-# }
-
-# fshow - git commit browser
+# Git commit browser
 fshow() {
   git log --graph --color=always \
     --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
@@ -39,14 +30,15 @@ fshow() {
   FZF-EOF"
 }
 
-# Another function which is not based on grep or locate
+# Change directory to parent of selected file
 cdf() {
   local file
   local dir
   file=$(fzf +m -q "$1") && dir=$(dirname "$file") && cd "$dir" || exit
 }
 
-# fbr - checkout git branch (including remote branches), sorted by most recent commit, limit 30 last branches
+# Checkout git branch (including remote branches)
+# Sorted by most recent commit, limit 30 last branches
 fbr() {
   local branches branch
   branches=$(git for-each-ref --count=30 --sort=-committerdate refs/heads/ --format="%(refname:short)") &&
@@ -55,13 +47,14 @@ fbr() {
   git checkout "$(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
 }
 
-vmod(){
+# Edit modified files from git status
+vmod() {
   ${EDITOR:-vim} "$(git status -s | fzf -m)"
 }
 
-# fs [FUZZY PATTERN] - Select selected tmux session
-#   - Bypass fuzzy finder if there's only one match (--select-1)
-#   - Exit if there's no match (--exit-0)
+# Select tmux session
+# - Bypass fuzzy finder if there's only one match (--select-1)
+# - Exit if there's no match (--exit-0)
 fs() {
   SESSION=$(tmux list-sessions -F "#{session_name}" | \
     fzf --query="$1" --select-1 --exit-0) &&
@@ -72,9 +65,9 @@ fs() {
   fi
 }
 
-# fe [FUZZY PATTERN] - Open the selected file with the default editor
-#   - Bypass fuzzy finder if there's only one match (--select-1)
-#   - Exit if there's no match (--exit-0)
+# Open selected file with default editor
+# - Bypass fuzzy finder if there's only one match (--select-1)
+# - Exit if there's no match (--exit-0)
 fe() {
   local files
   IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0 --preview\
@@ -82,11 +75,10 @@ fe() {
   [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 }
 
-# fstash - easier way to deal with stashes
-# type fstash to get a list of your stashes
-# enter shows you the contents of the stash
-# ctrl-d shows a diff of the stash against your current HEAD
-# ctrl-b checks the stash out as a branch, for easier merging
+# Git stash manager
+# - Enter: shows contents of the stash
+# - Ctrl-d: shows diff of stash against current HEAD
+# - Ctrl-b: checks stash out as a branch for easier merging
 fstash() {
   local out q k sha
   while out=$(

@@ -22,6 +22,17 @@ alias dots="cd $DOTFILES"
 alias coding="cd $PROJECTS_DIR"
 alias lp="lsp"
 
+# Directory navigation {{{
+# Quick navigation to parent directories
+alias ...="cd ../../.."
+alias ....="cd ../../../.."
+
+# Directory stack navigation
+alias d='dirs -v'  # List directory stack with numbers
+# Jump to directory stack entry by number (1-9)
+for index ({1..9}) alias "$index"="cd +${index}"; unset index
+# }}}
+
 #alias tree="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
 alias digls="ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /' -e 's/-/|/'"
 

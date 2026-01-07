@@ -1,41 +1,36 @@
-# Cook PYTHONPATH {{{
+# ==============================================================================
+# Environment Variables
+# ==============================================================================
 
-# enables matplolib kitty backend globally
+# Python path for matplotlib kitty backend
 export PYTHONPATH="$HOME/.config/kitty/mplbackend":$PYTHONPATH
 
-# }}}
-
-# Cook TEXINPUTS {{{
-
+# LaTeX inputs
 export TEXINPUTS=".:~/beamer-compostela:"
 
-# }}}
+# ==============================================================================
+# PATH Configuration
+# ==============================================================================
 
-# Cook system PATH {{{
-
-# System paths
+# System paths (prepended to PATH)
 SYS_PATHS=(
-  "$HOME/.dotfiles/scripts"           # Personal scripts
-  "$HOME/.local/share/nvim/mason/bin" # nvim mason binaries
-  "$HOME/go/bin" # nvim mason binaries
+  "$HOME/.dotfiles/scripts"
+  "$HOME/.local/share/nvim/mason/bin"
+  "$HOME/go/bin"
   "$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin"
-  "$HOMEBREW_PREFIX/sbin" # Brew scripts
-  "$HOMEBREW_PREFIX/bin"  # Brew scripts
+  "$HOMEBREW_PREFIX/sbin"
+  "$HOMEBREW_PREFIX/bin"
 )
 
-# User paths
+# User paths (appended to PATH)
 USER_PATHS=(
-  # "/usr/local/opt/fzf/bin" # Fzf
   "$HOME/.cargo/env"
-  "$HOME/.dotfiles/scripts" # Personal scripts
-  "$HOME/.local/bin"        # Personal scripts
-  "$HOME/.dotfiles/scripts" # Personal scripts
-  "$HOME/.cargo"            # Personal scripts
+  "$HOME/.dotfiles/scripts"
+  "$HOME/.local/bin"
+  "$HOME/.cargo/bin"
 )
 
-# Set PATH with ordering: SYS:PATH:USER
+# Set PATH with ordering: SYS:PATH:USER (removes duplicates)
 export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")
-
-# }}}
 
 # vim: fdm=marker et ts=2 sw=2 tw=0

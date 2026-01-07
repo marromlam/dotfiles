@@ -1,14 +1,14 @@
-# docker helper functions
-# https://calbertts.medium.com/docker-and-fuzzy-finder-fzf
-#
-#
-#
-# Running containers
-# The first command is runc, which is from now an amazing command to run a new
-# container by selecting the docker image from a interactive menu
+#!/bin/zsh
+# ==============================================================================
+# Docker Helper Functions with FZF
+# ==============================================================================
+# Source: https://calbertts.medium.com/docker-and-fuzzy-finder-fzf
+
+# Run a new container by selecting docker image from interactive menu
 runc() {
   export FZF_DEFAULT_OPTS='--height 90% --reverse --border'
   local image=$(docker images --format '{{.Repository}}:{{.Tag}}' | fzf-tmux --reverse --multi)
+  
   if [[ $image != '' ]]; then
     echo -e "\n  \033[1mDocker image:\033[0m" $image
     read -e -p $'  \e[1mOptions: \e[0m' -i "-it --rm" options
@@ -16,7 +16,7 @@ runc() {
     printf "  \033[1mChoose the command: \033[0m"
     local cmd=$(echo -e "/bin/bash\nsh" | fzf-tmux --reverse --multi)
     if [[ $cmd == '' ]]; then
-        read -e -p $'  \e[1mCustom command: \e[0m' cmd
+      read -e -p $'  \e[1mCustom command: \e[0m' cmd
     fi
     echo -e "  \033[1mCommand: \033[0m" $cmd
 
@@ -24,12 +24,13 @@ runc() {
     printf "  \033[1mChoose the volume: \033[0m"
     local volume=$(fzf-tmux --reverse --multi)
     local curDir=${PWD##*/}
+    
     if [[ $volume == '.' ]]; then
-        echo -e "  \033[1mVolume: \033[0m" $volume
-        volume="`pwd`:/$curDir -w /$curDir"
+      echo -e "  \033[1mVolume: \033[0m" $volume
+      volume="`pwd`:/$curDir -w /$curDir"
     else
-        echo -e "  \033[1mVolume: \033[0m" $volume
-        volume="`pwd`/$volume:/$volume -w /$volume"
+      echo -e "  \033[1mVolume: \033[0m" $volume
+      volume="`pwd`/$volume:/$volume -w /$volume"
     fi
 
     export FZF_DEFAULT_COMMAND=""
@@ -42,22 +43,21 @@ runc() {
   fi
 }
 
-
-# Running commands in already running containers
-# Sometimes you just need to run a command in already running container, but
-# it's pretty annoying to list all the running containers just to get the
-# container's ID or name, now you can have runinc
+# Run command in already running container
 runinc() {
   export FZF_DEFAULT_OPTS='--height 90% --reverse --border'
   local container=$(docker ps --format '{{.Names}} => {{.Image}}' | fzf-tmux --reverse --multi | awk -F '\\=>' '{print $1}')
+  
   if [[ $container != '' ]]; then
     echo -e "\n  \033[1mDocker container:\033[0m" $container
     read -e -p $'  \e[1mOptions: \e[0m' -i "-it" options
+    
     if [[ $@ == '' ]]; then
-				read -e -p $'  \e[1mCommand: \e[0m' cmd
+      read -e -p $'  \e[1mCommand: \e[0m' cmd
     else
-				cmd="$@"
+      cmd="$@"
     fi
+    
     echo ''
     history -s runinc "$@"
     history -s docker exec $options $container $cmd
@@ -67,17 +67,16 @@ runinc() {
   export FZF_DEFAULT_OPTS=""
 }
 
-
-
-
-# Stops and/or removes a docker container
+# Stop and/or remove a docker container
 stopc() {
   export FZF_DEFAULT_OPTS='--height 90% --reverse --border'
   local container=$(docker ps --format '{{.Names}} => {{.Image}}' | fzf-tmux --reverse --multi | awk -F '\\=>' '{print $1}')
+  
   if [[ $container != '' ]]; then
     echo -e "\n  \033[1mDocker container:\033[0m" $container
     printf "  \033[1mRemove?: \033[0m"
     local cmd=$(echo -e "No\nYes" | fzf-tmux --reverse --multi)
+    
     if [[ $cmd != '' ]]; then
       if [[ $cmd == 'No' ]]; then
         echo -e "\n  Stopping $container ...\n"
@@ -100,10 +99,7 @@ stopc() {
   export FZF_DEFAULT_OPTS=""
 }
 
-
-# Getting the container's IP Address
-# Inspect the IP address quickly choosing the container from the menu by running
-# showipc
+# Get container's IP address
 showipc() {
   export FZF_DEFAULT_OPTS='--height 90% --reverse --border'
   local container=$(docker ps -a --format '{{.Names}} => {{.Image}}' | fzf-tmux --reverse --multi | awk -F '\\=>' '{print $1}')
@@ -118,6 +114,8 @@ showipc() {
   fi
 }
 
-
-
+# Docker cleanup alias
 alias docker-cleanup='docker system prune -a --volumes'
+
+
+# vim: ft=bash
