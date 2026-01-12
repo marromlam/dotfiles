@@ -39,13 +39,14 @@ local api, notify, fmt, augroup =
 ---@field clear boolean?
 ---@field inherit string?
 
+local enable_italics = false
 local attrs = {
   fg = true,
   bg = true,
   sp = true,
   blend = true,
   bold = true,
-  italic = true,
+  italic = enable_italics,
   standout = true,
   underline = true,
   undercurl = true,

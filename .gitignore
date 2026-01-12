@@ -95,3 +95,4 @@ package.sjon
 files/.config/pdftex-figures/roots
 files/.config/browsh/firefox_profile
 files/.config/kitty/kitty.conf.bak
+files/.config/go/telemetry
