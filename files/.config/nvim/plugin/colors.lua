@@ -19,14 +19,15 @@ local function general_overrides(dim_factor)
   local normal_bg = highlight.get('Normal', 'bg')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
+  local stl_bg = '#3e3a3e'
   highlight.all({
     -- { PanelSt = { link = 'StatusLine' } },
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
     -- Status line {{{
     -- Search count
-    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color2 } },
+    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
-    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color2 } },
+    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     {
       StDevEnv = {
@@ -42,54 +43,54 @@ local function general_overrides(dim_factor)
       },
     },
     -- { StSeparator = { bg = '#00aaff', fg = bg_color } },
-    { StModified = { fg = '#ffaaff', bg = bg_color } },
-    { StTitle = { fg = { from = 'Normal', attr = 'fg' }, bg = bg_color } },
-    { StFaded = { fg = { from = 'Comment', attr = 'fg' }, bg = bg_color } },
+    { StModified = { fg = '#ffaaff', bg = stl_bg } },
+    { StTitle = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
+    { StFaded = { fg = { from = 'Comment', attr = 'fg' }, bg = stl_bg } },
     -- { StGit = { fg = '#ff0000', bg = '#00ff00' } },
     {
       StBranch = {
         fg = { from = 'DiagnosticInfo', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
       },
     },
     {
-      StGitAdd = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = bg_color },
+      StGitAdd = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = stl_bg },
     },
     {
       StGitDelete = {
         fg = { from = 'GitSignsDelete', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
       },
     },
     {
       StGitModified = {
         fg = { from = 'DiagnosticWarn', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
       },
     },
     {
-      StInfo = { fg = { from = 'DiagnosticInfo', attr = 'fg' }, bg = bg_color },
+      StInfo = { fg = { from = 'DiagnosticInfo', attr = 'fg' }, bg = stl_bg },
     },
     {
-      StWarn = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = bg_color },
+      StWarn = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = stl_bg },
     },
     {
       StError = {
         fg = { from = 'DiagnosticError', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
       },
     },
     {
       StFilename = {
         fg = { from = 'Normal', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
         bold = true,
       },
     },
     {
       StEnv = {
         fg = { from = 'DiagnosticError', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
         bold = true,
         italic = true,
       },
@@ -97,15 +98,15 @@ local function general_overrides(dim_factor)
     {
       StDirectory = {
         fg = { from = 'Comment', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
         italic = true,
       },
     },
-    -- { StFilename = { fg = '#0000ff', bg = bg_color } },
+    -- { StFilename = { fg = '#0000ff', bg = stl_bg } },
     {
       StParent = {
         fg = { from = 'DiagnosticWarn', attr = 'fg' },
-        bg = bg_color,
+        bg = stl_bg,
         italic = true,
       },
     },

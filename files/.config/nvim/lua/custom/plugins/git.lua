@@ -304,6 +304,20 @@ return {
   {
     'sindrets/diffview.nvim',
     cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewToggleFiles' },
+    -- diff3_mixed
+    opts = {
+      enhanced_diff_hl = true,
+      signs = {
+        fold_closed = '',
+        fold_open = '',
+        done = '✓',
+      },
+      view = {
+        merge_tool = {
+          layout = 'diff3_mixed',
+        },
+      },
+    },
   },
   {
     'isakbm/gitgraph.nvim',

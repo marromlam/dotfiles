@@ -74,7 +74,8 @@ require('external_grep')
 --------------------------------------------------------------------------------
 vim.o.background = 'dark' -- or "light"
 vim.opt.termguicolors = true
-vim.cmd([[colorscheme gruvbox]])
+-- vim.cmd([[colorscheme gruvbox]])
+vim.cmd('colorscheme carbonfox')
 -- vim.cmd([[colorscheme horizon]])
 -- vim.cmd([[colorscheme rose-pine]])
 -- vim.cmd([[colorscheme github_dark]])

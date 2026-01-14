@@ -14,9 +14,9 @@ return {
       -- Setup basic colorscheme first (fast path)
       require('gruvbox').setup({
         contrast = 'hard',
-        palette_overrides = {
-          dark0_hard = '#0E1018',
-        },
+        -- palette_overrides = {
+        --   dark0_hard = '#0E1018',
+        -- },
         terminal_colors = true,
         undercurl = true,
         underline = true,
@@ -117,6 +117,28 @@ return {
       end)
 
       vim.cmd('colorscheme gruvbox')
+    end,
+  },
+  -- First, install the plugin (using lazy.nvim as an example)
+  {
+    'EdenEast/nightfox.nvim',
+    config = function()
+      require('nightfox').setup({
+        options = {
+          -- Optional: customize settings
+          transparent = false,
+          terminal_colors = true,
+          dim_inactive = false,
+          -- styles = {
+          --   comments = 'italic',
+          --   keywords = 'bold',
+          --   types = 'italic,bold',
+          -- },
+        },
+      })
+
+      -- Set the colorscheme
+      vim.cmd('colorscheme carbonfox')
     end,
   },
 }
