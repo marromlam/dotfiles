@@ -81,8 +81,7 @@ local function general_overrides(dim_factor)
   -- Diff filler lines use the `fillchars.diff` glyph (you set it to '╱').
   -- This glyph is highlighted with `DiffDelete` and can look too bright, so
   -- keep it as a subtle dark grey, just above the background.
-  local diff_delete_filler_fg =
-    highlight.blend(normal_bg, highlight.darken_hsl(normal_fg, -1 + 0.25), 0.35)
+  local diff_delete_filler_fg = highlight.darken_hsl(normal_fg, -0.8)
   do
     local configured = mrl.ui.current and mrl.ui.current.float_bg
     if vim.is_callable(configured) then
