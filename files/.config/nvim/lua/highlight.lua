@@ -96,6 +96,230 @@ local function tint(color, percent)
   return fmt('#%02x%02x%02x', blend(r), blend(g), blend(b))
 end
 
+--- Blend two hex colors using an alpha for the foreground.
+--- `alpha = 0` returns bg, `alpha = 1` returns fg.
+---@param bg string hex color (#RRGGBB)
+---@param fg string hex color (#RRGGBB)
+---@param alpha number 0..1
+---@return string
+local function blend(bg, fg, alpha)
+  assert(bg and fg and alpha ~= nil, 'blend(bg, fg, alpha) requires 3 args')
+  if type(bg) ~= 'string' or type(fg) ~= 'string' then return 'NONE' end
+  if bg == 'NONE' or fg == 'NONE' then return 'NONE' end
+  if not bg:match('^#%x%x%x%x%x%x$') or not fg:match('^#%x%x%x%x%x%x$') then
+    return 'NONE'
+  end
+  alpha = math.min(math.max(alpha, 0), 1)
+
+  local br, bgc, bb =
+    tonumber(bg:sub(2, 3), 16),
+    tonumber(bg:sub(4, 5), 16),
+    tonumber(bg:sub(6, 7), 16)
+  local fr, fgc, fb =
+    tonumber(fg:sub(2, 3), 16),
+    tonumber(fg:sub(4, 5), 16),
+    tonumber(fg:sub(6, 7), 16)
+  if not br or not bgc or not bb or not fr or not fgc or not fb then
+    return 'NONE'
+  end
+
+  local function mix(b, f) return math.floor((1 - alpha) * b + alpha * f + 0.5) end
+  return fmt('#%02x%02x%02x', mix(br, fr), mix(bgc, fgc), mix(bb, fb))
+end
+
+-- Blend two hex colors with alpha compositing
+-- @param fg_hex: foreground color in hex format (e.g., "#ff0000" or "ff0000")
+-- @param bg_hex: background color in hex format
+-- @param alpha: alpha value for foreground (0.0 to 1.0), defaults to 0.5
+-- @return: blended color in hex format
+local function blend_colors(fg_hex, bg_hex, alpha)
+  alpha = alpha or 0.5
+
+  if type(fg_hex) ~= 'string' or type(bg_hex) ~= 'string' then return 'NONE' end
+  if fg_hex == 'NONE' or bg_hex == 'NONE' then return 'NONE' end
+
+  -- Remove '#' if present
+  fg_hex = fg_hex:gsub('#', '')
+  bg_hex = bg_hex:gsub('#', '')
+
+  if #fg_hex ~= 6 or #bg_hex ~= 6 then return 'NONE' end
+
+  -- Parse hex colors to RGB
+  local fg_r = tonumber(fg_hex:sub(1, 2), 16)
+  local fg_g = tonumber(fg_hex:sub(3, 4), 16)
+  local fg_b = tonumber(fg_hex:sub(5, 6), 16)
+
+  local bg_r = tonumber(bg_hex:sub(1, 2), 16)
+  local bg_g = tonumber(bg_hex:sub(3, 4), 16)
+  local bg_b = tonumber(bg_hex:sub(5, 6), 16)
+
+  if not fg_r or not fg_g or not fg_b or not bg_r or not bg_g or not bg_b then
+    return 'NONE'
+  end
+
+  alpha = math.min(math.max(alpha, 0), 1)
+
+  -- Alpha blend: out = fg * alpha + bg * (1 - alpha)
+  local out_r = math.floor(fg_r * alpha + bg_r * (1 - alpha) + 0.5)
+  local out_g = math.floor(fg_g * alpha + bg_g * (1 - alpha) + 0.5)
+  local out_b = math.floor(fg_b * alpha + bg_b * (1 - alpha) + 0.5)
+
+  -- Convert back to hex
+  return string.format('#%02x%02x%02x', out_r, out_g, out_b)
+end
+
+local function normalize_hex(hex)
+  if type(hex) ~= 'string' then return nil end
+  hex = hex:gsub('#', '')
+  if #hex ~= 6 then return nil end
+  return hex:lower()
+end
+
+-- Convert RGB (0..255) to HSL (0..1)
+local function rgb_to_hsl(r, g, b)
+  r, g, b = r / 255, g / 255, b / 255
+  local maxc, minc = math.max(r, g, b), math.min(r, g, b)
+  local h, s, l = 0, 0, (maxc + minc) / 2
+
+  if maxc ~= minc then
+    local d = maxc - minc
+    s = l > 0.5 and d / (2 - maxc - minc) or d / (maxc + minc)
+
+    if maxc == r then
+      h = (g - b) / d + (g < b and 6 or 0)
+    elseif maxc == g then
+      h = (b - r) / d + 2
+    else
+      h = (r - g) / d + 4
+    end
+    h = h / 6
+  end
+
+  return h, s, l
+end
+
+-- Convert HSL (0..1) to RGB (0..255 ints)
+local function hsl_to_rgb(h, s, l)
+  local function hue_to_rgb(p, q, t)
+    if t < 0 then t = t + 1 end
+    if t > 1 then t = t - 1 end
+    if t < 1 / 6 then return p + (q - p) * 6 * t end
+    if t < 1 / 2 then return q end
+    if t < 2 / 3 then return p + (q - p) * (2 / 3 - t) * 6 end
+    return p
+  end
+
+  local r, g, b
+  if s == 0 then
+    r, g, b = l, l, l
+  else
+    local q = l < 0.5 and l * (1 + s) or l + s - l * s
+    local p = 2 * l - q
+    r = hue_to_rgb(p, q, h + 1 / 3)
+    g = hue_to_rgb(p, q, h)
+    b = hue_to_rgb(p, q, h - 1 / 3)
+  end
+
+  return math.floor(r * 255 + 0.5),
+    math.floor(g * 255 + 0.5),
+    math.floor(b * 255 + 0.5)
+end
+
+-- Darken a color by scaling HSL lightness while preserving hue/saturation.
+-- `lightness_factor` in 0..1: lower is darker.
+local function darken_hsl(hex, lightness_factor)
+  lightness_factor = lightness_factor or 0.0
+  local h = normalize_hex(hex)
+  if not h then return 'NONE' end
+  local r = tonumber(h:sub(1, 2), 16)
+  local g = tonumber(h:sub(3, 4), 16)
+  local b = tonumber(h:sub(5, 6), 16)
+  if not r or not g or not b then return 'NONE' end
+
+  local hh, ss, ll = rgb_to_hsl(r, g, b)
+
+  if lightness_factor > 0 then
+    -- Lighten: move toward 1.0 (white)
+    ll = ll + (1 - ll) * lightness_factor
+  else
+    -- Darken: move toward 0.0 (black)
+    ll = ll * (1 + lightness_factor)
+  end
+
+  ll = math.min(math.max(ll, 0), 1)
+  r, g, b = hsl_to_rgb(hh, ss, ll)
+  return fmt('#%02x%02x%02x', r, g, b)
+end
+
+--- Compute an alpha (0..1) such that blend(bg, fg, alpha) ~= target.
+--- Returns a best-effort alpha (averaged across RGB channels) and clamps to [0,1].
+---@param bg string hex color (#RRGGBB)
+---@param fg string hex color (#RRGGBB)
+---@param target string hex color (#RRGGBB)
+---@return number
+local function blend_alpha(bg, fg, target)
+  if
+    type(bg) ~= 'string'
+    or type(fg) ~= 'string'
+    or type(target) ~= 'string'
+    or bg == 'NONE'
+    or fg == 'NONE'
+    or target == 'NONE'
+    or not bg:match('^#%x%x%x%x%x%x$')
+    or not fg:match('^#%x%x%x%x%x%x$')
+    or not target:match('^#%x%x%x%x%x%x$')
+  then
+    return 0.5
+  end
+
+  local br, bgc, bb =
+    tonumber(bg:sub(2, 3), 16),
+    tonumber(bg:sub(4, 5), 16),
+    tonumber(bg:sub(6, 7), 16)
+  local fr, fgc, fb =
+    tonumber(fg:sub(2, 3), 16),
+    tonumber(fg:sub(4, 5), 16),
+    tonumber(fg:sub(6, 7), 16)
+  local tr, tgc, tb =
+    tonumber(target:sub(2, 3), 16),
+    tonumber(target:sub(4, 5), 16),
+    tonumber(target:sub(6, 7), 16)
+  if
+    not br
+    or not bgc
+    or not bb
+    or not fr
+    or not fgc
+    or not fb
+    or not tr
+    or not tgc
+    or not tb
+  then
+    return 0.5
+  end
+
+  local function alpha_for(b, f, t)
+    local denom = (f - b)
+    if denom == 0 then return nil end
+    return (t - b) / denom
+  end
+
+  local alphas = {
+    alpha_for(br, fr, tr),
+    alpha_for(bgc, fgc, tgc),
+    alpha_for(bb, fb, tb),
+  }
+
+  local sum, n = 0, 0
+  for _, a in ipairs(alphas) do
+    if a and a == a and a ~= math.huge and a ~= -math.huge then
+      sum, n = sum + a, n + 1
+    end
+  end
+  local a = n > 0 and (sum / n) or 0.5
+  return math.min(math.max(a, 0), 1)
+end
+
 local err_warn = vim.schedule_wrap(function(group, attribute)
   notify(
     fmt(
@@ -246,6 +470,12 @@ mrl.highlight = {
   set = set,
   all = all,
   tint = tint,
+  blend = blend,
+  blend_colors = blend_colors,
+  blend_alpha = blend_alpha,
+  rgb_to_hsl = rgb_to_hsl,
+  hsl_to_rgb = hsl_to_rgb,
+  darken_hsl = darken_hsl,
   plugin = plugin,
   set_winhl = set_winhl,
 }

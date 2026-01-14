@@ -49,6 +49,8 @@ function mrl.ui.refresh_palette()
     teal = '#15AABF',
     pale_pink = '#b490c0',
     magenta = '#c678dd',
+    -- "red" should track the theme's git-delete color (see derived.red below)
+    red = '#E06C75',
     pale_red = '#E06C75',
     light_red = '#c43e1f',
     dark_red = '#be5046',
@@ -72,6 +74,8 @@ function mrl.ui.refresh_palette()
     derived.magenta = pal.magenta or defaults.magenta
     derived.pale_pink = pal.pink or pal.magenta or defaults.pale_pink
     derived.pale_red = pal.red or defaults.pale_red
+    -- Prefer the actual GitSignsDelete highlight if available (theme-defined)
+    derived.red = hex_from_hl('GitSignsDelete', 'fg', pal.red or defaults.red)
     derived.dark_orange = pal.orange or defaults.dark_orange
     derived.bright_yellow = pal.yellow or defaults.bright_yellow
     derived.light_yellow = pal.yellow or defaults.light_yellow
@@ -82,6 +86,7 @@ function mrl.ui.refresh_palette()
   else
     -- Generic fallback: derive from highlight groups
     derived.pale_red = hex_from_hl('DiagnosticError', 'fg', defaults.pale_red)
+    derived.red = hex_from_hl('GitSignsDelete', 'fg', derived.pale_red or defaults.red)
     derived.dark_orange = hex_from_hl('DiagnosticWarn', 'fg', defaults.dark_orange)
     derived.teal = hex_from_hl('DiagnosticInfo', 'fg', defaults.teal)
     derived.bright_blue = hex_from_hl('DiagnosticHint', 'fg', defaults.bright_blue)
@@ -273,7 +278,7 @@ mrl.ui.lsp = {
 -- Keep palette synced to the active colorscheme.
 vim.api.nvim_create_autocmd({ 'ColorScheme' }, {
   group = vim.api.nvim_create_augroup('MrlUIPalette', { clear = true }),
-  callback = function() vim.schedule(mrl.ui.refresh_palette) end,
+  callback = function() mrl.ui.refresh_palette() end,
 })
 vim.schedule(mrl.ui.refresh_palette)
 

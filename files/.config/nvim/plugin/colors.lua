@@ -14,13 +14,75 @@ end
 
 local highlight = mrl.highlight
 
+local function blend_colors(fg_hex, bg_hex, alpha)
+  alpha = alpha or 0.5
+
+  -- Remove '#' if present
+  fg_hex = fg_hex:gsub('#', '')
+  bg_hex = bg_hex:gsub('#', '')
+
+  -- Parse hex colors to RGB
+  local fg_r = tonumber(fg_hex:sub(1, 2), 16)
+  local fg_g = tonumber(fg_hex:sub(3, 4), 16)
+  local fg_b = tonumber(fg_hex:sub(5, 6), 16)
+
+  local bg_r = tonumber(bg_hex:sub(1, 2), 16)
+  local bg_g = tonumber(bg_hex:sub(3, 4), 16)
+  local bg_b = tonumber(bg_hex:sub(5, 6), 16)
+
+  -- Alpha blend: out = fg * alpha + bg * (1 - alpha)
+  local out_r = math.floor(fg_r * alpha + bg_r * (1 - alpha) + 0.5)
+  local out_g = math.floor(fg_g * alpha + bg_g * (1 - alpha) + 0.5)
+  local out_b = math.floor(fg_b * alpha + bg_b * (1 - alpha) + 0.5)
+
+  -- Convert back to hex
+  return string.format('#%02x%02x%02x', out_r, out_g, out_b)
+end
+
 local function general_overrides(dim_factor)
   local is_dark = vim.g.high_contrast_theme
   local normal_bg = highlight.get('Normal', 'bg')
+  local normal_fg = highlight.get('Normal', 'fg', '#ffffff')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
-  local stl_bg = '#3e3a3e'
+  local stl_bg = highlight.darken_hsl(normal_bg, 0.15)
   local float_bg = normal_bg
+  local pal = (mrl.ui and mrl.ui.palette) or {}
+  -- Deleted-line diff background should track the theme's GitSignsDelete color.
+  -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
+  local diff_delete_fg = highlight.get(
+    'GitSignsDelete',
+    'fg',
+    type(pal.red) == 'string' and pal.red
+      or type(pal.pale_red) == 'string' and pal.pale_red
+      or '#ff0000'
+  )
+  -- Added-line diff background should track the theme's GitSignsAdd color.
+  local diff_add_fg = highlight.get(
+    'GitSignsAdd',
+    'fg',
+    type(pal.green) == 'string' and pal.green or '#00ff00'
+  )
+  local diff_change_fg = highlight.get(
+    'GitSignsChange',
+    'fg',
+    type(pal.bright_yellow) == 'string' and pal.bright_yellow
+      or type(pal.light_yellow) == 'string' and pal.light_yellow
+      or '#0000ff'
+  )
+
+  -- VSCode-ish: keep original text colors, just tint backgrounds.
+  -- Use HSL darkening to keep hue/saturation consistent across themes.
+  local diff_bg_factor = 0.3
+  local diff_add_bg = highlight.darken_hsl(diff_add_fg, -1 + 0.15)
+  local diff_delete_bg = highlight.darken_hsl(diff_delete_fg, -1 + 0.15)
+  local diff_change_bg = highlight.darken_hsl(diff_change_fg, -1 + 0.20)
+  local diff_text_bg = highlight.darken_hsl(diff_change_fg, -1 + 0.30)
+  -- Diff filler lines use the `fillchars.diff` glyph (you set it to '╱').
+  -- This glyph is highlighted with `DiffDelete` and can look too bright, so
+  -- keep it as a subtle dark grey, just above the background.
+  local diff_delete_filler_fg =
+    highlight.blend(normal_bg, highlight.darken_hsl(normal_fg, -1 + 0.25), 0.35)
   do
     local configured = mrl.ui.current and mrl.ui.current.float_bg
     if vim.is_callable(configured) then
@@ -195,11 +257,31 @@ local function general_overrides(dim_factor)
     { MasonHeading = { inherit = 'MasonNormal', bold = true } },
     { MasonHeader = { inherit = 'MasonNormal', bold = true } },
     { MasonHeaderSecondary = { inherit = 'MasonNormal', bold = true } },
-    { MasonHighlight = { fg = { from = 'DiagnosticInfo', attr = 'fg' }, bg = float_bg } },
-    { MasonHighlightSecondary = { fg = { from = 'DiagnosticHint', attr = 'fg' }, bg = float_bg } },
+    {
+      MasonHighlight = {
+        fg = { from = 'DiagnosticInfo', attr = 'fg' },
+        bg = float_bg,
+      },
+    },
+    {
+      MasonHighlightSecondary = {
+        fg = { from = 'DiagnosticHint', attr = 'fg' },
+        bg = float_bg,
+      },
+    },
     { MasonMuted = { fg = { from = 'Comment', attr = 'fg' }, bg = float_bg } },
-    { MasonWarning = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = float_bg } },
-    { MasonError = { fg = { from = 'DiagnosticError', attr = 'fg' }, bg = float_bg } },
+    {
+      MasonWarning = {
+        fg = { from = 'DiagnosticWarn', attr = 'fg' },
+        bg = float_bg,
+      },
+    },
+    {
+      MasonError = {
+        fg = { from = 'DiagnosticError', attr = 'fg' },
+        bg = float_bg,
+      },
+    },
     -- Lazy.nvim UI (doesn't necessarily use NormalFloat directly)
     { LazyNormal = { bg = float_bg } },
     { LazyBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
@@ -242,10 +324,30 @@ local function general_overrides(dim_factor)
     { SpellRare = { undercurl = true } },
     -- }}}
     -- Diff {{{
-    -- { DiffAdd = { bg = '#26332c', fg = 'NONE', underline = false } },
-    -- { DiffDelete = { bg = '#572E33', fg = '#5c6370', underline = false } },
-    -- { DiffChange = { bg = '#273842', fg = 'NONE', underline = false } },
-    -- { DiffText = { bg = '#314753', fg = 'NONE' } },
+    -- Diff (VSCode-ish): only change backgrounds
+    {
+      DiffAdd = {
+        bg = diff_add_bg,
+      },
+    },
+    { DiffAddText = { inherit = 'DiffAdd', bold = true } },
+    {
+      DiffChange = {
+        bg = diff_change_bg,
+      },
+    },
+    {
+      DiffDelete = {
+        bg = diff_delete_bg,
+        fg = diff_delete_filler_fg,
+      },
+    },
+    { DiffDeleteText = { inherit = 'DiffDelete', bold = true } },
+    {
+      DiffText = {
+        bg = diff_text_bg,
+      },
+    },
     -- these highlights are syntax groups that are set in diff.vim
     { diffAdded = { inherit = 'DiffAdd' } },
     { diffChanged = { inherit = 'DiffChange' } },
@@ -389,12 +491,39 @@ local function general_overrides(dim_factor)
         fg = { from = 'Normal', attr = 'fg' },
       },
     },
-    { FzfLuaBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
-    { FzfLuaPreviewNormal = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
-    { FzfLuaPreviewBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
-    { FzfLuaPreviewTitle = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
-    { FzfLuaHelpNormal = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
-    { FzfLuaHelpBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
+    {
+      FzfLuaBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } },
+    },
+    {
+      FzfLuaPreviewNormal = {
+        bg = float_bg,
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaPreviewBorder = {
+        bg = float_bg,
+        fg = { from = 'Comment', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaPreviewTitle = {
+        bg = float_bg,
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaHelpNormal = {
+        bg = float_bg,
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      FzfLuaHelpBorder = {
+        bg = float_bg,
+        fg = { from = 'Comment', attr = 'fg' },
+      },
+    },
     -- FzfLuaBorder Normal  hls.border  Main win border
     -- FzfLuaTitle  FzfLuaNormal    hls.title   Main win title
     -- FzfLuaBackdrop   *bg=Black   hls.backdrop    Backdrop color
@@ -579,6 +708,12 @@ end
 
 augroup('UserHighlights', {
   event = 'ColorScheme',
+  command = function() user_highlights() end,
+}, {
+  -- Run once after plugins load, so plugin highlight overrides don't win.
+  event = 'User',
+  pattern = 'LazyDone',
+  once = true,
   command = function() user_highlights() end,
 }, {
   event = 'FileType',
