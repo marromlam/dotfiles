@@ -61,8 +61,8 @@ return {
       direction = 'float',
       on_open = float_handler,
       highlights = {
-        FloatBorder = { guibg = 'Black', guifg = 'DarkGray' },
-        NormalFloat = { guibg = 'Black' },
+        FloatBorder = { link = 'FloatBorder' },
+        NormalFloat = { link = 'NormalFloat' },
       },
     })
 

@@ -20,6 +20,15 @@ local function general_overrides(dim_factor)
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
   local stl_bg = '#3e3a3e'
+  local float_bg = normal_bg
+  do
+    local configured = mrl.ui.current and mrl.ui.current.float_bg
+    if vim.is_callable(configured) then
+      float_bg = configured()
+    elseif type(configured) == 'string' then
+      float_bg = configured
+    end
+  end
   highlight.all({
     -- { PanelSt = { link = 'StatusLine' } },
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
@@ -163,9 +172,14 @@ local function general_overrides(dim_factor)
     },
     -- }}}
     -- Floats {{{
-    { NormalFloat = { bg = { from = 'Normal', alter = -0.15 } } },
+    -- Ensure no highlight-level transparency ("blend") affects floats.
+    { NormalFloat = { bg = float_bg, blend = 0 } },
     {
-      FloatBorder = { bg = { from = 'NormalFloat' }, fg = { from = 'Comment' } },
+      FloatBorder = {
+        bg = { from = 'NormalFloat' },
+        fg = { from = 'Comment' },
+        blend = 0,
+      },
     },
     {
       FloatTitle = {
@@ -174,6 +188,45 @@ local function general_overrides(dim_factor)
         bg = { from = 'FloatBorder', attr = 'fg' },
       },
     },
+    -- Mason (doesn't necessarily use NormalFloat directly)
+    { MasonNormal = { fg = { from = 'Normal', attr = 'fg' }, bg = float_bg } },
+    { MasonNormalNC = { inherit = 'MasonNormal' } },
+    { MasonBorder = { fg = { from = 'Comment', attr = 'fg' }, bg = float_bg } },
+    { MasonHeading = { inherit = 'MasonNormal', bold = true } },
+    { MasonHeader = { inherit = 'MasonNormal', bold = true } },
+    { MasonHeaderSecondary = { inherit = 'MasonNormal', bold = true } },
+    { MasonHighlight = { fg = { from = 'DiagnosticInfo', attr = 'fg' }, bg = float_bg } },
+    { MasonHighlightSecondary = { fg = { from = 'DiagnosticHint', attr = 'fg' }, bg = float_bg } },
+    { MasonMuted = { fg = { from = 'Comment', attr = 'fg' }, bg = float_bg } },
+    { MasonWarning = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = float_bg } },
+    { MasonError = { fg = { from = 'DiagnosticError', attr = 'fg' }, bg = float_bg } },
+    -- Lazy.nvim UI (doesn't necessarily use NormalFloat directly)
+    { LazyNormal = { bg = float_bg } },
+    { LazyBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
+    { LazyButton = { bg = float_bg } },
+    { LazyButtonActive = { bg = float_bg } },
+    { LazyH1 = { bg = float_bg } },
+    { LazyH2 = { bg = float_bg } },
+    -- Notify (rcarriga/nvim-notify)
+    { NotifyBackground = { bg = float_bg } },
+    { NotifyERRORBody = { bg = float_bg } },
+    { NotifyWARNBody = { bg = float_bg } },
+    { NotifyINFOBody = { bg = float_bg } },
+    { NotifyDEBUGBody = { bg = float_bg } },
+    { NotifyTRACEBody = { bg = float_bg } },
+    { NotifyERRORBorder = { bg = float_bg } },
+    { NotifyWARNBorder = { bg = float_bg } },
+    { NotifyINFOBorder = { bg = float_bg } },
+    { NotifyDEBUGBorder = { bg = float_bg } },
+    { NotifyTRACEBorder = { bg = float_bg } },
+    { NotifyERRORTitle = { bg = float_bg } },
+    { NotifyWARNTitle = { bg = float_bg } },
+    { NotifyINFOTitle = { bg = float_bg } },
+    { NotifyDEBUGTitle = { bg = float_bg } },
+    { NotifyTRACETitle = { bg = float_bg } },
+    -- which-key (popup window)
+    { WhichKeyFloat = { link = 'NormalFloat' } },
+    { WhichKeyBorder = { link = 'FloatBorder' } },
     -- }}}
     -- Created highlights {{{
     { Dim = { fg = { from = 'Normal', attr = 'bg', alter = dim_factor } } },
@@ -320,22 +373,28 @@ local function general_overrides(dim_factor)
     -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
     {
       FzfLuaNormal = {
-        bg = { from = 'Normal', attr = 'bg' },
+        bg = float_bg,
         fg = { from = 'Normal', attr = 'fg' },
       },
     },
     {
       FzfLuaTitle = {
-        bg = { from = 'Normal', attr = 'bg' },
+        bg = float_bg,
         fg = { from = 'Normal', attr = 'fg' },
       },
     },
     {
       FzfLuaTitle = {
-        bg = { from = 'Normal', attr = 'bg' },
+        bg = float_bg,
         fg = { from = 'Normal', attr = 'fg' },
       },
     },
+    { FzfLuaBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
+    { FzfLuaPreviewNormal = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
+    { FzfLuaPreviewBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
+    { FzfLuaPreviewTitle = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
+    { FzfLuaHelpNormal = { bg = float_bg, fg = { from = 'Normal', attr = 'fg' } } },
+    { FzfLuaHelpBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
     -- FzfLuaBorder Normal  hls.border  Main win border
     -- FzfLuaTitle  FzfLuaNormal    hls.title   Main win title
     -- FzfLuaBackdrop   *bg=Black   hls.backdrop    Backdrop color
@@ -369,7 +428,7 @@ local function general_overrides(dim_factor)
     -- FzfLuaDirPart    Comment hls.dir_part    Path formatters directory hl group
     -- FzfLuaFilePart   @none   hls.file_part   Path formatters file hl group
     -- FzfLuaLiveSym    *Brown1 hls.live_sym    LSP live symbols query match
-    { FzfLuaFzfNormal = { bg = '#ffff00', fg = '#00ff00' } },
+    { FzfLuaFzfNormal = { bg = float_bg, fg = '#00ff00' } },
     -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
     -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
     { ['@fzf.normal'] = { bg = '#ff0000', fg = '#00ff00' } },

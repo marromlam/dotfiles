@@ -20,6 +20,16 @@ return {
         top_down = false,
         render = 'wrapped-compact',
         stages = 'fade_in_slide_out',
+        -- Used by notify for blending/opacity calculations; keep aligned with float bg
+        background_colour = (function()
+          local configured = mrl.ui.current and mrl.ui.current.float_bg
+          if vim.is_callable(configured) then return configured() end
+          if type(configured) == 'string' then return configured end
+          if mrl and mrl.highlight and mrl.highlight.get then
+            return mrl.highlight.get('Normal', 'bg')
+          end
+          return 'NONE'
+        end)(),
         on_open = function(win)
           if vim.api.nvim_win_is_valid(win) then
             vim.api.nvim_win_set_config(win, { border = 'single' })

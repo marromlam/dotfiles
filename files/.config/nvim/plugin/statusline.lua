@@ -595,7 +595,7 @@ function mrl.ui.statusline.render()
       table.insert(
         component_opts[1],
         1,
-        { icons.misc.clippy .. ': ', 'StTitle' }
+        { icons.misc.puzzle .. ': ', 'StTitle' }
       )
       component_opts.id = LSP_COMPONENT_ID
       component_opts.click = 'v:lua.mrl.ui.statusline.lsp_client_click'
@@ -691,7 +691,6 @@ function mrl.ui.statusline.render()
     -- neovim package updates
     {
       {
-        { 'updates:', 'StFaded' },
         { space, 'StSeparator' },
         { pending_updates, 'StTitle' },
         { space, 'StSeparator' },

@@ -4,27 +4,123 @@
 
 -- mrl.p_table is defined in tools.lua, which is loaded before this file in
 -- init.lua
+--
+-- Theme palette (derived from active colorscheme).
+-- NOTE: we mutate this table in-place so any modules that captured a reference
+-- (e.g. `local P = mrl.ui.palette`) keep seeing updates after `:colorscheme`.
+mrl.ui.palette = mrl.ui.palette or {}
 
-mrl.ui.palette = {
-  green = '#98c379',
-  dark_green = '#10B981',
-  blue = '#82AAFE',
-  dark_blue = '#4e88ff',
-  bright_blue = '#51afef',
-  teal = '#15AABF',
-  pale_pink = '#b490c0',
-  magenta = '#c678dd',
-  pale_red = '#E06C75',
-  light_red = '#c43e1f',
-  dark_red = '#be5046',
-  dark_orange = '#FF922B',
-  bright_yellow = '#FAB005',
-  light_yellow = '#e5c07b',
-  whitesmoke = '#9E9E9E',
-  light_gray = '#626262',
-  comment_grey = '#5c6370',
-  grey = '#3E4556',
-}
+local function hex_from_hl(name, attr, fallback)
+  local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
+  if not ok or not hl then return fallback end
+  local v = hl[attr]
+  if not v then return fallback end
+  return ('#%06x'):format(v)
+end
+
+local function tint(color, percent)
+  local ok = type(color) == 'string' and color:match('^#%x%x%x%x%x%x$')
+  if not ok then return color end
+  local r = tonumber(color:sub(2, 3), 16)
+  local g = tonumber(color:sub(4, 5), 16)
+  local b = tonumber(color:sub(6, 7), 16)
+  local function blend(component)
+    component = math.floor(component * (1 + percent))
+    return math.min(math.max(component, 0), 255)
+  end
+  return ('#%02x%02x%02x'):format(blend(r), blend(g), blend(b))
+end
+
+local function get_nightfox_palette()
+  local ok, nightfox_palette = pcall(require, 'nightfox.palette')
+  if not ok or not nightfox_palette or not nightfox_palette.load then return nil end
+  return nightfox_palette.load(vim.g.colors_name or 'carbonfox')
+end
+
+--- Refresh palette from the active colorscheme.
+function mrl.ui.refresh_palette()
+  -- Prior hardcoded palette as last-resort defaults
+  local defaults = {
+    green = '#98c379',
+    dark_green = '#10B981',
+    blue = '#82AAFE',
+    dark_blue = '#4e88ff',
+    bright_blue = '#51afef',
+    teal = '#15AABF',
+    pale_pink = '#b490c0',
+    magenta = '#c678dd',
+    pale_red = '#E06C75',
+    light_red = '#c43e1f',
+    dark_red = '#be5046',
+    dark_orange = '#FF922B',
+    bright_yellow = '#FAB005',
+    light_yellow = '#e5c07b',
+    whitesmoke = '#9E9E9E',
+    light_gray = '#626262',
+    comment_grey = '#5c6370',
+    grey = '#3E4556',
+  }
+
+  local pal = get_nightfox_palette()
+  local derived = {}
+
+  if pal then
+    -- Nightfox palette naming (works across carbonfox/nightfox variants)
+    derived.green = pal.green or defaults.green
+    derived.blue = pal.blue or defaults.blue
+    derived.teal = pal.cyan or pal.teal or defaults.teal
+    derived.magenta = pal.magenta or defaults.magenta
+    derived.pale_pink = pal.pink or pal.magenta or defaults.pale_pink
+    derived.pale_red = pal.red or defaults.pale_red
+    derived.dark_orange = pal.orange or defaults.dark_orange
+    derived.bright_yellow = pal.yellow or defaults.bright_yellow
+    derived.light_yellow = pal.yellow or defaults.light_yellow
+    derived.comment_grey = pal.comment or pal.fg3 or defaults.comment_grey
+    derived.whitesmoke = pal.fg1 or pal.fg0 or defaults.whitesmoke
+    derived.light_gray = pal.fg3 or defaults.light_gray
+    derived.grey = pal.bg3 or pal.bg2 or defaults.grey
+  else
+    -- Generic fallback: derive from highlight groups
+    derived.pale_red = hex_from_hl('DiagnosticError', 'fg', defaults.pale_red)
+    derived.dark_orange = hex_from_hl('DiagnosticWarn', 'fg', defaults.dark_orange)
+    derived.teal = hex_from_hl('DiagnosticInfo', 'fg', defaults.teal)
+    derived.bright_blue = hex_from_hl('DiagnosticHint', 'fg', defaults.bright_blue)
+    derived.green = hex_from_hl('GitSignsAdd', 'fg', defaults.green)
+    derived.blue = hex_from_hl('Function', 'fg', defaults.blue)
+    derived.magenta = hex_from_hl('Statement', 'fg', defaults.magenta)
+    derived.pale_pink = hex_from_hl('Special', 'fg', defaults.pale_pink)
+    derived.bright_yellow = hex_from_hl('WarningMsg', 'fg', defaults.bright_yellow)
+    derived.light_yellow = derived.bright_yellow
+    derived.comment_grey = hex_from_hl('Comment', 'fg', defaults.comment_grey)
+    derived.whitesmoke = hex_from_hl('Normal', 'fg', defaults.whitesmoke)
+    derived.light_gray = tint(derived.comment_grey, 0.1)
+    derived.grey = tint(hex_from_hl('Normal', 'bg', defaults.grey), 0.15)
+  end
+
+  derived.dark_green = tint(derived.green, -0.25)
+  derived.dark_blue = tint(derived.blue, -0.25)
+  derived.light_red = tint(derived.pale_red, -0.15)
+  derived.dark_red = tint(derived.pale_red, -0.30)
+
+  -- Write into the shared table in-place
+  for k in pairs(mrl.ui.palette) do
+    mrl.ui.palette[k] = nil
+  end
+  for k, v in pairs(defaults) do
+    mrl.ui.palette[k] = derived[k] or v
+  end
+  for k, v in pairs(derived) do
+    mrl.ui.palette[k] = v
+  end
+
+  -- Keep LSP colors in sync with the palette (if lsp table already exists)
+  if mrl.ui.lsp and mrl.ui.lsp.colors then
+    mrl.ui.lsp.colors.error = mrl.ui.palette.pale_red
+    mrl.ui.lsp.colors.warn = mrl.ui.palette.dark_orange
+    mrl.ui.lsp.colors.hint = mrl.ui.palette.bright_blue
+    mrl.ui.lsp.colors.info = mrl.ui.palette.teal
+  end
+end
 
 mrl.ui.border = {
   line = { '┌', '─', '┐', '│', '┘', '─', '└', '│' },
@@ -116,6 +212,7 @@ mrl.ui.icons = {
     -- block = "▌",
     block = '▏',
     clippy = '',
+    puzzle = '',
     settings = '⚙',
     key = '',
     config = '',
@@ -172,6 +269,13 @@ mrl.ui.lsp = {
     TypeParameter = '@lsp.type.parameter',
   },
 }
+
+-- Keep palette synced to the active colorscheme.
+vim.api.nvim_create_autocmd({ 'ColorScheme' }, {
+  group = vim.api.nvim_create_augroup('MrlUIPalette', { clear = true }),
+  callback = function() vim.schedule(mrl.ui.refresh_palette) end,
+})
+vim.schedule(mrl.ui.refresh_palette)
 
 ----------------------------------------------------------------------------------------------------
 -- UI Settings
@@ -323,4 +427,20 @@ function mrl.ui.decorations.set_colorcolumn(bufnr, fn)
 end
 
 ----------------------------------------------------------------------------------------------------
-mrl.ui.current = { border = 'single' } -- Use square borders everywhere
+mrl.ui.current = {
+  border = 'single', -- Use square borders everywhere
+  -- Float/popup background color source of truth.
+  -- Kept as a function so it always matches the active colorscheme's Normal bg.
+  float_bg = function()
+    -- Prefer our highlight helper (returns hex)
+    if mrl and mrl.highlight and mrl.highlight.get then
+      return mrl.highlight.get('Normal', 'bg')
+    end
+
+    -- Fallback to Neovim API (also returns hex)
+    local ok, hl =
+      pcall(vim.api.nvim_get_hl, 0, { name = 'Normal', link = false })
+    if ok and hl and hl.bg then return ('#%06x'):format(hl.bg) end
+    return 'NONE'
+  end,
+}

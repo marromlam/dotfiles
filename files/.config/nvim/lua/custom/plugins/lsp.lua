@@ -7,7 +7,7 @@ return { -- LSP Configuration & Plugins
     event = { 'BufReadPre' },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'mason-org/mason.nvim', config = true },
+      { 'mason-org/mason.nvim', opts = { ui = { border = border } } },
       { 'mason-org/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
 
@@ -20,6 +20,35 @@ return { -- LSP Configuration & Plugins
       },
     },
     config = function()
+      -- Floating UI (hover/signature/diagnostics) border styling
+      -- Some plugins/LSP helpers call `vim.lsp.util.open_floating_preview` directly,
+      -- so enforce a default border there too.
+      do
+        local orig = vim.lsp.util.open_floating_preview
+        ---@diagnostic disable-next-line: duplicate-set-field
+        function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+          opts = opts or {}
+          opts.border = opts.border or border
+          return orig(contents, syntax, opts, ...)
+        end
+      end
+
+      -- Prefer wrapping the existing handlers instead of `vim.lsp.with(...)`
+      -- (some setups/tools flag `vim.lsp.with` / `vim.lsp.handlers.hover` as deprecated).
+      local function with_border(handler)
+        return function(err, result, ctx, config)
+          config = config or {}
+          config.border = config.border or border
+          return handler(err, result, ctx, config)
+        end
+      end
+
+      vim.lsp.handlers['textDocument/hover'] =
+        with_border(vim.lsp.handlers['textDocument/hover'])
+      vim.lsp.handlers['textDocument/signatureHelp'] =
+        with_border(vim.lsp.handlers['textDocument/signatureHelp'])
+      vim.diagnostic.config({ float = { border = border } })
+
       -- Brief aside: **What is LSP?**  #234523
       --
       -- LSP is an initialism you've probably heard, but might not understand what it is.

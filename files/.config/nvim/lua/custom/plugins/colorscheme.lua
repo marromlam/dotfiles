@@ -35,7 +35,6 @@ return {
         invert_intend_guides = false,
         inverse = true,
         overrides = {
-          NormalFloat = { fg = '#ebdbb2', bg = '#504945' },
           Comment = { fg = '#81878f', italic = enable_italics, bold = true },
           Define = { link = 'GruvboxPurple' },
           Macro = { link = 'GruvboxPurple' },
@@ -78,14 +77,6 @@ return {
         vim.api.nvim_set_hl(0, 'StGitAdd', {
           fg = mrl.get_hi('GitSignsAdd').fg,
           bg = mrl.get_hi('Statusline').bg,
-        })
-        vim.api.nvim_set_hl(0, 'NormalFloat', {
-          fg = mrl.get_hi('NormalFloat').fg,
-          bg = mrl.get_hi('Normal').bg,
-        })
-        vim.api.nvim_set_hl(0, 'FloatBorder', {
-          fg = mrl.get_hi('FloatBorder').fg,
-          bg = mrl.get_hi('Normal').bg,
         })
         local cursor_bg = mrl.get_hi('CursorLine').bg
         local comment_fg = mrl.get_hi('Comment').fg

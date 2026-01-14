@@ -57,14 +57,17 @@ return {
       split = { win_options = { winhighlight = { Normal = 'Normal' } } },
       popup = {
         border = { style = border, padding = { 0, 1 } },
+        win_options = { winblend = 0 },
       },
       cmdline_popup = {
         position = { row = 5, col = '50%' },
         size = { width = 'auto', height = 'auto' },
         border = { style = border, padding = { 0, 1 } },
+        win_options = { winblend = 0 },
       },
       confirm = {
         border = { style = border, padding = { 0, 1 }, text = { top = '' } },
+        win_options = { winblend = 0 },
       },
       popupmenu = {
         relative = 'editor',
@@ -72,6 +75,7 @@ return {
         size = { width = 60, height = 10 },
         border = { style = border, padding = { 0, 1 } },
         win_options = {
+          winblend = 0,
           winhighlight = { Normal = 'NormalFloat', FloatBorder = 'FloatBorder' },
         },
       },

@@ -16,9 +16,11 @@ return {
     version = '*',
     init = function()
       highlight.plugin('blink', {
-        { BlinkCmpMenuBorder = { link = 'PickerBorder' } },
-        { BlinkCmpDocBorder = { link = 'PickerBorder' } },
-        { BlinkCmpMenu = { link = 'Normal' } },
+        -- Keep completion popups consistent with float styling
+        { BlinkCmpMenuBorder = { link = 'FloatBorder' } },
+        { BlinkCmpDocBorder = { link = 'FloatBorder' } },
+        { BlinkCmpMenu = { link = 'NormalFloat' } },
+        { BlinkCmpDoc = { link = 'NormalFloat' } },
       })
     end,
     opts = {
@@ -121,6 +123,14 @@ return {
       },
     },
     config = function()
+      highlight.plugin('cmp', {
+        -- nvim-cmp menu + documentation popups
+        { CmpPmenu = { link = 'NormalFloat' } },
+        { CmpPmenuBorder = { link = 'FloatBorder' } },
+        { CmpDocumentation = { link = 'NormalFloat' } },
+        { CmpDocumentationBorder = { link = 'FloatBorder' } },
+      })
+
       -- See `:help cmp`
       local cmp = require('cmp')
       local luasnip = require('luasnip')

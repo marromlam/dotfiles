@@ -31,14 +31,14 @@ gui:
   showCommandLog: true
   commandLogSize: 8
 git:
-  paging:
-    colorArg: never
-    # pager: ydiff -p cat -s --wrap --width={{columnWidth}}
-    # pager: "icdiff --cols={{columnWidth}} --line-numbers --color-map='plain'"
-    # pager: "git difftool --no-prompt {{args}} --extcmd='icdiff --cols={{width}}' {{filename}}"
-    pager: git difftool --no-prompt --extcmd 'icdiff --line-numbers --cols=120'
-    useConfig: false
-    externalDiffCommand: "icdiff --cols={{columnWidth}} --line-numbers --no-headers"
+  pagers:
+    - colorArg: never
+      # pager: ydiff -p cat -s --wrap --width={{columnWidth}}
+      # pager: "icdiff --cols={{columnWidth}} --line-numbers --color-map='plain'"
+      # pager: "git difftool --no-prompt {{args}} --extcmd='icdiff --cols={{width}}' {{filename}}"
+      pager: git difftool --no-prompt --extcmd 'icdiff --line-numbers --cols=120'
+      useConfig: false
+      externalDiffCommand: "icdiff --cols={{columnWidth}} --line-numbers --no-headers"
   merging:
     # only applicable to unix users
     manualCommit: false
