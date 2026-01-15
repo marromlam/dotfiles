@@ -72,47 +72,47 @@ require('external_grep')
 --------------------------------------------------------------------------------
 -- COLORSCHEME and extra temporal highlights {{{
 --------------------------------------------------------------------------------
-vim.o.background = 'dark' -- or "light"
-vim.opt.termguicolors = true
--- vim.cmd([[colorscheme gruvbox]])
-vim.cmd('colorscheme carbonfox')
--- vim.cmd([[colorscheme horizon]])
--- vim.cmd([[colorscheme rose-pine]])
--- vim.cmd([[colorscheme github_dark]])
--- vim.cmd([[colorscheme github_dark_default]])
-
-vim.cmd([[
-hi Match ctermbg=162
-sig define highlightline linehl=Match
-au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost * if expand("%:p") != "" | exe("call map(range(1,1000), {i->execute('sig unplace 999 file='.expand('%:p'))})") | call map(getline(1, '$'), {idx, val -> execute('if val =~ "^\\s*##" | exe "sig place 999 line=".expand(idx+1)." name=highlightline file=".expand("%:p") | endif')}) | endif
-]])
-
-vim.cmd([[
-autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
-autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
-FzfLua register_ui_select
-set colorcolumn=81
-]])
-
-vim.cmd([[
-function! GoToColumnInFile (fileInfoString)
-  let fileInfo = split(a:fileInfoString, ":")
-  let column = 0
-  normal! gF
-  if len(fileInfo) > 2
-    let column = fileInfo[2]
-    execute 'normal! ' . column . '|'
-  endif
-endfunction
-nnoremap <leader>gF :call GoToColumnInFile(expand("<cWORD>"))<CR>
-]])
-
--- enable if neovim >= 0.12
-if vim.fn.has('nvim-0.12') == 1 then
-  vim.cmd([[
-  set diffopt+=inline:char
-  ]])
-end
+-- vim.o.background = 'dark' -- or "light"
+-- vim.opt.termguicolors = true
+-- -- vim.cmd([[colorscheme gruvbox]])
+-- vim.cmd('colorscheme carbonfox')
+-- -- vim.cmd([[colorscheme horizon]])
+-- -- vim.cmd([[colorscheme rose-pine]])
+-- -- vim.cmd([[colorscheme github_dark]])
+-- -- vim.cmd([[colorscheme github_dark_default]])
+--
+-- vim.cmd([[
+-- hi Match ctermbg=162
+-- sig define highlightline linehl=Match
+-- au TextChanged,TextChangedI,TextChangedP,BufWinEnter,BufWritePost,FileWritePost * if expand("%:p") != "" | exe("call map(range(1,1000), {i->execute('sig unplace 999 file='.expand('%:p'))})") | call map(getline(1, '$'), {idx, val -> execute('if val =~ "^\\s*##" | exe "sig place 999 line=".expand(idx+1)." name=highlightline file=".expand("%:p") | endif')}) | endif
+-- ]])
+--
+-- vim.cmd([[
+-- autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
+-- autocmd! FileType fzf tnoremap <buffer> <esc><esc> <c-c>
+-- FzfLua register_ui_select
+-- set colorcolumn=81
+-- ]])
+--
+-- vim.cmd([[
+-- function! GoToColumnInFile (fileInfoString)
+--   let fileInfo = split(a:fileInfoString, ":")
+--   let column = 0
+--   normal! gF
+--   if len(fileInfo) > 2
+--     let column = fileInfo[2]
+--     execute 'normal! ' . column . '|'
+--   endif
+-- endfunction
+-- nnoremap <leader>gF :call GoToColumnInFile(expand("<cWORD>"))<CR>
+-- ]])
+--
+-- -- enable if neovim >= 0.12
+-- if vim.fn.has('nvim-0.12') == 1 then
+--   vim.cmd([[
+--   set diffopt+=inline:char
+--   ]])
+-- end
 
 -- old stuff
 -- vim.cmd [[

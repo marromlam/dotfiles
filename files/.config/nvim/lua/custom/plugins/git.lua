@@ -405,7 +405,12 @@ return {
     -- dir = '~/Workspaces/personal/git-worktree.nvim',
 
     dependencies = { 'nvim-lua/plenary.nvim' },
-    lazy = false,
+    cmd = {
+      'GitWorktreeCreate',
+      'GitWorktreeDelete',
+      'GitWorktreeList',
+      'GitWorktreeSwitch',
+    },
   },
 }
 

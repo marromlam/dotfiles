@@ -134,8 +134,9 @@ return { -- Collection of various small independent plugins/modules
   {
     'echasnovski/mini.icons',
     version = false,
-    lazy = false,
-    priority = 1000, -- Load early so mock is available for other plugins
+    -- This was a measurable startup cost (~10ms). None of your always-on startup
+    -- plugins require devicons, so load it after UI is up.
+    event = 'VeryLazy',
     config = function()
       -- Setup with optimized config
       require('mini.icons').setup({

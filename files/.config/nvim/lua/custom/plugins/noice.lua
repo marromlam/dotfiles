@@ -4,7 +4,9 @@ local border, highlight, L =
 
 return {
   'folke/noice.nvim',
-  event = 'VeryLazy',
+  -- Defer until you actually enter the command-line (big startup win).
+  event = 'CmdlineEnter',
+  cmd = { 'Noice', 'NoiceHistory', 'NoiceLast', 'NoiceDismiss', 'NoiceErrors' },
   dependencies = { 'MunifTanjim/nui.nvim' },
   -- cond = false,
   -- disable = true,

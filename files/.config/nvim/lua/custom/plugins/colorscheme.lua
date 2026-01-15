@@ -5,11 +5,11 @@ return {
 
   {
     'ellisonleao/gruvbox.nvim',
-    lazy = false,
-    -- cond = false,
+    -- Keep available, but don't pay startup cost unless you re-enable it.
+    enabled = false,
+    cond = false,
     -- enabled = false,
     priority = 1000,
-    enabled = true,
     config = function()
       -- Setup basic colorscheme first (fast path)
       require('gruvbox').setup({
@@ -113,6 +113,8 @@ return {
   -- First, install the plugin (using lazy.nvim as an example)
   {
     'EdenEast/nightfox.nvim',
+    lazy = false,
+    priority = 1000,
     config = function()
       require('nightfox').setup({
         options = {

@@ -146,7 +146,64 @@ vim.opt.confirm = true -- make vim prompt me to save before doing destructive th
 vim.opt.completeopt = { 'menuone', 'noselect' }
 vim.opt.hlsearch = true
 vim.opt.autowriteall = true -- automatically :write before running commands and changing files
-vim.opt.clipboard = { 'unnamedplus' }
+-- Clipboard can be a major startup cost on some systems (notably WSL) because
+-- the default clipboard provider does discovery work. Defer setup and prefer a
+-- fast explicit provider when available.
+vim.schedule(function()
+  local fn = vim.fn
+
+  local function set_opt()
+    -- Use unnamedplus (system clipboard) once a provider is configured.
+    vim.opt.clipboard = { 'unnamedplus' }
+  end
+
+  if fn.executable('win32yank.exe') == 1 then
+    vim.g.clipboard = {
+      name = 'win32yank',
+      copy = {
+        ['+'] = 'win32yank.exe -i --crlf',
+        ['*'] = 'win32yank.exe -i --crlf',
+      },
+      paste = {
+        ['+'] = 'win32yank.exe -o --lf',
+        ['*'] = 'win32yank.exe -o --lf',
+      },
+      cache_enabled = 0,
+    }
+    set_opt()
+  elseif fn.executable('wl-copy') == 1 and fn.executable('wl-paste') == 1 then
+    vim.g.clipboard = {
+      name = 'wl-clipboard',
+      copy = {
+        ['+'] = 'wl-copy --foreground --type text/plain',
+        ['*'] = 'wl-copy --foreground --type text/plain',
+      },
+      paste = {
+        ['+'] = 'wl-paste --no-newline',
+        ['*'] = 'wl-paste --no-newline',
+      },
+      cache_enabled = 1,
+    }
+    set_opt()
+  elseif fn.executable('xclip') == 1 then
+    vim.g.clipboard = {
+      name = 'xclip',
+      copy = {
+        ['+'] = 'xclip -quiet -i -selection clipboard',
+        ['*'] = 'xclip -quiet -i -selection primary',
+      },
+      paste = {
+        ['+'] = 'xclip -quiet -o -selection clipboard',
+        ['*'] = 'xclip -quiet -o -selection primary',
+      },
+      cache_enabled = 1,
+    }
+    set_opt()
+  else
+    -- Fall back to the built-in provider (may be slower on some systems).
+    set_opt()
+  end
+end)
 vim.o.laststatus = 3
 vim.o.termguicolors = true
 vim.o.guifont = 'CartographCF Nerd Font Mono:h14,codicon'
@@ -244,9 +301,7 @@ vim.filetype.add({
     ['.*'] = {
       function(path, bufnr)
         local content = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1] or ''
-        if content:match('^%w+ %d+ %d%d:%d%d:') then
-          return 'log'
-        end
+        if content:match('^%w+ %d+ %d%d:%d%d:') then return 'log' end
       end,
       { priority = -math.huge },
     },

@@ -16,6 +16,77 @@ end
 local fn, api, v, env, cmd, fmt =
   vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
 
+-- -----------------------------------------------------------------------------
+-- Performance-sensitive: avoid heavy Vimscript in init.lua
+-- -----------------------------------------------------------------------------
+
+-- Highlight lines starting with '##' (headings) using a lightweight sign group.
+-- This replaces the old Vimscript that unplaced/placed signs across 1000 ids.
+do
+  local group = api.nvim_create_augroup('HeadingLineSign', { clear = true })
+  local sign_name = 'highlightline'
+  local sign_group = 'headingline'
+  local debounce_ms = 120
+  local pending = {} ---@type table<integer, uv_timer_t?>
+
+  -- Define sign once (safe to call multiple times).
+  pcall(fn.sign_define, sign_name, { linehl = 'Match' })
+
+  local function update(bufnr)
+    if not api.nvim_buf_is_valid(bufnr) then return end
+    if vim.bo[bufnr].buftype ~= '' then return end
+
+    local ft = vim.bo[bufnr].filetype
+    if ft ~= 'markdown' and ft ~= 'org' and ft ~= 'norg' then return end
+
+    pcall(fn.sign_unplace, sign_group, { buffer = bufnr })
+
+    local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    for i, line in ipairs(lines) do
+      if line:match('^%s*##') then
+        -- id=0 lets Vim allocate IDs; placing is scoped to sign_group+buffer.
+        pcall(fn.sign_place, 0, sign_group, sign_name, bufnr, {
+          lnum = i,
+          priority = 10,
+        })
+      end
+    end
+  end
+
+  local function schedule(bufnr)
+    if pending[bufnr] then
+      pending[bufnr]:stop()
+      pending[bufnr]:close()
+      pending[bufnr] = nil
+    end
+    pending[bufnr] = vim.defer_fn(function()
+      pending[bufnr] = nil
+      update(bufnr)
+    end, debounce_ms)
+  end
+
+  api.nvim_create_autocmd(
+    { 'BufWinEnter', 'TextChanged', 'TextChangedI', 'TextChangedP' },
+    {
+      group = group,
+      callback = function(args) schedule(args.buf) end,
+    }
+  )
+end
+
+-- Better terminal UX inside fzf-lua: allow Esc to abort.
+api.nvim_create_autocmd('FileType', {
+  group = api.nvim_create_augroup('FzfTerminalMappings', { clear = true }),
+  pattern = 'fzf',
+  callback = function(args)
+    vim.keymap.set('t', '<esc>', '<c-c>', { buffer = args.buf, silent = true })
+    vim.keymap.set('t', '<esc><esc>', '<c-c>', {
+      buffer = args.buf,
+      silent = true,
+    })
+  end,
+})
+
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`

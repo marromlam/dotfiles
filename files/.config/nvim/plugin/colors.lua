@@ -219,8 +219,9 @@ local function general_overrides(dim_factor)
     },
     -- }}}
     -- xxx {{{
-    { VertSplit = { fg = { from = 'Comment' } } },
-    { WinSeparator = { fg = { from = 'Comment' } } },
+    -- Make window split lines match the statusline background.
+    { VertSplit = { fg = { from = 'StatusLine', attr = 'bg' } } },
+    { WinSeparator = { fg = { from = 'StatusLine', attr = 'bg' } } },
     { CursorLine = { bg = { from = 'Normal', alter = dim_factor } } },
     { CursorLineNr = { bg = 'NONE' } },
     { iCursor = { bg = '#00aaff' } },
