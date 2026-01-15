@@ -87,6 +87,31 @@ api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Disable indent guides in terminal buffers (mini.indentscope / indent-blankline / etc).
+do
+  local group = api.nvim_create_augroup('DisableIndentGuidesInTerminal', { clear = true })
+
+  local function disable(buf)
+    if not api.nvim_buf_is_valid(buf) then return end
+    -- Common plugin conventions:
+    vim.b[buf].miniindentscope_disable = true
+    vim.b[buf].ibl_disable = true
+    vim.b[buf].indent_blankline_enabled = false
+  end
+
+  api.nvim_create_autocmd('TermOpen', {
+    group = group,
+    callback = function(args) disable(args.buf) end,
+  })
+
+  -- Some terminal plugins use a FileType instead of buftype checks.
+  api.nvim_create_autocmd('FileType', {
+    group = group,
+    pattern = { 'toggleterm', 'terminal' },
+    callback = function(args) disable(args.buf) end,
+  })
+end
+
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
@@ -224,6 +249,221 @@ augroup('UpdateVim', {
   pattern = { '*' },
   command = 'wincmd =', -- Make windows equal size when vim resizes
 })
+
+-- -----------------------------------------------------------------------------
+-- SmartClose: treat tool buffers like panels
+-- -----------------------------------------------------------------------------
+
+do
+  local group = api.nvim_create_augroup('SmartClose', { clear = true })
+
+  local smart_close_filetypes = {
+    ['qf'] = true,
+    ['help'] = true,
+    ['checkhealth'] = true,
+    ['startuptime'] = true,
+    ['log'] = true,
+    ['query'] = true,
+    ['dbui'] = true,
+    ['dbout'] = true,
+    ['lspinfo'] = true,
+    ['tsplayground'] = true,
+    ['diff'] = true,
+    ['noice'] = true,
+  }
+
+  local smart_close_filetype_patterns = {
+    '^git.*',
+    '^Neogit.*',
+    '^neotest.*',
+    '^fugitive.*',
+    '^copilot.*',
+    '^Diffview.*',
+  }
+
+  local smart_close_buftypes = {
+    ['nofile'] = true,
+    ['quickfix'] = true,
+  }
+
+  local function ft_matches(ft)
+    if smart_close_filetypes[ft] then return true end
+    for _, pat in ipairs(smart_close_filetype_patterns) do
+      if ft:match(pat) then return true end
+    end
+    return false
+  end
+
+  local function smart_close()
+    if fn.winnr('$') ~= 1 then
+      api.nvim_win_close(0, true)
+    else
+      -- If it's the last window, delete the buffer instead.
+      pcall(cmd.bdelete, { 0, bang = true })
+    end
+  end
+
+  -- Auto open quickfix after grep-like commands.
+  api.nvim_create_autocmd('QuickFixCmdPost', {
+    group = group,
+    pattern = '*grep*',
+    command = 'cwindow',
+  })
+
+  -- Close certain filetypes by pressing q.
+  api.nvim_create_autocmd('FileType', {
+    group = group,
+    callback = function(args)
+      local buf = args.buf
+      local ft = vim.bo[buf].filetype or ''
+      local bt = vim.bo[buf].buftype or ''
+      local is_unmapped = fn.hasmapto('q', 'n') == 0
+      local eligible = is_unmapped or vim.wo.previewwindow or ft_matches(ft)
+        or smart_close_buftypes[bt]
+
+      if eligible then
+        vim.keymap.set('n', 'q', smart_close, {
+          buffer = buf,
+          nowait = true,
+          silent = true,
+        })
+      end
+    end,
+  })
+
+  -- Close quickfix buffer if it's the only remaining window.
+  api.nvim_create_autocmd('BufEnter', {
+    group = group,
+    callback = function()
+      if fn.winnr('$') == 1 and vim.bo.buftype == 'quickfix' then
+        api.nvim_buf_delete(0, { force = true })
+      end
+    end,
+  })
+
+  -- Close location list when quitting a window.
+  api.nvim_create_autocmd('QuitPre', {
+    group = group,
+    nested = true,
+    callback = function()
+      if vim.bo.filetype ~= 'qf' then cmd.lclose({ mods = { silent = true } }) end
+    end,
+  })
+end
+
+-- -----------------------------------------------------------------------------
+-- Formatting guardrail: disable formatting in third-party/runtime code
+-- -----------------------------------------------------------------------------
+
+do
+  local group = api.nvim_create_augroup('FormattingGuardrail', { clear = true })
+
+  local function startswith(s, prefix)
+    return type(s) == 'string'
+      and type(prefix) == 'string'
+      and prefix ~= ''
+      and s:sub(1, #prefix) == prefix
+  end
+
+  local function should_disable_formatting(bufnr)
+    if not api.nvim_buf_is_valid(bufnr) then return false end
+    if vim.bo[bufnr].buftype ~= '' then return false end
+    if not vim.bo[bufnr].modifiable then return false end
+    if vim.bo[bufnr].filetype == '' then return false end
+
+    local path = api.nvim_buf_get_name(bufnr)
+    if path == '' then return false end
+
+    -- Always allow formatting in your own code/config.
+    local allow_prefixes = {
+      vim.g.personal_directory,
+      vim.g.work_directory,
+      vim.g.dotfiles,
+      vim.g.vim_dir,
+      vim.env.HOME,
+    }
+    for _, p in ipairs(allow_prefixes) do
+      if p and startswith(path, p) then
+        -- Don't blanket-allow HOME; only use it to prevent disabling on empty vars.
+        -- If you want stricter behavior, remove HOME from this list.
+        if p ~= vim.env.HOME then return false end
+      end
+    end
+
+    -- Disable formatting in runtime/plugin directories.
+    if vim.env.VIMRUNTIME and startswith(path, vim.env.VIMRUNTIME) then return true end
+
+    for _, dir in ipairs(vim.split(vim.o.runtimepath, ',', { plain = true })) do
+      if dir ~= '' and startswith(path, dir) then
+        -- Never disable in your actual config path.
+        if vim.g.vim_dir and startswith(path, vim.g.vim_dir) then return false end
+        return true
+      end
+    end
+
+    return false
+  end
+
+  api.nvim_create_autocmd('BufEnter', {
+    group = group,
+    callback = function(args)
+      vim.b[args.buf].formatting_disabled = should_disable_formatting(args.buf)
+    end,
+  })
+end
+
+-- -----------------------------------------------------------------------------
+-- Trailing whitespace highlight (different in insert vs normal)
+-- -----------------------------------------------------------------------------
+
+do
+  local group = api.nvim_create_augroup('WhitespaceMatch', { clear = true })
+
+  local function is_floating_win()
+    return fn.win_gettype() == 'popup'
+  end
+
+  local function is_invalid_buf(bufnr)
+    return vim.bo[bufnr].filetype == ''
+      or vim.bo[bufnr].buftype ~= ''
+      or not vim.bo[bufnr].modifiable
+  end
+
+  local function ensure_hl()
+    pcall(api.nvim_set_hl, 0, 'ExtraWhitespace', { fg = 'red' })
+  end
+
+  local function toggle_trailing(mode)
+    local bufnr = api.nvim_get_current_buf()
+    if is_invalid_buf(bufnr) or is_floating_win() then return end
+
+    ensure_hl()
+
+    local pattern = mode == 'i' and [[\s\+\%#\@<!$]] or [[\s\+$]]
+    if vim.w.whitespace_match_number then
+      pcall(fn.matchdelete, vim.w.whitespace_match_number)
+      vim.w.whitespace_match_number =
+        fn.matchadd('ExtraWhitespace', pattern, 10)
+    else
+      vim.w.whitespace_match_number = fn.matchadd('ExtraWhitespace', pattern)
+    end
+  end
+
+  api.nvim_create_autocmd('ColorScheme', {
+    group = group,
+    callback = ensure_hl,
+  })
+
+  api.nvim_create_autocmd({ 'BufEnter', 'FileType', 'InsertLeave' }, {
+    group = group,
+    callback = function() toggle_trailing('n') end,
+  })
+
+  api.nvim_create_autocmd('InsertEnter', {
+    group = group,
+    callback = function() toggle_trailing('i') end,
+  })
+end
 
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {

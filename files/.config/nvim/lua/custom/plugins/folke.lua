@@ -33,6 +33,8 @@ return {
       statuscolumn = { enabled = false },
       words = { enabled = true },
     },
+    enabled = false,
+    cond = false,
   },
   {
     'folke/zen-mode.nvim',

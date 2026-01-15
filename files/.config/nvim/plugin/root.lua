@@ -18,7 +18,18 @@ local fn, fs, api = vim.fn, vim.fs, vim.api
 --  Project root finder
 -------------------------------------------------------------------------------
 
-local root_names = { '.git', 'Makefile', 'go.mod', 'go.sum' }
+-- Root markers. Keep this list small and high-signal.
+local root_names = {
+  '.git',
+  'Makefile',
+  'go.mod',
+  'go.sum',
+  'package.json',
+  'pyproject.toml',
+  'requirements.txt',
+  'Cargo.toml',
+  'composer.json',
+}
 
 -- Cache to use for speed up (at cost of possibly outdated results)
 local root_cache = {}

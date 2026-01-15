@@ -380,7 +380,8 @@ return { -- LSP Configuration & Plugins
       'mfussenegger/nvim-lint',
     },
     config = function()
-      require('lint').try_lint()
+      -- Don't error if linters aren't installed (common on fresh machines / WSL).
+      pcall(function() require('lint').try_lint() end)
       require('tiny-inline-diagnostic').setup({
         -- "modern", "classic", "minimal", "powerline", "simple"
         preset = 'simple',

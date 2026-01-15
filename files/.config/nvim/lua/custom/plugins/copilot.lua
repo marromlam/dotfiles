@@ -381,14 +381,22 @@ return {
 
   {
     'folke/sidekick.nvim',
+    -- require fzf lua and noice gui for best experience
+    cmd = { 'Sidekick' },
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'folke/noice.nvim',
+      'ibhagwan/fzf-lua',
+      -- Sidekick uses `vim.ui.select` for things like model selection; dressing
+      -- restores the floating picker UI.
+      { 'stevearc/dressing.nvim', opts = {} },
+    },
     keys = {
       {
         '<tab>',
         mode = 'i',
         function()
-          if not require('sidekick').nes_jump_or_apply() then
-            return '<Tab>'
-          end
+          if not require('sidekick').nes_jump_or_apply() then return '<Tab>' end
         end,
         expr = true,
         desc = 'Goto/Apply Next Edit Suggestion',
@@ -429,7 +437,9 @@ return {
       },
       {
         '<leader>ac',
-        function() require('sidekick.cli').toggle({ name = 'claude', focus = true }) end,
+        function()
+          require('sidekick.cli').toggle({ name = 'claude', focus = true })
+        end,
         desc = 'Sidekick Toggle Claude',
       },
     },

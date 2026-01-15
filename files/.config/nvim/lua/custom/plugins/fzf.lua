@@ -303,6 +303,42 @@ return {
   {
     'ibhagwan/fzf-lua',
     cmd = 'FzfLua',
+    init = function()
+      -- Use fzf-lua as the default `vim.ui.select` picker (small dropdown).
+      -- Lazy-load fzf-lua on first use.
+      local orig_select = vim.ui.select
+      vim.ui.select = function(items, opts, on_choice)
+        ensure_fzf_setup()
+
+        local ok, fzf = pcall(require, 'fzf-lua')
+        if not ok then
+          pcall(require('lazy').load, { plugins = { 'fzf-lua' } })
+          ok, fzf = pcall(require, 'fzf-lua')
+        end
+
+        if ok and fzf and type(fzf.register_ui_select) == 'function' then
+          -- Register once with a compact UI similar to your dropdown pickers.
+          -- Args: (opts, silent, opts_once)
+          pcall(fzf.register_ui_select, {
+            winopts = {
+              height = 0.33,
+              width = 0.45,
+              row = 0.15,
+              col = 0.50,
+              title_pos = 'center',
+              preview = { hidden = 'hidden' },
+            },
+            fzf_opts = {
+              ['--layout'] = 'reverse',
+              ['--info'] = 'inline',
+            },
+          }, true)
+          return vim.ui.select(items, opts, on_choice)
+        end
+
+        return orig_select(items, opts, on_choice)
+      end
+    end,
     keys = {
       {
         '<c-p>',
