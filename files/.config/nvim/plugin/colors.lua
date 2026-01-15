@@ -46,7 +46,7 @@ local function general_overrides(dim_factor)
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
   local stl_bg = highlight.darken_hsl(normal_bg, 0.15)
-  local float_bg = normal_bg
+  local float_bg = '#232323'
   local pal = (mrl.ui and mrl.ui.palette) or {}
   -- Deleted-line diff background should track the theme's GitSignsDelete color.
   -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
@@ -82,14 +82,19 @@ local function general_overrides(dim_factor)
   -- This glyph is highlighted with `DiffDelete` and can look too bright, so
   -- keep it as a subtle dark grey, just above the background.
   local diff_delete_filler_fg = highlight.darken_hsl(normal_fg, -0.8)
-  do
-    local configured = mrl.ui.current and mrl.ui.current.float_bg
-    if vim.is_callable(configured) then
-      float_bg = configured()
-    elseif type(configured) == 'string' then
-      float_bg = configured
-    end
-  end
+  -- do
+  --   local configured = mrl.ui.current and mrl.ui.current.float_bg
+  --   if vim.is_callable(configured) then
+  --     float_bg = configured()
+  --   elseif type(configured) == 'string' then
+  --     float_bg = configured
+  --   end
+  -- end
+  -- -- Make float background exactly match the border color.
+  -- do
+  --   local border_fg = highlight.get('Comment', 'fg', normal_fg)
+  --   if border_fg ~= 'NONE' then float_bg = border_fg end
+  -- end
   highlight.all({
     -- { PanelSt = { link = 'StatusLine' } },
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
@@ -238,8 +243,10 @@ local function general_overrides(dim_factor)
     { NormalFloat = { bg = float_bg, blend = 0 } },
     {
       FloatBorder = {
-        bg = { from = 'NormalFloat' },
-        fg = { from = 'Comment' },
+        -- Border background should match the main Normal background (not NormalFloat).
+        bg = { from = 'Normal', attr = 'bg' },
+        -- bg = { from = 'NormalFloat', attr = 'bg' },
+        fg = { from = 'NormalFloat', attr = 'bg' },
         blend = 0,
       },
     },
@@ -492,7 +499,8 @@ local function general_overrides(dim_factor)
       },
     },
     {
-      FzfLuaBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } },
+      -- Make fzf-lua borders follow FloatBorder exactly.
+      FzfLuaBorder = { clear = true, link = 'FloatBorder' },
     },
     {
       FzfLuaPreviewNormal = {
@@ -502,8 +510,8 @@ local function general_overrides(dim_factor)
     },
     {
       FzfLuaPreviewBorder = {
-        bg = float_bg,
-        fg = { from = 'Comment', attr = 'fg' },
+        clear = true,
+        link = 'FloatBorder',
       },
     },
     {
@@ -520,8 +528,8 @@ local function general_overrides(dim_factor)
     },
     {
       FzfLuaHelpBorder = {
-        bg = float_bg,
-        fg = { from = 'Comment', attr = 'fg' },
+        clear = true,
+        link = 'FloatBorder',
       },
     },
     -- FzfLuaBorder Normal  hls.border  Main win border

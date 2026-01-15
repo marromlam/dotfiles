@@ -285,13 +285,13 @@ return {
           height = 8, -- Height of the input window in vertical layout
         },
         edit = {
-          border = 'single',
+          border = mrl.ui.current.border,
           start_insert = true, -- Start insert mode when opening the edit window
         },
         ask = {
           floating = false, -- Open the 'AvanteAsk' prompt in a floating window
           start_insert = true, -- Start insert mode when opening the ask window
-          border = 'single',
+          border = mrl.ui.current.border,
           ---@type "ours" | "theirs"
           focus_on_apply = 'ours', -- which diff to focus after applying
         },

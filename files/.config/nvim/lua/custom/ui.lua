@@ -128,8 +128,13 @@ function mrl.ui.refresh_palette()
 end
 
 mrl.ui.border = {
-  line = { '┌', '─', '┐', '│', '┘', '─', '└', '│' },
-  rectangle = { '┌', '─', '┐', '│', '┘', '─', '└', '│' },
+  -- Custom border style:
+  -- ▗▄▄▄▖
+  -- ▐   ▌
+  -- ▝▀▀▀▘
+  box = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
+  line = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
+  rectangle = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
 }
 
 mrl.ui.icons = {
@@ -433,7 +438,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 mrl.ui.current = {
-  border = 'single', -- Use square borders everywhere
+  border = mrl.ui.border.box, -- Global border style
   -- Float/popup background color source of truth.
   -- Kept as a function so it always matches the active colorscheme's Normal bg.
   float_bg = function()

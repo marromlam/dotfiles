@@ -160,6 +160,9 @@ local function ensure_fzf_setup()
     winopts = {
       backdrop = 100,
       border = ui.border.rectangle,
+      preview = {
+        border = ui.border.rectangle,
+      },
     },
     keymap = {
       builtin = {
@@ -303,6 +306,7 @@ return {
   {
     'ibhagwan/fzf-lua',
     cmd = 'FzfLua',
+    config = function() ensure_fzf_setup() end,
     init = function()
       -- Use fzf-lua as the default `vim.ui.select` picker (small dropdown).
       -- Lazy-load fzf-lua on first use.
