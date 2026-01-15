@@ -112,6 +112,41 @@ do
   })
 end
 
+-- Ensure all terminal windows use the main Normal background (including plugin-created ones).
+do
+  local group = api.nvim_create_augroup('TerminalNormalBackground', { clear = true })
+
+  local function apply_terminal_winhighlight(buf)
+    if not api.nvim_buf_is_valid(buf) then return end
+    local bt, ft = vim.bo[buf].buftype, vim.bo[buf].filetype
+    if bt ~= 'terminal' and ft ~= 'toggleterm' and ft ~= 'terminal' then return end
+
+    local win = api.nvim_get_current_win()
+    if not api.nvim_win_is_valid(win) then return end
+
+    api.nvim_win_call(win, function()
+      vim.opt_local.winhighlight:append({
+        -- Force terminal windows to inherit the main editor background.
+        Normal = 'Normal',
+        NormalNC = 'NormalNC',
+        -- For floating terminal windows, ensure the float "Normal" maps to Normal too.
+        NormalFloat = 'Normal',
+      })
+    end)
+  end
+
+  api.nvim_create_autocmd({ 'TermOpen', 'BufWinEnter' }, {
+    group = group,
+    callback = function(args) apply_terminal_winhighlight(args.buf) end,
+  })
+
+  api.nvim_create_autocmd('FileType', {
+    group = group,
+    pattern = { 'toggleterm', 'terminal' },
+    callback = function(args) apply_terminal_winhighlight(args.buf) end,
+  })
+end
+
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`

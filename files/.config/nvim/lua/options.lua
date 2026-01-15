@@ -114,7 +114,13 @@ vim.opt.conceallevel = 2
 vim.opt.breakindent = true
 vim.opt.breakindentopt = 'sbr'
 vim.opt.linebreak = true -- lines wrap at words rather than random characters
-vim.opt.signcolumn = 'yes'
+-- If we render signs inside `statuscolumn`, disable the built-in signcolumn to
+-- avoid duplicated icons.
+local statuscolumn_enabled = mrl
+  and mrl.ui
+  and mrl.ui.statuscolumn
+  and mrl.ui.statuscolumn.enable
+vim.opt.signcolumn = statuscolumn_enabled and 'no' or 'yes'
 vim.opt.ruler = false
 vim.opt.cmdheight = 0
 vim.opt.showbreak = [[↪ ]] -- Options include -> '…', '↳ ', '→','↪ '

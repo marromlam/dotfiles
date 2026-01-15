@@ -13,7 +13,8 @@ return {
     winbar = { enabled = mrl.ui.winbar.enable },
     highlights = {
       FloatBorder = { link = 'FloatBorder' },
-      NormalFloat = { link = 'NormalFloat' },
+      -- Make floating terminals match the main Normal background.
+      NormalFloat = { link = 'Normal' },
     },
     float_opts = {
       -- border = mrl.ui.current.border,
@@ -62,7 +63,7 @@ return {
       on_open = float_handler,
       highlights = {
         FloatBorder = { link = 'FloatBorder' },
-        NormalFloat = { link = 'NormalFloat' },
+        NormalFloat = { link = 'Normal' },
       },
     })
 

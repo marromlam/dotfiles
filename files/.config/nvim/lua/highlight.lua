@@ -354,15 +354,6 @@ local function get(group, attribute, fallback)
   )
   local color = data[attribute] or fallback
   if not color then
-    if vim.v.vim_did_enter == 0 then
-      api.nvim_create_autocmd('User', {
-        pattern = 'LazyDone',
-        once = true,
-        callback = function() err_warn(group, attribute) end,
-      })
-    else
-      vim.schedule(function() err_warn(group, attribute) end)
-    end
     return 'NONE'
   end
   return color

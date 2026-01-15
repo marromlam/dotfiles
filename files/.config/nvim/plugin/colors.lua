@@ -45,8 +45,8 @@ local function general_overrides(dim_factor)
   local normal_fg = highlight.get('Normal', 'fg', '#ffffff')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
-  local stl_bg = highlight.darken_hsl(normal_bg, 0.15)
-  local float_bg = '#232323'
+  local stl_bg = highlight.darken_hsl(normal_bg, -0.20)
+  local float_bg = highlight.darken_hsl(normal_bg, -0.20)
   local pal = (mrl.ui and mrl.ui.palette) or {}
   -- Deleted-line diff background should track the theme's GitSignsDelete color.
   -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
@@ -96,11 +96,9 @@ local function general_overrides(dim_factor)
   --   if border_fg ~= 'NONE' then float_bg = border_fg end
   -- end
   highlight.all({
-    -- { PanelSt = { link = 'StatusLine' } },
+    -- Status line
+    { PanelSt = { link = 'StatusLine' } },
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
-    -- Status line {{{
-    -- Search count
-    { Statusline = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
@@ -231,6 +229,10 @@ local function general_overrides(dim_factor)
     { CursorLineNr = { bg = 'NONE' } },
     { iCursor = { bg = '#00aaff' } },
     { PmenuSbar = { link = 'Normal' } },
+    -- Terminal windows should match the main editor background.
+    -- Neovim uses these groups (when defined) for :terminal buffers.
+    { TermNormal = { link = 'Normal' } },
+    { TermNormalNC = { link = 'NormalNC' } },
     {
       Folded = {
         fg = { from = 'Normal' },

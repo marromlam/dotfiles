@@ -37,6 +37,25 @@ local function get_nightfox_palette()
   return nightfox_palette.load(vim.g.colors_name or 'carbonfox')
 end
 
+-- Nightfox palette values can be "Color" objects (tables with `.base` and a
+-- callable metatable). Normalize everything we store in `mrl.ui.palette` to a
+-- hex string so other modules can safely use it.
+local function as_hex(v, fallback)
+  if type(v) == 'string' then return v end
+  if type(v) == 'number' then return ('#%06x'):format(v) end
+  if type(v) == 'table' then
+    if type(v.base) == 'string' then return v.base end
+    if vim.is_callable(v) then
+      local ok, res = pcall(v)
+      if ok then
+        if type(res) == 'string' then return res end
+        if type(res) == 'number' then return ('#%06x'):format(res) end
+      end
+    end
+  end
+  return fallback
+end
+
 --- Refresh palette from the active colorscheme.
 function mrl.ui.refresh_palette()
   -- Prior hardcoded palette as last-resort defaults
@@ -68,21 +87,21 @@ function mrl.ui.refresh_palette()
 
   if pal then
     -- Nightfox palette naming (works across carbonfox/nightfox variants)
-    derived.green = pal.green or defaults.green
-    derived.blue = pal.blue or defaults.blue
-    derived.teal = pal.cyan or pal.teal or defaults.teal
-    derived.magenta = pal.magenta or defaults.magenta
-    derived.pale_pink = pal.pink or pal.magenta or defaults.pale_pink
-    derived.pale_red = pal.red or defaults.pale_red
+    derived.green = as_hex(pal.green, defaults.green)
+    derived.blue = as_hex(pal.blue, defaults.blue)
+    derived.teal = as_hex(pal.cyan or pal.teal, defaults.teal)
+    derived.magenta = as_hex(pal.magenta, defaults.magenta)
+    derived.pale_pink = as_hex(pal.pink or pal.magenta, defaults.pale_pink)
+    derived.pale_red = as_hex(pal.red, defaults.pale_red)
     -- Prefer the actual GitSignsDelete highlight if available (theme-defined)
     derived.red = hex_from_hl('GitSignsDelete', 'fg', pal.red or defaults.red)
-    derived.dark_orange = pal.orange or defaults.dark_orange
-    derived.bright_yellow = pal.yellow or defaults.bright_yellow
-    derived.light_yellow = pal.yellow or defaults.light_yellow
-    derived.comment_grey = pal.comment or pal.fg3 or defaults.comment_grey
-    derived.whitesmoke = pal.fg1 or pal.fg0 or defaults.whitesmoke
-    derived.light_gray = pal.fg3 or defaults.light_gray
-    derived.grey = pal.bg3 or pal.bg2 or defaults.grey
+    derived.dark_orange = as_hex(pal.orange, defaults.dark_orange)
+    derived.bright_yellow = as_hex(pal.yellow, defaults.bright_yellow)
+    derived.light_yellow = as_hex(pal.yellow, defaults.light_yellow)
+    derived.comment_grey = as_hex(pal.comment or pal.fg3, defaults.comment_grey)
+    derived.whitesmoke = as_hex(pal.fg1 or pal.fg0, defaults.whitesmoke)
+    derived.light_gray = as_hex(pal.fg3, defaults.light_gray)
+    derived.grey = as_hex(pal.bg3 or pal.bg2, defaults.grey)
   else
     -- Generic fallback: derive from highlight groups
     derived.pale_red = hex_from_hl('DiagnosticError', 'fg', defaults.pale_red)
