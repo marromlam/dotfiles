@@ -19,7 +19,8 @@ end
 
 mrl.ui.statusline = {}
 
-local state = { lsp_clients_visible = true }
+-- LSP clients are collapsed by default: show only 🧩 <count>.
+local state = { lsp_clients_visible = false }
 
 local str = require('custom.strings')
 
@@ -378,28 +379,33 @@ end
 --------------------------------------------------------------------------------
 
 local LSP_COMPONENT_ID = 2000
-local MAX_LSP_SERVER_COUNT = 3
 
 function mrl.ui.statusline.lsp_client_click()
   state.lsp_clients_visible = not state.lsp_clients_visible
   vim.cmd('redrawstatus')
 end
 
----Return a sorted list of lsp client names and their priorities
 ---@param ctx StatuslineContext
----@return table[]
+---@return boolean, string[]
 local function stl_lsp_clients(ctx)
-  local clients = vim.lsp.get_clients({ bufnr = ctx.bufnum })
-  if not state.lsp_clients_visible then
-    return { { name = fmt('%d attached', #clients), priority = 2 } }
-  end
-  if falsy(clients) then return { { name = 'none', priority = 7 } } end
-  table.sort(clients, function(a, b) return a.name < b.name end)
+  local clients = vim.lsp.get_clients({ bufnr = ctx.bufnum }) or {}
+  if #clients == 0 then return false, {} end
 
-  return vim.tbl_map(
-    function(client) return { name = client.name, priority = 4 } end,
-    clients
-  )
+  local has_copilot = false
+  local names = {}
+
+  for _, client in ipairs(clients) do
+    local name = client.name or ''
+    -- Copilot should be displayed independently from other LSPs.
+    if name == 'copilot' or name:match('copilot') then
+      has_copilot = true
+    else
+      table.insert(names, name)
+    end
+  end
+
+  table.sort(names)
+  return has_copilot, names
 end
 
 --------------------------------------------------------------------------------
@@ -575,32 +581,33 @@ function mrl.ui.statusline.render()
   -- LSP
   -----------------------------------------------------------------------------//
   local diagnostics = diagnostic_info(ctx)
-  -- Build LSP clients list (optimized: replaced vim.iter with simple loop)
-  local lsp_clients_list = stl_lsp_clients(ctx)
-  local lsp_clients = {}
-  for idx, client in ipairs(lsp_clients_list) do
-    local component_opts = {
+  local has_copilot, lsp_client_names = stl_lsp_clients(ctx)
+  -- Count excludes Copilot (it has its own icon).
+  local lsp_client_count = #lsp_client_names
+  local lsp_clients = {
+    {
       {
-        {
-          client.name == 'copilot' and icons.misc.copilot .. ' ' or client.name,
-          'StFaded',
-        },
         { space, 'StSeparator' },
-        { '', 'StFaded' },
+        { icons.misc.puzzle, 'StTitle' },
+        { space, 'StSeparator' },
+        { tostring(lsp_client_count), 'StTitle' },
+        has_copilot and { space, 'StSeparator' } or nil,
+        has_copilot and { icons.misc.copilot, 'StTitle' } or nil,
       },
-      priority = client.priority,
-    }
-    -- Add icon prefix and click handler to first client
-    if idx == 1 and #lsp_clients_list > 0 then
-      table.insert(
-        component_opts[1],
-        1,
-        { icons.misc.puzzle .. ': ', 'StTitle' }
-      )
-      component_opts.id = LSP_COMPONENT_ID
-      component_opts.click = 'v:lua.mrl.ui.statusline.lsp_client_click'
-    end
-    table.insert(lsp_clients, component_opts)
+      priority = 2,
+      id = LSP_COMPONENT_ID,
+      click = 'v:lua.mrl.ui.statusline.lsp_client_click',
+    },
+  }
+  if state.lsp_clients_visible and lsp_client_count > 0 then
+    table.insert(lsp_clients, {
+      {
+        { space, 'StSeparator' },
+        { table.concat(lsp_client_names, ', '), 'StFaded' },
+      },
+      -- Lowest priority: keep the count visible if space is tight.
+      priority = 9,
+    })
   end
   -----------------------------------------------------------------------------//
   -- Left section
@@ -836,14 +843,6 @@ augroup('CustomStatusline', {
   event = 'BufReadPre',
   once = true,
   command = git_updates,
-}, {
-  event = 'LspAttach',
-  command = function(args)
-    local clients = vim.lsp.get_clients({ bufnr = args.buf })
-    if vim.o.columns < 200 and #clients > MAX_LSP_SERVER_COUNT then
-      state.lsp_clients_visible = false
-    end
-  end,
 }, {
   event = 'User',
   pattern = {

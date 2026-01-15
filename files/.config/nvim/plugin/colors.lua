@@ -581,10 +581,11 @@ end
 local function set_sidebar_highlight(dim_factor)
   highlight.all({
     {
-      PanelDarkBackground = { bg = { from = 'Normal', alter = dim_factor } },
+      -- Panels should match the main window background.
+      PanelDarkBackground = { bg = { from = 'Normal', attr = 'bg' } },
     },
     { PanelDarkHeading = { inherit = 'PanelDarkBackground', bold = true } },
-    { PanelBackground = { bg = { from = 'Normal', alter = dim_factor } } },
+    { PanelBackground = { bg = { from = 'Normal', attr = 'bg' } } },
     { PanelHeading = { inherit = 'PanelBackground', bold = true } },
     {
       PanelWinSeparator = {
@@ -595,7 +596,7 @@ local function set_sidebar_highlight(dim_factor)
       },
     },
     { PanelStNC = { link = 'PanelWinSeparator' } },
-    { PanelSt = { bg = { from = 'Normal', alter = -0.2 } } },
+    { PanelSt = { bg = { from = 'Normal', attr = 'bg' } } },
 
     -- Avanté Panel colors
     {
@@ -660,6 +661,7 @@ local sidebar_fts = {
   'Outline',
   'dbui',
   'neotest-summary',
+  'fugitive',
   'AvanteSidebar',
   'AvanteInput',
   'Avante',
@@ -667,6 +669,9 @@ local sidebar_fts = {
 }
 
 local function on_sidebar_enter()
+  -- Panels should feel like sidebars: no line numbers.
+  vim.opt_local.number = false
+  vim.opt_local.relativenumber = false
   vim.opt_local.winhighlight:append({
     Normal = 'PanelDarkBackground',
     -- AvanteSidebarNormal = { link = 'PanelDarkBackground' },

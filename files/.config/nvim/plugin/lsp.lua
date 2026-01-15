@@ -28,11 +28,5 @@ vim.diagnostic.config({
       [S.HINT] = icons.hint,
       [S.ERROR] = icons.error,
     },
-    linehl = {
-      [S.WARN] = 'DiagnosticSignWarnLine',
-      [S.INFO] = 'DiagnosticSignInfoLine',
-      [S.HINT] = 'DiagnosticSignHintLine',
-      [S.ERROR] = 'DiagnosticSignErrorLine',
-    },
   },
 })
