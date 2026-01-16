@@ -1,9 +1,9 @@
 return {
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     event = 'VeryLazy',
     build = ':TSUpdate',
-    dependencies = { { 'nvim-treesitter/nvim-treesitter-textobjects' } },
     config = function()
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup({
@@ -93,6 +93,16 @@ return {
         },
       })
     end,
+  },
+
+  -- IMPORTANT: `nvim-treesitter-textobjects` requires `nvim-treesitter` to be
+  -- loaded first. If declared as a dependency of treesitter, Lazy will load it
+  -- *before* treesitter (dependencies load first), causing `require('nvim-treesitter.configs')`
+  -- to fail. Keep it as a separate plugin that depends on treesitter instead.
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    event = 'VeryLazy',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
   },
 
   {
