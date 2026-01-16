@@ -389,7 +389,35 @@ return {
       'ibhagwan/fzf-lua',
       -- Sidekick uses `vim.ui.select` for things like model selection; dressing
       -- restores the floating picker UI.
-      { 'stevearc/dressing.nvim', opts = {} },
+      {
+        'stevearc/dressing.nvim',
+        dependencies = { 'ibhagwan/fzf-lua' },
+        opts = {
+          select = {
+            -- Force fzf-lua for a compact picker (match file picker sizing).
+            backend = { 'fzf_lua', 'builtin' },
+            fzf_lua = {
+              winopts = {
+                height = 0.30,
+                width = 0.30,
+                row = 0.10,
+                -- col = 0.50,
+                title_pos = 'center',
+
+                preview = {
+                  hidden = 'hidden',
+                  layout = 'vertical',
+                  vertical = 'up:50%',
+                },
+              },
+              fzf_opts = {
+                ['--layout'] = 'reverse',
+                ['--info'] = 'inline',
+              },
+            },
+          },
+        },
+      },
     },
     keys = {
       {

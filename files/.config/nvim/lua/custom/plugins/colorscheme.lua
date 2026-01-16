@@ -1,6 +1,6 @@
 -- COLORSCHEME
 --
-local enable_italics = false
+local enable_italics = true
 return {
 
   {

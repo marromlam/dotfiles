@@ -71,10 +71,15 @@ vim.opt.diffopt = vim.opt.diffopt
     'hiddenoff',
     'foldcolumn:0',
     'context:4',
-    'algorithm:histogram',
+    'algorithm:myers',
     'indent-heuristic',
     'linematch:60',
   }
+if vim.fn.has('nvim-0.12') == 1 then
+  vim.cmd([[
+  set diffopt+=inline:char
+  ]])
+end
 -- }}}
 
 -- Format Options {{{

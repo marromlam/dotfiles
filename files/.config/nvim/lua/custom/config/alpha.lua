@@ -127,7 +127,7 @@ function M.config()
 
   dashboard.section.buttons.val = {
     button('Title', 'p', '  Pick a session', '<Cmd>ListSessions<CR>'),
-    button('Title', 'f', '  Find file', ':Telescope find_files<CR>'),
+    button('Title', 'f', '  Find file', ':FzfLua files<CR>'),
     button('Title', 'q', '  Quit', ':qa<CR>'),
   }
 

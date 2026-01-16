@@ -167,6 +167,9 @@ mrl.ui.icons = {
     light_shade_block = '░',
     right_chubby_block = '▓',
   },
+  -- Unified scrollbar glyph (used by fzf-lua and other UIs).
+  -- FULL BLOCK (U+2588) to match fzf-lua preview scrollbar look.
+  scrollbar = '█',
   lsp = {
     error = '', -- '✗'
     warn = '', -- 

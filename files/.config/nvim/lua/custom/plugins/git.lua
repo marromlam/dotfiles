@@ -32,6 +32,7 @@ return {
     'lewis6991/gitsigns.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
     opts = {
+      -- signcolumn = false, -- Disable icons in sign column
       signs = {
         add = { text = icons.right_block },
         change = { text = icons.right_block },
@@ -234,18 +235,17 @@ return {
       { '<leader>gB', '<cmd>Git blame<cr>', desc = 'Git Blame' },
       {
         '<leader>gb',
-        -- '<cmd>FzfLua git_branches<cr>',
-        '<cmd>Telescope git_branches<cr>',
+        '<cmd>FzfLua git_branches<cr>',
         desc = '[git] Checkout branch',
       },
       {
         '<leader>gc',
-        '<cmd>Telescope git_commits<cr>',
+        '<cmd>FzfLua git_commits<cr>',
         desc = '[git] Checkout commit',
       },
       {
         '<leader>gC',
-        '<cmd>Telescope git_bcommits<cr>',
+        '<cmd>FzfLua git_bcommits<cr>',
         desc = '[git] Checkout commit(for current file)',
       },
       {

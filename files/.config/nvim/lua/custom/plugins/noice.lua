@@ -65,11 +65,17 @@ return {
         position = { row = 5, col = '50%' },
         size = { width = 'auto', height = 'auto' },
         border = { style = border, padding = { 0, 1 } },
-        win_options = { winblend = 0 },
+        win_options = {
+          winblend = 0,
+          winhighlight = { Normal = 'NormalPopup', FloatBorder = 'PopupBorder' },
+        },
       },
       confirm = {
         border = { style = border, padding = { 0, 1 }, text = { top = '' } },
-        win_options = { winblend = 0 },
+        win_options = {
+          winblend = 0,
+          winhighlight = { Normal = 'NormalPopup', FloatBorder = 'PopupBorder' },
+        },
       },
       popupmenu = {
         relative = 'editor',
@@ -78,7 +84,8 @@ return {
         border = { style = border, padding = { 0, 1 } },
         win_options = {
           winblend = 0,
-          winhighlight = { Normal = 'NormalFloat', FloatBorder = 'FloatBorder' },
+          -- Treat cmdline/popupmenu as "popup-normal" (not float-normal)
+          winhighlight = { Normal = 'NormalPopup', FloatBorder = 'PopupBorder' },
         },
       },
     },
@@ -222,7 +229,7 @@ return {
     require('noice').setup(opts)
 
     -- Noice uses `winhighlight` to map FloatBorder -> NoiceCmdlinePopupBorder.
-    -- Force these border groups to link to FloatBorder immediately (no scheduling),
+    -- Force these border groups to link to PopupBorder immediately (no scheduling),
     -- otherwise they may keep their default DiagnosticSign* colors.
     for _, name in ipairs({
       'NoiceCmdlinePopupBorder',
@@ -236,43 +243,43 @@ return {
       'NoiceCmdlinePopupBorderLua',
       'NoiceConfirmBorder',
     }) do
-      pcall(vim.api.nvim_set_hl, 0, name, { link = 'FloatBorder' })
+      pcall(vim.api.nvim_set_hl, 0, name, { link = 'PopupBorder' })
     end
 
     highlight.plugin('noice', {
       { NoiceMini = { inherit = 'MsgArea', bg = { from = 'Normal' } } },
       {
         NoicePopupBaseGroup = {
-          inherit = 'NormalFloat',
+          inherit = 'NormalPopup',
           fg = { from = 'DiagnosticSignInfo' },
         },
       },
       {
         NoicePopupWarnBaseGroup = {
-          inherit = 'NormalFloat',
+          inherit = 'NormalPopup',
           fg = { from = 'Float' },
         },
       },
       {
         NoicePopupInfoBaseGroup = {
-          inherit = 'NormalFloat',
+          inherit = 'NormalPopup',
           fg = { from = 'Conditional' },
         },
       },
-      { NoiceCmdlinePopup = { bg = { from = 'NormalFloat' } } },
-      { NoiceCmdlinePopupBorder = { link = 'FloatBorder' } },
+      { NoiceCmdlinePopup = { link = 'NormalPopup' } },
+      { NoiceCmdlinePopupBorder = { link = 'PopupBorder' } },
       {
         NoiceCmdlinePopupTitleCmdline = {
           inherit = 'NoicePopupBaseGroup',
           reverse = true,
         },
       },
-      -- Ensure command-line borders actually use FloatBorder (bg/fg).
+      -- Ensure command-line borders actually use PopupBorder (bg/fg).
       {
-        NoiceCmdlinePopupBorderCmdline = { clear = true, link = 'FloatBorder' },
+        NoiceCmdlinePopupBorderCmdline = { clear = true, link = 'PopupBorder' },
       },
       {
-        NoiceCmdlinePopupBorderSearch = { clear = true, link = 'FloatBorder' },
+        NoiceCmdlinePopupBorderSearch = { clear = true, link = 'PopupBorder' },
       },
       {
         NoiceCmdlinePopupTitleSearch = {
@@ -281,7 +288,7 @@ return {
         },
       },
       {
-        NoiceCmdlinePopupBorderFilter = { clear = true, link = 'FloatBorder' },
+        NoiceCmdlinePopupBorderFilter = { clear = true, link = 'PopupBorder' },
       },
       {
         NoiceCmdlinePopupTitleFilter = {
@@ -289,7 +296,7 @@ return {
           reverse = true,
         },
       },
-      { NoiceCmdlinePopupBorderHelp = { clear = true, link = 'FloatBorder' } },
+      { NoiceCmdlinePopupBorderHelp = { clear = true, link = 'PopupBorder' } },
       {
         NoiceCmdlinePopupTitleHelp = {
           inherit = 'NoicePopupInfoBaseGroup',
@@ -299,7 +306,7 @@ return {
       {
         NoiceCmdlinePopupBorderSubstitute = {
           clear = true,
-          link = 'FloatBorder',
+          link = 'PopupBorder',
         },
       },
       {
@@ -311,7 +318,7 @@ return {
       {
         NoiceCmdlinePopupBorderIncRename = {
           clear = true,
-          link = 'FloatBorder',
+          link = 'PopupBorder',
         },
       },
       {
@@ -320,8 +327,8 @@ return {
           reverse = true,
         },
       },
-      { NoiceCmdlinePopupBorderInput = { clear = true, link = 'FloatBorder' } },
-      { NoiceCmdlinePopupBorderLua = { clear = true, link = 'FloatBorder' } },
+      { NoiceCmdlinePopupBorderInput = { clear = true, link = 'PopupBorder' } },
+      { NoiceCmdlinePopupBorderLua = { clear = true, link = 'PopupBorder' } },
       { NoiceCmdlineIconCmdline = { link = 'NoicePopupBaseGroup' } },
       { NoiceCmdlineIconSearch = { link = 'NoicePopupWarnBaseGroup' } },
       { NoiceCmdlineIconFilter = { link = 'NoicePopupWarnBaseGroup' } },
@@ -330,8 +337,8 @@ return {
       { NoiceCmdlineIconSubstitute = { link = 'NoicePopupWarnBaseGroup' } },
       { NoiceCmdlineIconInput = { link = 'NoicePopupBaseGroup' } },
       { NoiceCmdlineIconLua = { link = 'NoicePopupBaseGroup' } },
-      { NoiceConfirm = { bg = { from = 'NormalFloat' } } },
-      { NoiceConfirmBorder = { clear = true, link = 'FloatBorder' } },
+      { NoiceConfirm = { link = 'NormalPopup' } },
+      { NoiceConfirmBorder = { clear = true, link = 'PopupBorder' } },
     })
 
     vim.keymap.set({ 'n', 'i', 's' }, '<c-f>', function()

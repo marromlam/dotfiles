@@ -57,24 +57,48 @@ end
 
 ---@alias Chunks {[1]: string | number, [2]: string, max_size: integer?}[]
 
+---@param chunks any
+---@return Chunks?
+local function normalize_chunks(chunks)
+  if type(chunks) ~= 'table' then return end
+  if vim.islist(chunks) then return chunks end
+
+  -- Allow "sparse arrays" like {[1]=..., [2]=..., [7]=...} by compacting them.
+  local keys = {}
+  for k, _ in pairs(chunks) do
+    if type(k) == 'number' and k >= 1 and math.floor(k) == k then
+      keys[#keys + 1] = k
+    end
+  end
+  if #keys == 0 then return end
+  table.sort(keys)
+
+  local dense = {}
+  for _, k in ipairs(keys) do
+    local v = chunks[k]
+    if v ~= nil then dense[#dense + 1] = v end
+  end
+  return dense
+end
+
 ---@param chunks Chunks
 ---@return string
 local function chunks_to_string(chunks)
-  if not chunks or not vim.islist(chunks) then return '' end
-  local strings = mrl.fold(function(acc, item)
+  chunks = normalize_chunks(chunks)
+  if not chunks then return '' end
+
+  local strings = {}
+  for _, item in ipairs(chunks) do
     local text, hl = unpack(item)
     if not falsy(text) then
       if type(text) ~= 'string' then text = tostring(text) end
       if item.max_size then text = truncate_string(text, item.max_size) end
       text = text:gsub('%%', '%%%1')
-      table.insert(
-        acc,
+      strings[#strings + 1] =
         not falsy(hl) and ('%%#%s#%s%%*'):format(hl, text) or text
-      )
     end
-    return acc
-  end, chunks)
-  return table.concat(strings)
+  end
+  return table.concat(strings, '')
 end
 
 --- @class ComponentOpts
@@ -93,12 +117,12 @@ local function component(opts)
   assert(opts, 'component options are required')
   if opts.cond ~= nil and falsy(opts.cond) then return end
 
-  local item = opts[1]
-  if not vim.islist(item) then
+  local item = normalize_chunks(opts[1])
+  if not item then
     error(
       fmt(
         'component options are required but got %s instead',
-        vim.inspect(item)
+        vim.inspect(opts[1])
       )
     )
   end

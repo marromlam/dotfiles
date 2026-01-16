@@ -45,8 +45,9 @@ local function general_overrides(dim_factor)
   local normal_fg = highlight.get('Normal', 'fg', '#ffffff')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
-  local stl_bg = highlight.darken_hsl(normal_bg, -0.20)
-  local float_bg = highlight.darken_hsl(normal_bg, -0.20)
+  local stl_bg = highlight.darken_hsl(normal_bg, 0.10)
+  local float_bg = highlight.darken_hsl(normal_bg, 0)
+  local popup_bg = highlight.darken_hsl(normal_bg, 0.10)
   local pal = (mrl.ui and mrl.ui.palette) or {}
   -- Deleted-line diff background should track the theme's GitSignsDelete color.
   -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
@@ -70,6 +71,23 @@ local function general_overrides(dim_factor)
       or type(pal.light_yellow) == 'string' and pal.light_yellow
       or '#0000ff'
   )
+
+  -- fzf-lua scrollbar thumb color (used for both preview + fzf list scrollbar)
+  local popup_thumb = highlight.blend(
+    popup_bg,
+    highlight.get('Comment', 'fg', normal_fg),
+    0.30
+  )
+
+  -- Statuscolumn git bar colors (subtle bg tint from GitSigns fg colors)
+  local git_bar_alpha = 0.28
+  local git_add_bar_bg = highlight.blend(normal_bg, diff_add_fg, git_bar_alpha)
+  local git_change_bar_bg =
+    highlight.blend(normal_bg, diff_change_fg, git_bar_alpha)
+  local git_delete_bar_bg =
+    highlight.blend(normal_bg, diff_delete_fg, git_bar_alpha)
+  local git_untracked_bar_bg =
+    highlight.blend(normal_bg, highlight.get('Comment', 'fg', normal_fg), 0.20)
 
   -- VSCode-ish: keep original text colors, just tint backgrounds.
   -- Use HSL darkening to keep hue/saturation consistent across themes.
@@ -243,6 +261,24 @@ local function general_overrides(dim_factor)
     -- Floats {{{
     -- Ensure no highlight-level transparency ("blend") affects floats.
     { NormalFloat = { bg = float_bg, blend = 0 } },
+    -- A popup background that matches the main editor (`Normal`) background.
+    -- Use this for UIs that should not look like "floats" (e.g. fzf-lua).
+    {
+      NormalPopup = {
+        bg = popup_bg,
+        fg = { from = 'Normal', attr = 'fg' },
+        blend = 0,
+      },
+    },
+    {
+      PopupBorder = {
+        -- Border background should match the main Normal background.
+        bg = { from = 'Normal', attr = 'bg' },
+        -- Border foreground uses the popup background tint.
+        fg = popup_bg,
+        blend = 0,
+      },
+    },
     {
       FloatBorder = {
         -- Border background should match the main Normal background (not NormalFloat).
@@ -260,44 +296,44 @@ local function general_overrides(dim_factor)
       },
     },
     -- Mason (doesn't necessarily use NormalFloat directly)
-    { MasonNormal = { fg = { from = 'Normal', attr = 'fg' }, bg = float_bg } },
-    { MasonNormalNC = { inherit = 'MasonNormal' } },
-    { MasonBorder = { fg = { from = 'Comment', attr = 'fg' }, bg = float_bg } },
+    { MasonNormal = { link = 'NormalPopup' } },
+    { MasonNormalNC = { link = 'NormalPopup' } },
+    { MasonBorder = { clear = true, link = 'PopupBorder' } },
     { MasonHeading = { inherit = 'MasonNormal', bold = true } },
     { MasonHeader = { inherit = 'MasonNormal', bold = true } },
     { MasonHeaderSecondary = { inherit = 'MasonNormal', bold = true } },
     {
       MasonHighlight = {
         fg = { from = 'DiagnosticInfo', attr = 'fg' },
-        bg = float_bg,
+        bg = popup_bg,
       },
     },
     {
       MasonHighlightSecondary = {
         fg = { from = 'DiagnosticHint', attr = 'fg' },
-        bg = float_bg,
+        bg = popup_bg,
       },
     },
-    { MasonMuted = { fg = { from = 'Comment', attr = 'fg' }, bg = float_bg } },
+    { MasonMuted = { fg = { from = 'Comment', attr = 'fg' }, bg = popup_bg } },
     {
       MasonWarning = {
         fg = { from = 'DiagnosticWarn', attr = 'fg' },
-        bg = float_bg,
+        bg = popup_bg,
       },
     },
     {
       MasonError = {
         fg = { from = 'DiagnosticError', attr = 'fg' },
-        bg = float_bg,
+        bg = popup_bg,
       },
     },
     -- Lazy.nvim UI (doesn't necessarily use NormalFloat directly)
-    { LazyNormal = { bg = float_bg } },
-    { LazyBorder = { bg = float_bg, fg = { from = 'Comment', attr = 'fg' } } },
-    { LazyButton = { bg = float_bg } },
-    { LazyButtonActive = { bg = float_bg } },
-    { LazyH1 = { bg = float_bg } },
-    { LazyH2 = { bg = float_bg } },
+    { LazyNormal = { link = 'NormalPopup' } },
+    { LazyBorder = { clear = true, link = 'PopupBorder' } },
+    { LazyButton = { bg = popup_bg } },
+    { LazyButtonActive = { bg = popup_bg } },
+    { LazyH1 = { bg = popup_bg } },
+    { LazyH2 = { bg = popup_bg } },
     -- Notify (rcarriga/nvim-notify)
     { NotifyBackground = { bg = float_bg } },
     { NotifyERRORBody = { bg = float_bg } },
@@ -324,6 +360,23 @@ local function general_overrides(dim_factor)
     { PickerBorder = { link = 'Normal' } },
     { UnderlinedTitle = { bold = true, underline = true } },
     { StatusColSep = { link = 'Dim' } },
+    -- Statuscolumn: git indicator as a colored bar (│).
+    -- When there is no change, use the separator grey.
+    { StatusColGitAdd = { fg = diff_add_fg, bg = 'NONE' } },
+    { StatusColGitChange = { fg = diff_change_fg, bg = 'NONE' } },
+    { StatusColGitDelete = { fg = diff_delete_fg, bg = 'NONE' } },
+    {
+      StatusColGitUntracked = {
+        fg = { from = 'Comment', attr = 'fg' },
+        bg = 'NONE',
+      },
+    },
+    { StatusColGitNone = { link = 'StatusColSep' } },
+    -- fzf-lua preview scrollbar (float) colors
+    { FzfLuaScrollFloatEmpty = { clear = true, link = 'NormalPopup' } },
+    { FzfLuaScrollFloatFull = { bg = popup_thumb } },
+    -- fzf-lua list scrollbar (fzf --scrollbar): uses the fg color of this hl group
+    { FzfLuaFzfScrollbar = { fg = popup_thumb, bg = 'NONE' } },
     { CodeBlock = { bg = { from = 'Normal', alter = 0.3 } } },
     { markdownCode = { link = 'CodeBlock' } },
     { markdownCodeBlock = { link = 'CodeBlock' } },
@@ -484,54 +537,48 @@ local function general_overrides(dim_factor)
     -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
     {
       FzfLuaNormal = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       FzfLuaTitle = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       FzfLuaTitle = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       -- Make fzf-lua borders follow FloatBorder exactly.
-      FzfLuaBorder = { clear = true, link = 'FloatBorder' },
+      FzfLuaBorder = { clear = true, link = 'PopupBorder' },
     },
     {
       FzfLuaPreviewNormal = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       FzfLuaPreviewBorder = {
         clear = true,
-        link = 'FloatBorder',
+        link = 'PopupBorder',
       },
     },
     {
       FzfLuaPreviewTitle = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       FzfLuaHelpNormal = {
-        bg = float_bg,
-        fg = { from = 'Normal', attr = 'fg' },
+        link = 'NormalPopup',
       },
     },
     {
       FzfLuaHelpBorder = {
         clear = true,
-        link = 'FloatBorder',
+        link = 'PopupBorder',
       },
     },
     -- FzfLuaBorder Normal  hls.border  Main win border
@@ -567,10 +614,11 @@ local function general_overrides(dim_factor)
     -- FzfLuaDirPart    Comment hls.dir_part    Path formatters directory hl group
     -- FzfLuaFilePart   @none   hls.file_part   Path formatters file hl group
     -- FzfLuaLiveSym    *Brown1 hls.live_sym    LSP live symbols query match
-    { FzfLuaFzfNormal = { bg = float_bg, fg = '#00ff00' } },
+    -- fzf-lua's internal "fzf" UI groups (make sure no debug colors leak).
+    { FzfLuaFzfNormal = { clear = true, link = 'FzfLuaNormal' } },
     -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
     -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
-    { ['@fzf.normal'] = { bg = '#ff0000', fg = '#00ff00' } },
+    { ['@fzf.normal'] = { clear = true, link = 'FzfLuaNormal' } },
     -- FzfLuaFzfNormal  FzfLuaNormal    fzf.normal  fzf's fg|bg
     -- FzfLuaFzfCursorLine  FzfLuaCursorLine    fzf.cursorline  fzf's fg+|bg+
     -- FzfLuaFzfMatch   Special fzf.match   fzf's hl+

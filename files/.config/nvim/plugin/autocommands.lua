@@ -89,7 +89,8 @@ api.nvim_create_autocmd('FileType', {
 
 -- Disable indent guides in terminal buffers (mini.indentscope / indent-blankline / etc).
 do
-  local group = api.nvim_create_augroup('DisableIndentGuidesInTerminal', { clear = true })
+  local group =
+    api.nvim_create_augroup('DisableIndentGuidesInTerminal', { clear = true })
 
   local function disable(buf)
     if not api.nvim_buf_is_valid(buf) then return end
@@ -114,12 +115,15 @@ end
 
 -- Ensure all terminal windows use the main Normal background (including plugin-created ones).
 do
-  local group = api.nvim_create_augroup('TerminalNormalBackground', { clear = true })
+  local group =
+    api.nvim_create_augroup('TerminalNormalBackground', { clear = true })
 
   local function apply_terminal_winhighlight(buf)
     if not api.nvim_buf_is_valid(buf) then return end
     local bt, ft = vim.bo[buf].buftype, vim.bo[buf].filetype
-    if bt ~= 'terminal' and ft ~= 'toggleterm' and ft ~= 'terminal' then return end
+    if bt ~= 'terminal' and ft ~= 'toggleterm' and ft ~= 'terminal' then
+      return
+    end
 
     local win = api.nvim_get_current_win()
     if not api.nvim_win_is_valid(win) then return end
@@ -135,15 +139,25 @@ do
     end)
   end
 
-  api.nvim_create_autocmd({ 'TermOpen', 'BufWinEnter' }, {
-    group = group,
-    callback = function(args) apply_terminal_winhighlight(args.buf) end,
-  })
+  -- Apply early, but also re-apply on WinEnter since some plugins set winhighlight
+  -- after opening (Sidekick/toggleterm/etc).
+  api.nvim_create_autocmd(
+    { 'TermOpen', 'BufWinEnter', 'BufEnter', 'WinEnter' },
+    {
+      group = group,
+      callback = function(args)
+        -- Defer one tick so we win over later winhighlight setters.
+        vim.schedule(function() apply_terminal_winhighlight(args.buf) end)
+      end,
+    }
+  )
 
   api.nvim_create_autocmd('FileType', {
     group = group,
     pattern = { 'toggleterm', 'terminal' },
-    callback = function(args) apply_terminal_winhighlight(args.buf) end,
+    callback = function(args)
+      vim.schedule(function() apply_terminal_winhighlight(args.buf) end)
+    end,
   })
 end
 
@@ -199,7 +213,7 @@ augroup('VimrcIncSearchHighlight', {
 ----------------------------------------------------------------------------------------------------
 -- HLSEARCH
 ----------------------------------------------------------------------------------------------------
--- In order to get hlsearch working the way I like i.e. on when using /,?,N,n,*,#, etc. and off when
+--   In order to get hlsearch working the way I like i.e. on when using /,?,N,n,*,#, etc. and off when
 -- When I'm not using them, I need to set the following:
 -- The mappings below are essentially faked user input this is because in order to automatically turn off
 -- the search highlight just changing the value of 'hlsearch' inside a function does not work
@@ -353,7 +367,9 @@ do
       local ft = vim.bo[buf].filetype or ''
       local bt = vim.bo[buf].buftype or ''
       local is_unmapped = fn.hasmapto('q', 'n') == 0
-      local eligible = is_unmapped or vim.wo.previewwindow or ft_matches(ft)
+      local eligible = is_unmapped
+        or vim.wo.previewwindow
+        or ft_matches(ft)
         or smart_close_buftypes[bt]
 
       if eligible then
@@ -381,7 +397,9 @@ do
     group = group,
     nested = true,
     callback = function()
-      if vim.bo.filetype ~= 'qf' then cmd.lclose({ mods = { silent = true } }) end
+      if vim.bo.filetype ~= 'qf' then
+        cmd.lclose({ mods = { silent = true } })
+      end
     end,
   })
 end
@@ -426,12 +444,16 @@ do
     end
 
     -- Disable formatting in runtime/plugin directories.
-    if vim.env.VIMRUNTIME and startswith(path, vim.env.VIMRUNTIME) then return true end
+    if vim.env.VIMRUNTIME and startswith(path, vim.env.VIMRUNTIME) then
+      return true
+    end
 
     for _, dir in ipairs(vim.split(vim.o.runtimepath, ',', { plain = true })) do
       if dir ~= '' and startswith(path, dir) then
         -- Never disable in your actual config path.
-        if vim.g.vim_dir and startswith(path, vim.g.vim_dir) then return false end
+        if vim.g.vim_dir and startswith(path, vim.g.vim_dir) then
+          return false
+        end
         return true
       end
     end
@@ -454,9 +476,7 @@ end
 do
   local group = api.nvim_create_augroup('WhitespaceMatch', { clear = true })
 
-  local function is_floating_win()
-    return fn.win_gettype() == 'popup'
-  end
+  local function is_floating_win() return fn.win_gettype() == 'popup' end
 
   local function is_invalid_buf(bufnr)
     return vim.bo[bufnr].filetype == ''

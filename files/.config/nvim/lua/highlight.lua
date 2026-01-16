@@ -39,7 +39,7 @@ local api, notify, fmt, augroup =
 ---@field clear boolean?
 ---@field inherit string?
 
-local enable_italics = false
+local enable_italics = true
 local attrs = {
   fg = true,
   bg = true,
@@ -353,9 +353,7 @@ local function get(group, attribute, fallback)
     ('the attribute passed in is invalid: %s'):format(attribute)
   )
   local color = data[attribute] or fallback
-  if not color then
-    return 'NONE'
-  end
+  if not color then return 'NONE' end
   return color
 end
 

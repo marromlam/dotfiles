@@ -144,6 +144,116 @@ local function filetype(ctx)
   return get_buffer_icon(ctx.bufnum, { default = true })
 end
 
+-- Terminal buffer labeling ----------------------------------------------------
+-- For plain :terminal buffers we want to show the actual running process,
+-- not just $SHELL. For Sidekick's tmux-backed terminals, show the active tmux
+-- pane's current command.
+local function trim(s)
+  if type(s) ~= 'string' then return '' end
+  return (s:gsub('^%s+', ''):gsub('%s+$', ''))
+end
+
+local function sysline(cmd)
+  local ok, out = pcall(fn.systemlist, cmd)
+  if not ok or not out or not out[1] then return '' end
+  return trim(out[1])
+end
+
+local function tmux_server_args_from_pid(pid)
+  local args = trim(sysline({ 'ps', '-o', 'args=', '-p', tostring(pid) }))
+  if args == '' then return {} end
+  local server_args = {}
+  local sock = args:match('%-S%s+(%S+)')
+  local label = args:match('%-L%s+(%S+)')
+  if sock then
+    server_args[#server_args + 1] = '-S'
+    server_args[#server_args + 1] = sock
+  elseif label then
+    server_args[#server_args + 1] = '-L'
+    server_args[#server_args + 1] = label
+  end
+  return server_args
+end
+
+local function tmux_pane_current_command(tmux_args, client_pid)
+  tmux_args = tmux_args or {}
+  local cmd_base = vim.list_extend({ 'tmux' }, tmux_args)
+
+  -- Match the tmux client that is running inside this terminal by PID.
+  local clients = fn.systemlist(vim.list_extend(vim.deepcopy(cmd_base), {
+    'list-clients',
+    '-F',
+    '#{client_pid}\t#{client_name}',
+  }))
+  if type(clients) ~= 'table' then return '' end
+
+  local name
+  for _, line in ipairs(clients) do
+    local cpid, cname = line:match('^(%d+)\t([^\t]*)$')
+    if cpid and tonumber(cpid) == client_pid then
+      name = cname
+      break
+    end
+  end
+  -- If we couldn't match by PID, but there is exactly one client, use it.
+  if not name and #clients == 1 then
+    local _, cname = clients[1]:match('^(%d+)\t([^\t]*)$')
+    name = cname
+  end
+  if not name or name == '' then return '' end
+
+  return sysline(vim.list_extend(vim.deepcopy(cmd_base), {
+    'display-message',
+    '-p',
+    '-t',
+    name,
+    '#{pane_current_command}',
+  }))
+end
+
+local function terminal_display_name(buf)
+  local cached = vim.b[buf].mrl_term_display
+  local now = (vim.uv and vim.uv.now and vim.uv.now()) or 0
+  if
+    type(cached) == 'table'
+    and type(cached.value) == 'string'
+    and type(cached.ts) == 'number'
+    and now > 0
+    and (now - cached.ts) < 1000
+  then
+    return cached.value
+  end
+
+  local job = vim.b[buf].terminal_job_id or vim.bo[buf].channel
+  local pid = 0
+  do
+    local jid = tonumber(job)
+    if jid and jid > 0 then
+      -- NOTE: jobpid() throws E900 for invalid job ids. Never let statusline error.
+      local ok, p = pcall(fn.jobpid, jid)
+      if ok and type(p) == 'number' and p > 0 then pid = p end
+    end
+  end
+
+  local comm = (pid > 0)
+      and sysline({ 'ps', '-o', 'comm=', '-p', tostring(pid) })
+    or ''
+
+  local value = comm ~= '' and comm or fn.fnamemodify(vim.env.SHELL or '', ':t')
+
+  local is_tmux = (type(value) == 'string' and value:match('^tmux') ~= nil)
+  if is_tmux and pid and pid > 0 then
+    -- Normalize tmux display name; we will replace with pane command when possible.
+    value = 'tmux'
+    local tmux_args = tmux_server_args_from_pid(pid)
+    local pane_cmd = tmux_pane_current_command(tmux_args, pid)
+    if pane_cmd ~= '' then value = pane_cmd end
+  end
+
+  vim.b[buf].mrl_term_display = { value = value, ts = now }
+  return value
+end
+
 --- This function allow me to specify titles for special case buffers
 --- like the preview window or a quickfix window
 --- CREDIT: https://vi.stackexchange.com/a/18090
@@ -153,8 +263,10 @@ local function special_buffers(ctx)
   if ctx.filetype == 'AvanteInput' then return 'Avante' end
   if ctx.filetype == 'AvanteSelectedFiles' then return 'Avante' end
   if ctx.filetype == 'Avante' then return 'Avante' end
-  if ctx.buftype == 'terminal' and falsy(ctx.filetype) then
-    return ('Terminal(%s)'):format(fn.fnamemodify(vim.env.SHELL, ':t'))
+  -- Many terminal providers (toggleterm, sidekick, etc) set a non-empty filetype,
+  -- but they still use `buftype=terminal`. Always use our terminal label.
+  if ctx.buftype == 'terminal' then
+    return ('Terminal(%s)'):format(terminal_display_name(ctx.bufnum))
   end
   if fn.getloclist(0, { filewinid = 0 }).filewinid > 0 then
     return 'Location List'
@@ -588,11 +700,15 @@ function mrl.ui.statusline.render()
     {
       {
         { space, 'StSeparator' },
+        has_copilot and { icons.misc.copilot .. space .. space, 'StTitle' }
+          or nil,
         { icons.misc.puzzle, 'StTitle' },
         { space, 'StSeparator' },
-        { tostring(lsp_client_count), 'StTitle' },
-        has_copilot and { space, 'StSeparator' } or nil,
-        has_copilot and { icons.misc.copilot, 'StTitle' } or nil,
+        { tostring(lsp_client_count), 'StFaded' },
+        -- Give Copilot its own breathing room.
+        -- has_copilot and { ' ', 'StSeparator' } or { space, 'StSeparator' },
+        -- Space before the next right-side segment (git/debugger/etc).
+        { space, 'StSeparator' },
       },
       priority = 2,
       id = LSP_COMPONENT_ID,
@@ -799,13 +915,14 @@ function mrl.ui.statusline.render()
         { ctx.expandtab and icons.misc.indent or icons.misc.tab, 'StTitle' },
         { space, 'StSeparator' },
         { ctx.shiftwidth, 'StTitle' },
+        { space, 'StSeparator' },
       },
       cond = ctx.shiftwidth > 2 or not ctx.expandtab,
       priority = 6,
-    },
+    }
     -- }}}
     -- Space after {{{
-    { { { space, 'StSeparator' } }, priority = 1 }
+    -- { { { space, 'StSeparator' } }, priority = 1 }
     -- }}}
   )
   -- removes 5 columns to add some padding

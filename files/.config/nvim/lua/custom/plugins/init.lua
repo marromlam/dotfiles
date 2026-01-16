@@ -120,7 +120,14 @@ return {
 
   {
     'rlch/github-notifications.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope.nvim' },
+    dependencies = { 'nvim-lua/plenary.nvim', 'ibhagwan/fzf-lua' },
+    keys = {
+      {
+        '<leader>gn',
+        function() require('custom.gh_notifications').open() end,
+        desc = 'github notifications (fzf)',
+      },
+    },
   },
 
   {

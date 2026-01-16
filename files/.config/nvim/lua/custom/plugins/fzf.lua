@@ -1,6 +1,6 @@
 local fn, env, ui = vim.fn, vim.env, mrl.ui
 local icons, lsp_hls = ui.icons, ui.lsp.highlights
-local prompt = icons.misc.telescope .. '  '
+local prompt = icons.misc.search .. '  '
 
 -- Lazy-load fzf-lua only when needed
 local function fzf_lua() return require('fzf-lua') end
@@ -43,7 +43,7 @@ local function dropdown(opts)
     opts.winopts.title = fzf_title(title)
   end
   return vim.tbl_deep_extend('force', {
-    prompt = icons.misc.telescope .. '  ',
+    prompt = icons.misc.search .. '  ',
     fzf_opts = { ['--layout'] = 'reverse' },
     winopts = {
       title_pos = opts.winopts.title and 'center' or nil,
@@ -131,7 +131,7 @@ local function ensure_fzf_setup()
       ['--info'] = 'inline', -- hidden OR inline:⏐
       ['--reverse'] = false,
       ['--layout'] = 'default',
-      ['--scrollbar'] = icons.separators.right_block,
+      ['--scrollbar'] = icons.scrollbar,
       ['--ellipsis'] = icons.misc.ellipsis,
       ['--pointer'] = '▸',
       ['--marker'] = '◆',
@@ -151,7 +151,12 @@ local function ensure_fzf_setup()
       --   ['marker'] = { 'fg', '@character' },
       --   ['spinner'] = { 'fg', 'DiagnosticOk' },
       --   ['header'] = { 'fg', 'Comment' },
-      ['gutter'] = { 'bg', 'Normal' },
+      -- Keep the embedded fzf UI background consistent with the picker window.
+      ['bg'] = { 'bg', 'NormalPopup' },
+      ['bg+'] = { 'bg', 'PmenuSel' },
+      ['gutter'] = { 'bg', 'NormalPopup' },
+      -- Make the list scrollbar match the preview scrollbar styling.
+      ['scrollbar'] = { 'fg', 'FzfLuaFzfScrollbar' },
       --   ['separator'] = { 'fg', 'Comment' },
     },
     previewers = {
@@ -162,6 +167,10 @@ local function ensure_fzf_setup()
       border = ui.border.rectangle,
       preview = {
         border = ui.border.rectangle,
+        -- Preview scrollbar is separate from fzf's `--scrollbar` option.
+        -- Use a float scrollbar with our unified glyph.
+        scrollbar = 'float',
+        scrollchar = icons.scrollbar,
       },
     },
     keymap = {
@@ -188,11 +197,11 @@ local function ensure_fzf_setup()
     },
     -- customize prompts {{{
     highlights = {
-      prompt = icons.misc.telescope .. '  ',
+      prompt = icons.misc.search .. '  ',
       winopts = { title = fzf_title('Highlights') },
     },
     helptags = {
-      prompt = icons.misc.telescope .. '  ',
+      prompt = icons.misc.search .. '  ',
       winopts = { title = fzf_title('Help', '󰋖') },
     },
     oldfiles = dropdown({
@@ -324,10 +333,11 @@ return {
           -- Register once with a compact UI similar to your dropdown pickers.
           -- Args: (opts, silent, opts_once)
           pcall(fzf.register_ui_select, {
+            -- Make `vim.ui.select` popups roughly match the file picker size.
             winopts = {
-              height = 0.33,
-              width = 0.45,
-              row = 0.15,
+              height = 0.70,
+              width = 0.35,
+              row = 0.10,
               col = 0.50,
               title_pos = 'center',
               preview = { hidden = 'hidden' },
@@ -335,6 +345,7 @@ return {
             fzf_opts = {
               ['--layout'] = 'reverse',
               ['--info'] = 'inline',
+              ['--scrollbar'] = icons.scrollbar,
             },
           }, true)
           return vim.ui.select(items, opts, on_choice)

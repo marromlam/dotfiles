@@ -3,8 +3,14 @@ return {
     'linux-cultist/venv-selector.nvim',
     dependencies = {
       'neovim/nvim-lspconfig',
-      'nvim-telescope/telescope.nvim',
+      'ibhagwan/fzf-lua',
       'mfussenegger/nvim-dap-python',
+    },
+    opts = {
+      options = {
+        -- Prefer fzf-lua instead of telescope.
+        picker = 'fzf-lua',
+      },
     },
     cmd = {
       'VenvSelect',
