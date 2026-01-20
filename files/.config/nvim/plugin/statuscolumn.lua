@@ -205,10 +205,20 @@ api.nvim_create_autocmd({ 'BufEnter', 'FileType' }, {
     local ft = vim.bo[buf].filetype
     local win = api.nvim_get_current_win()
     local winhl = vim.wo[win].winhl or ''
+    if vim.bo[buf].buftype == 'terminal' then
+      vim.opt_local.statuscolumn = ''
+      vim.opt_local.signcolumn = 'no'
+      return
+    end
+    if not vim.wo[win].number and not vim.wo[win].relativenumber then
+      vim.opt_local.statuscolumn = ''
+      vim.opt_local.signcolumn = 'yes'
+      return
+    end
     -- fzf-lua uses window-local winhl mappings like `Normal:FzfLuaNormal`
     -- for both the picker and its preview. Disable our statuscolumn there to
     -- avoid a "left stripe"/gutter inside the picker UI.
-    if winhl:match('FzfLua') then
+    if winhl:match('FzfLua') or winhl:match('FZF') then
       vim.opt_local.statuscolumn = ''
       vim.opt_local.signcolumn = 'no'
       return

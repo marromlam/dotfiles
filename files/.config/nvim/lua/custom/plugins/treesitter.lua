@@ -2,7 +2,7 @@ return {
   {
     'nvim-treesitter/nvim-treesitter',
     branch = 'master',
-    event = 'VeryLazy',
+    event = { 'BufReadPost', 'BufNewFile' },
     build = ':TSUpdate',
     config = function()
       ---@diagnostic disable-next-line: missing-fields
@@ -101,7 +101,7 @@ return {
   -- to fail. Keep it as a separate plugin that depends on treesitter instead.
   {
     'nvim-treesitter/nvim-treesitter-textobjects',
-    event = 'VeryLazy',
+    event = { 'BufReadPost', 'BufNewFile' },
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
   },
 
@@ -123,7 +123,7 @@ return {
   {
     'windwp/nvim-ts-autotag',
     dependencies = { 'nvim-treesitter' },
-    event = 'VeryLazy',
+    event = { 'BufReadPost', 'BufNewFile' },
     ft = {
       'html',
       'xml',
@@ -140,7 +140,7 @@ return {
 
   {
     'nvim-treesitter/nvim-treesitter-context',
-    event = 'VeryLazy',
+    event = { 'BufReadPost', 'BufNewFile' },
     init = function()
       local highlight = mrl.highlight
       highlight.plugin('treesitter-context', {

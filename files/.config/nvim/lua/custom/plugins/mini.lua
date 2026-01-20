@@ -230,51 +230,8 @@ return { -- Collection of various small independent plugins/modules
   },
   {
     'echasnovski/mini.indentscope',
-    version = false,
-    event = { 'BufReadPre', 'BufNewFile' },
-    config = function()
-      require('mini.indentscope').setup({
-        -- Draw options
-        draw = {
-          -- Delay (in ms) between event and start of drawing scope indicator
-          delay = 0,
-          -- Symbol priority. Increase to display on top of more symbols.
-          priority = 2,
-        },
-        -- Options for scope computation
-        options = {
-          -- Type of scope's border: which line(s) with smaller indent to
-          -- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'
-          border = 'both',
-          -- Whether to use cursor column when computing reference indent.
-          -- Useful to see incremental scopes with horizontal cursor movements.
-          indent_at_cursor = true,
-          -- Whether to decrease indent level for empty lines. Useful when
-          -- you want empty lines to have no indent scope. Requires setting
-          -- `indent_at_cursor = true`.
-          try_as_border = true,
-        },
-        -- Which character to use for drawing scope indicator
-        symbol = '│',
-        -- List of character patterns which should not have indentscope computed
-        exclude = {
-          '^diff',
-          '^fugitive',
-          '^git',
-          '^help',
-          '^lazy',
-          '^neogitstatus',
-          '^qf',
-          '^query',
-          '^spectre',
-          '^starter',
-          '^TelescopePrompt',
-          '^Trouble',
-          '^undotree',
-          '^which-key',
-        },
-      })
-    end,
+    enabled = false,
+    cond = false,
   },
   {
     'echasnovski/mini.trailspace',
@@ -293,6 +250,8 @@ return { -- Collection of various small independent plugins/modules
   {
     'echasnovski/mini.animate',
     version = false,
+    cond = false,
+    disable = true,
     event = 'VeryLazy',
     config = function()
       require('mini.animate').setup({

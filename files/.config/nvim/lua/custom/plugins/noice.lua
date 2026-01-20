@@ -4,7 +4,6 @@ local border, highlight, L =
 
 return {
   'folke/noice.nvim',
-  -- Defer until you actually enter the command-line (big startup win).
   event = 'CmdlineEnter',
   cmd = { 'Noice', 'NoiceHistory', 'NoiceLast', 'NoiceDismiss', 'NoiceErrors' },
   dependencies = { 'MunifTanjim/nui.nvim' },
@@ -111,7 +110,7 @@ return {
         filter = { event = 'msg_show', min_height = 20 },
       },
       {
-        view = 'notify',
+        view = 'mini',
         filter = {
           any = {
             { event = 'msg_show', min_height = 10 },
@@ -121,7 +120,7 @@ return {
         opts = { timeout = 10000 },
       },
       {
-        view = 'notify',
+        view = 'mini',
         filter = { event = 'notify', find = 'Type%-checking' },
         opts = { replace = true, merge = true, title = 'TSC' },
         stop = true,
@@ -136,7 +135,7 @@ return {
         }, -- minimise pattern not found messages
       },
       {
-        view = 'notify',
+        view = 'mini',
         filter = {
           any = {
             { warning = true },
@@ -153,7 +152,7 @@ return {
         },
       },
       {
-        view = 'notify',
+        view = 'mini',
         opts = {
           title = 'Error',
           level = L.ERROR,
@@ -169,7 +168,7 @@ return {
         },
       },
       {
-        view = 'notify',
+        view = 'mini',
         opts = { title = '' },
         filter = { kind = { 'emsg', 'echo', 'echomsg' } },
       },
@@ -227,6 +226,12 @@ return {
     })
 
     require('noice').setup(opts)
+
+    vim.api.nvim_create_user_command('NotifyTest', function()
+      vim.notify(('Noice mini toast\n'):rep(6), vim.log.levels.INFO, {
+        title = 'Noice Mini',
+      })
+    end, { desc = 'Test Noice mini notifications' })
 
     -- Noice uses `winhighlight` to map FloatBorder -> NoiceCmdlinePopupBorder.
     -- Force these border groups to link to PopupBorder immediately (no scheduling),

@@ -110,27 +110,67 @@ return {
       vim.cmd('colorscheme gruvbox')
     end,
   },
-  -- First, install the plugin (using lazy.nvim as an example)
+  -- Horizon (default)
   {
-    'EdenEast/nightfox.nvim',
+    'akinsho/horizon.nvim',
     lazy = false,
     priority = 1000,
     config = function()
-      require('nightfox').setup({
-        options = {
-          -- Optional: customize settings
-          transparent = false,
-          terminal_colors = true,
-          dim_inactive = false,
-          -- styles = {
-          --   comments = 'italic',
-          --   keywords = 'bold',
-          --   types = 'italic,bold',
-          -- },
+      vim.o.termguicolors = true
+      vim.cmd('colorscheme horizon')
+    end,
+  },
+
+  -- Keep Catppuccin available, but not enabled by default.
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    enabled = false,
+    cond = false,
+    lazy = true,
+    priority = 900,
+    config = function()
+      require('catppuccin').setup({
+        flavour = 'mocha',
+        transparent_background = false,
+        term_colors = true,
+        dim_inactive = { enabled = false },
+        styles = {
+          comments = enable_italics and { 'italic' } or {},
+          keywords = { 'bold' },
+          functions = {},
+          variables = {},
+        },
+        integrations = {
+          treesitter = true,
+          native_lsp = { enabled = true },
+          gitsigns = true,
+          telescope = true,
+          nvimtree = false,
+          notify = true,
+          mini = true,
         },
       })
 
-      -- Set the colorscheme
+      vim.cmd('colorscheme catppuccin')
+    end,
+  },
+
+  -- Keep Nightfox available, but not enabled by default.
+  {
+    'EdenEast/nightfox.nvim',
+    enabled = false,
+    cond = false,
+    lazy = true,
+    priority = 900,
+    config = function()
+      require('nightfox').setup({
+        options = {
+          transparent = false,
+          terminal_colors = true,
+          dim_inactive = false,
+        },
+      })
       vim.cmd('colorscheme carbonfox')
     end,
   },

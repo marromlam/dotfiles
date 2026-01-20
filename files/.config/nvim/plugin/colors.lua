@@ -45,9 +45,9 @@ local function general_overrides(dim_factor)
   local normal_fg = highlight.get('Normal', 'fg', '#ffffff')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
-  local stl_bg = highlight.darken_hsl(normal_bg, 0.10)
+  local stl_bg = highlight.darken_hsl(normal_bg, -0.20)
   local float_bg = highlight.darken_hsl(normal_bg, 0)
-  local popup_bg = highlight.darken_hsl(normal_bg, 0.10)
+  local popup_bg = highlight.darken_hsl(normal_bg, -0.20)
   local pal = (mrl.ui and mrl.ui.palette) or {}
   -- Deleted-line diff background should track the theme's GitSignsDelete color.
   -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
@@ -73,11 +73,8 @@ local function general_overrides(dim_factor)
   )
 
   -- fzf-lua scrollbar thumb color (used for both preview + fzf list scrollbar)
-  local popup_thumb = highlight.blend(
-    popup_bg,
-    highlight.get('Comment', 'fg', normal_fg),
-    0.30
-  )
+  local popup_thumb =
+    highlight.blend(popup_bg, highlight.get('Comment', 'fg', normal_fg), 0.30)
 
   -- Statuscolumn git bar colors (subtle bg tint from GitSigns fg colors)
   local git_bar_alpha = 0.28

@@ -6,43 +6,10 @@ return {
     main = 'ibl',
     opts = {
       indent = { char = '┊' },
+      exclude = {
+        filetypes = { 'notify', 'noice', 'noice_popup', 'noice_cmdline' },
+      },
     },
-  },
-
-  {
-    'rcarriga/nvim-notify',
-    event = 'VeryLazy',
-    config = function()
-      ---@type table
-      local notify = require('notify')
-      ---@diagnostic disable-next-line: undefined-field
-      notify.setup({
-        top_down = false,
-        render = 'wrapped-compact',
-        stages = 'fade_in_slide_out',
-        -- Used by notify for blending/opacity calculations; keep aligned with float bg
-        background_colour = (function()
-          local configured = mrl.ui.current and mrl.ui.current.float_bg
-          if vim.is_callable(configured) then return configured() end
-          if type(configured) == 'string' then return configured end
-          if mrl and mrl.highlight and mrl.highlight.get then
-            return mrl.highlight.get('Normal', 'bg')
-          end
-          return 'NONE'
-        end)(),
-        on_open = function(win)
-          if vim.api.nvim_win_is_valid(win) then
-            vim.api.nvim_win_set_config(win, { border = mrl.ui.current.border })
-          end
-        end,
-      })
-      vim.keymap.set('n', '<leader>nd', function()
-        ---@diagnostic disable-next-line: undefined-field
-        notify.dismiss({ silent = true, pending = true })
-      end, {
-        desc = 'dismiss notifications',
-      })
-    end,
   },
 
   -- {
@@ -164,7 +131,7 @@ return {
     'HiPhish/rainbow-delimiters.nvim',
     -- Match Akinsho's load order: define `vim.g.rainbow_delimiters` early,
     -- then fill in strategy/query when the plugin loads.
-    event = 'VeryLazy',
+    event = { 'BufReadPost', 'BufNewFile' },
     init = function()
       -- `vim.g` doesn't support mutating nested fields reliably; always reassign.
       local rd = vim.g.rainbow_delimiters or {}
