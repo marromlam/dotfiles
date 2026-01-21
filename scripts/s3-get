@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Function to check if required tools are installed
+check_dependencies() {
+    local missing_tools=()
+
+    for tool in "$@"; do
+        if ! command -v "$tool" &>/dev/null; then
+            missing_tools+=("$tool")
+        fi
+    done
+
+    if [ ${#missing_tools[@]} -gt 0 ]; then
+        echo "Error: The following required tools are not installed:" >&2
+        for tool in "${missing_tools[@]}"; do
+            echo "  - $tool" >&2
+        done
+        echo "Please install the missing tools and try again." >&2
+        exit 1
+    fi
+}
+
+# Function to get AWS profiles from ~/.aws/config
+get_aws_profiles() {
+    local config_file="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
+
+    if [[ ! -f "$config_file" ]]; then
+        echo "Error: AWS config file not found at $config_file" >&2
+        echo "Please run 'aws configure' or 'aws configure sso' first." >&2
+        exit 1
+    fi
+
+    # Extract profile names from config file
+    grep '^\[profile ' "$config_file" | sed 's/^\[profile \(.*\)\]/\1/' | sort -u
+}
+
+# Function to check AWS credentials validity
+check_aws_credentials() {
+    local profile="$1"
+
+    if ! aws sts get-caller-identity --profile "$profile" &>/dev/null; then
+        echo "Error: AWS credentials for profile '$profile' are invalid or expired." >&2
+        echo "Please run: aws sso login --profile $profile" >&2
+        exit 1
+    fi
+}
+
+# Function to list S3 buckets
+list_s3_buckets() {
+    local profile="$1"
+    aws s3api list-buckets --profile "$profile" | jq -r '.Buckets[].Name' | sed 's|^|s3://|'
+}
+
+# Function to list objects in S3 bucket with details
+list_s3_objects() {
+    local profile="$1"
+    local bucket="$2"
+
+    aws s3 ls "s3://$bucket/" --recursive --human-readable --summarize --profile "$profile"
+}
+
+# Function to preview files in fzf
+fzf_preview() {
+    local line="$1"
+
+    # Extract filename from 5th column onwards
+    local filename=$(echo "$line" | awk '{for (i=5; i<=NF; i++) printf "%s%s", $i, (i<NF?" ":"")}')
+
+    if [[ -z "$filename" ]]; then
+        exit 0
+    fi
+
+    local temp_file="/tmp/s3-preview-content-$$-$(basename "$filename")"
+
+    # Download file for preview
+    if aws s3 cp "s3://$BUCKET/${filename}" "$temp_file" --profile "$PROFILE" --region "$REGION" &>/dev/null; then
+        # Check file type and display accordingly
+        if [[ "$filename" == *.avro ]]; then
+            if [[ -x "$AVRO2JSON_PATH" ]]; then
+                "$AVRO2JSON_PATH" "$temp_file" 2>/dev/null | head -n 100
+            else
+                echo "avro2json not found at $AVRO2JSON_PATH"
+                echo "Cannot preview Avro file"
+            fi
+        elif [[ "$filename" == *.json ]]; then
+            if command -v jq &>/dev/null; then
+                jq -C '.' "$temp_file" 2>/dev/null | head -n 100
+            else
+                cat "$temp_file" | head -n 100
+            fi
+        elif command -v bat &>/dev/null; then
+            bat --style=plain --color=always "$temp_file" 2>/dev/null | head -n 100
+        else
+            cat "$temp_file" | head -n 100
+        fi
+        rm -f "$temp_file"
+    else
+        echo "Failed to download file for preview"
+    fi
+}
+export -f fzf_preview
+
+# Function to download selected files
+download_files() {
+    local profile="$1"
+    local bucket="$2"
+    local region="$3"
+    shift 3
+    local files=("$@")
+
+    for file_line in "${files[@]}"; do
+        # Extract filename from the line (5th column onwards)
+        local filename=$(echo "$file_line" | awk '{for (i=5; i<=NF; i++) printf "%s%s", $i, (i<NF?" ":"")}')
+
+        if [[ -z "$filename" ]]; then
+            continue
+        fi
+
+        # Get directory structure
+        local dir=$(dirname "$filename")
+
+        echo "Downloading '$filename'..."
+
+        # Create directory if needed
+        if [[ "$dir" != "." && -n "$dir" ]]; then
+            mkdir -p "$dir"
+        fi
+
+        # Download file
+        if aws s3 cp "s3://$bucket/${filename}" "$filename" --profile "$profile" --region "$region"; then
+            echo "Downloaded: $filename"
+        else
+            echo "Failed to download: $filename" >&2
+        fi
+    done
+}
+
+# Main script
+main() {
+    # Check for required dependencies
+    check_dependencies aws fzf jq
+
+    # Get and select AWS profile
+    echo "Selecting AWS profile..."
+    local profile
+    profile=$(get_aws_profiles | fzf --prompt="Select AWS Profile: " --height=40% --reverse)
+
+    if [[ -z "$profile" ]]; then
+        echo "Error: No profile selected." >&2
+        exit 1
+    fi
+
+    echo "Selected profile: $profile"
+
+    # Check AWS credentials
+    echo "Validating credentials..."
+    check_aws_credentials "$profile"
+
+    # Select S3 bucket
+    echo "Listing S3 buckets..."
+    local bucket_path
+    bucket_path=$(list_s3_buckets "$profile" | fzf --prompt="Select S3 Bucket: " --height=40% --reverse)
+
+    if [[ -z "$bucket_path" ]]; then
+        echo "Error: No bucket selected." >&2
+        exit 1
+    fi
+
+    # Extract bucket name from s3:// path
+    local bucket="${bucket_path#s3://}"
+    echo "Selected bucket: $bucket"
+
+    # Default region
+    local region="${AWS_DEFAULT_REGION:-us-east-1}"
+
+    # Select files with preview
+    echo "Listing objects in s3://$bucket..."
+    echo "Use TAB to select multiple files, ENTER to confirm"
+
+    # Export variables for preview function
+    export PROFILE="$profile"
+    export BUCKET="$bucket"
+    export REGION="$region"
+    export AVRO2JSON_PATH="$HOME/.dotfiles/scripts/avro2json"
+
+    # Use fzf with preview function
+    local selected_files
+    mapfile -t selected_files < <(list_s3_objects "$profile" "$bucket" |
+        fzf -m \
+            --prompt="Select files to download (TAB for multi-select): " \
+            --preview='bash -c "fzf_preview {}"' \
+            --preview-window=right:50%:wrap \
+            --bind='ctrl-/:toggle-preview')
+
+    if [[ ${#selected_files[@]} -eq 0 ]]; then
+        echo "No files selected. Exiting."
+        exit 0
+    fi
+
+    echo "Downloading ${#selected_files[@]} file(s)..."
+    download_files "$profile" "$bucket" "$region" "${selected_files[@]}"
+
+    echo "Download complete!"
+}
+
+# Run main function
+main "$@"
+
+# vim: ft=bash
