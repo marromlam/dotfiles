@@ -2,6 +2,73 @@
 
 set -euo pipefail
 
+# Cleanup temporary files on exit
+trap 'rm -f /tmp/s3-preview-content-$$-*' EXIT INT TERM
+
+# Cache directory and file
+CACHE_DIR="$HOME/.cache/s3-get"
+CACHE_FILE="$CACHE_DIR/bucket-regions.json"
+
+# Show usage information
+show_help() {
+    cat <<EOF
+Usage: $(basename "$0") [-d DIRECTORY] [-h]
+
+Download files from AWS S3 buckets interactively with fzf.
+
+Options:
+    -d DIRECTORY    Download files to the specified directory (default: current directory)
+    -h              Show this help message and exit
+
+Features:
+    - Dynamic AWS profile selection from ~/.aws/config
+    - Interactive bucket and file selection with fzf
+    - Multi-file selection support (use TAB)
+    - File preview for JSON, Avro, and text files
+    - Automatic directory structure preservation
+    - Cached bucket regions for faster lookups
+
+Requirements:
+    - aws (AWS CLI)
+    - fzf (fuzzy finder)
+    - jq (JSON processor)
+
+EOF
+}
+
+# Function to initialize cache
+init_cache() {
+    if [[ ! -d "$CACHE_DIR" ]]; then
+        mkdir -p "$CACHE_DIR"
+    fi
+
+    if [[ ! -f "$CACHE_FILE" ]]; then
+        echo '{}' >"$CACHE_FILE"
+    fi
+}
+
+# Function to get cached bucket region
+get_cached_region() {
+    local bucket="$1"
+
+    if [[ -f "$CACHE_FILE" ]]; then
+        jq -r --arg bucket "$bucket" '.[$bucket] // empty' "$CACHE_FILE" 2>/dev/null
+    fi
+}
+
+# Function to cache bucket region
+cache_bucket_region() {
+    local bucket="$1"
+    local region="$2"
+
+    if [[ -f "$CACHE_FILE" ]]; then
+        local temp_file
+        temp_file=$(mktemp)
+        jq --arg bucket "$bucket" --arg region "$region" '.[$bucket] = $region' "$CACHE_FILE" >"$temp_file"
+        mv "$temp_file" "$CACHE_FILE"
+    fi
+}
+
 # Function to check if required tools are installed
 check_dependencies() {
     local missing_tools=()
@@ -53,12 +120,72 @@ list_s3_buckets() {
     aws s3api list-buckets --profile "$profile" | jq -r '.Buckets[].Name' | sed 's|^|s3://|'
 }
 
+# Function to get bucket region (with caching)
+get_bucket_region() {
+    local profile="$1"
+    local bucket="$2"
+
+    # Check cache first
+    local cached_region
+    cached_region=$(get_cached_region "$bucket")
+
+    if [[ -n "$cached_region" ]]; then
+        echo "$cached_region"
+        return 0
+    fi
+
+    # Not in cache, fetch from AWS
+    local region
+    region=$(aws s3api get-bucket-location --bucket "$bucket" --profile "$profile" 2>/dev/null | jq -r '.LocationConstraint // "us-east-1"')
+
+    # AWS returns null for us-east-1
+    if [[ "$region" == "null" || -z "$region" ]]; then
+        region="us-east-1"
+    fi
+
+    # Cache the result
+    cache_bucket_region "$bucket" "$region"
+
+    echo "$region"
+}
+
 # Function to list objects in S3 bucket with details
 list_s3_objects() {
     local profile="$1"
     local bucket="$2"
 
     aws s3 ls "s3://$bucket/" --recursive --human-readable --summarize --profile "$profile"
+}
+
+# Function to get file size in bytes
+get_file_size_bytes() {
+    local profile="$1"
+    local bucket="$2"
+    local key="$3"
+
+    aws s3api head-object --bucket "$bucket" --key "$key" --profile "$profile" 2>/dev/null | jq -r '.ContentLength // 0'
+}
+
+# Function to show file metadata
+show_file_metadata() {
+    local profile="$1"
+    local bucket="$2"
+    local key="$3"
+
+    local metadata
+    metadata=$(aws s3api head-object --bucket "$bucket" --key "$key" --profile "$profile" 2>/dev/null)
+
+    if [[ -n "$metadata" ]]; then
+        echo "File: $key"
+        echo "Size: $(echo "$metadata" | jq -r '.ContentLength') bytes"
+        echo "Last Modified: $(echo "$metadata" | jq -r '.LastModified')"
+        echo "Content-Type: $(echo "$metadata" | jq -r '.ContentType // "unknown"')"
+        echo "ETag: $(echo "$metadata" | jq -r '.ETag')"
+        echo ""
+        echo "File is too large for preview (>300 MB)"
+    else
+        echo "Failed to retrieve metadata"
+    fi
 }
 
 # Function to preview files in fzf
@@ -69,6 +196,16 @@ fzf_preview() {
     local filename=$(echo "$line" | awk '{for (i=5; i<=NF; i++) printf "%s%s", $i, (i<NF?" ":"")}')
 
     if [[ -z "$filename" ]]; then
+        exit 0
+    fi
+
+    # Get file size
+    local size_bytes
+    size_bytes=$(get_file_size_bytes "$PROFILE" "$BUCKET" "$filename")
+
+    # 300 MB in bytes = 314572800
+    if [[ "$size_bytes" -gt 314572800 ]]; then
+        show_file_metadata "$PROFILE" "$BUCKET" "$filename"
         exit 0
     fi
 
@@ -88,12 +225,12 @@ fzf_preview() {
             if command -v jq &>/dev/null; then
                 jq -C '.' "$temp_file" 2>/dev/null | head -n 100
             else
-                cat "$temp_file" | head -n 100
+                head -n 100 "$temp_file"
             fi
         elif command -v bat &>/dev/null; then
             bat --style=plain --color=always "$temp_file" 2>/dev/null | head -n 100
         else
-            cat "$temp_file" | head -n 100
+            head -n 100 "$temp_file"
         fi
         rm -f "$temp_file"
     else
@@ -101,13 +238,16 @@ fzf_preview() {
     fi
 }
 export -f fzf_preview
+export -f get_file_size_bytes
+export -f show_file_metadata
 
 # Function to download selected files
 download_files() {
     local profile="$1"
     local bucket="$2"
     local region="$3"
-    shift 3
+    local download_dir="$4"
+    shift 4
     local files=("$@")
 
     for file_line in "${files[@]}"; do
@@ -118,10 +258,11 @@ download_files() {
             continue
         fi
 
-        # Get directory structure
-        local dir=$(dirname "$filename")
+        # Construct full path with download directory
+        local full_path="${download_dir}/${filename}"
+        local dir=$(dirname "$full_path")
 
-        echo "Downloading '$filename'..."
+        echo "Downloading '$filename' to '$full_path'..."
 
         # Create directory if needed
         if [[ "$dir" != "." && -n "$dir" ]]; then
@@ -129,8 +270,8 @@ download_files() {
         fi
 
         # Download file
-        if aws s3 cp "s3://$bucket/${filename}" "$filename" --profile "$profile" --region "$region"; then
-            echo "Downloaded: $filename"
+        if aws s3 cp "s3://$bucket/${filename}" "$full_path" --profile "$profile" --region "$region"; then
+            echo "Downloaded: $full_path"
         else
             echo "Failed to download: $filename" >&2
         fi
@@ -139,6 +280,33 @@ download_files() {
 
 # Main script
 main() {
+    local download_dir="."
+
+    # Parse command line arguments
+    while getopts "d:h" opt; do
+        case $opt in
+        d)
+            download_dir="$OPTARG"
+            # Create download directory if it doesn't exist
+            if [[ ! -d "$download_dir" ]]; then
+                mkdir -p "$download_dir"
+            fi
+            ;;
+        h)
+            show_help
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            show_help
+            exit 1
+            ;;
+        esac
+    done
+
+    # Initialize cache
+    init_cache
+
     # Check for required dependencies
     check_dependencies aws fzf jq
 
@@ -172,12 +340,26 @@ main() {
     local bucket="${bucket_path#s3://}"
     echo "Selected bucket: $bucket"
 
-    # Default region
-    local region="${AWS_DEFAULT_REGION:-us-east-1}"
+    # Detect bucket region (uses cache if available)
+    echo "Detecting bucket region..."
+    local region
+    region=$(get_bucket_region "$profile" "$bucket")
+    echo "Bucket region: $region"
 
     # Select files with preview
     echo "Listing objects in s3://$bucket..."
+
+    # Check if bucket has any objects
+    local objects_output
+    objects_output=$(list_s3_objects "$profile" "$bucket")
+
+    if [[ -z "$objects_output" ]] || ! echo "$objects_output" | grep -q "Total Objects:"; then
+        echo "Error: No objects found in bucket or bucket is empty." >&2
+        exit 1
+    fi
+
     echo "Use TAB to select multiple files, ENTER to confirm"
+    echo "Download directory: $download_dir"
 
     # Export variables for preview function
     export PROFILE="$profile"
@@ -187,7 +369,7 @@ main() {
 
     # Use fzf with preview function
     local selected_files
-    mapfile -t selected_files < <(list_s3_objects "$profile" "$bucket" |
+    mapfile -t selected_files < <(echo "$objects_output" |
         fzf -m \
             --prompt="Select files to download (TAB for multi-select): " \
             --preview='bash -c "fzf_preview {}"' \
@@ -200,7 +382,7 @@ main() {
     fi
 
     echo "Downloading ${#selected_files[@]} file(s)..."
-    download_files "$profile" "$bucket" "$region" "${selected_files[@]}"
+    download_files "$profile" "$bucket" "$region" "$download_dir" "${selected_files[@]}"
 
     echo "Download complete!"
 }
