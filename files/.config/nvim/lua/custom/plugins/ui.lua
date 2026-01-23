@@ -40,6 +40,132 @@ return {
   },
 
   {
+    'b0o/incline.nvim',
+    event = 'VeryLazy',
+    config = function()
+      local incline = require('incline')
+
+      local function set_hls()
+        local pal = mrl.ui.palette or {}
+        local bg = '#121212'
+        vim.api.nvim_set_hl(0, 'InclineNormal', {
+          fg = pal.whitesmoke or 'NONE',
+          bg = bg,
+        })
+        vim.api.nvim_set_hl(0, 'InclineNormalNC', {
+          fg = pal.light_gray or pal.comment_grey or 'NONE',
+          bg = bg,
+        })
+        vim.api.nvim_set_hl(0, 'InclineTitle', {
+          fg = pal.bright_blue or pal.blue or 'NONE',
+          bg = bg,
+          bold = true,
+        })
+        vim.api.nvim_set_hl(0, 'InclineModified', {
+          fg = pal.dark_orange or 'NONE',
+          bg = bg,
+        })
+        vim.api.nvim_set_hl(0, 'InclineGit', {
+          fg = pal.teal or pal.green or 'NONE',
+          bg = bg,
+        })
+      end
+
+      set_hls()
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        group = vim.api.nvim_create_augroup('MrlIncline', { clear = true }),
+        callback = set_hls,
+      })
+
+      local devicons_ok, devicons = pcall(require, 'nvim-web-devicons')
+
+      -- Use incline's render function so we can style per-window content.
+      incline.setup({
+        window = {
+          placement = { horizontal = 'right', vertical = 'top' },
+          margin = { vertical = 1, horizontal = 1 },
+          padding = 1,
+          winhighlight = {
+            Normal = 'InclineNormal',
+            NormalNC = 'InclineNormalNC',
+          },
+        },
+        ignore = {
+          buftypes = { 'terminal', 'nofile', 'prompt', 'quickfix' },
+          filetypes = {
+            'neo-tree',
+            'NvimTree',
+            'undotree',
+            'toggleterm',
+            'Trouble',
+            'noice',
+            'notify',
+            'qf',
+            'diff',
+            'alpha',
+            'startify',
+            'help',
+            'gitcommit',
+            'NeogitStatus',
+            'NeogitCommitMessage',
+            'DiffviewFiles',
+            'DiffviewFileHistory',
+          },
+        },
+        render = function(props)
+          local buf = props.buf
+          local ft = vim.bo[buf].ft
+          local bt = vim.bo[buf].bt
+          local decor = mrl.ui.decorations.get({
+            ft = ft,
+            bt = bt,
+            setting = 'winbar',
+          })
+          if
+            (decor and (decor.ft == false or decor.bt == false))
+            or (decor and (decor.ft == 'ignore' or decor.bt == 'ignore'))
+          then
+            return {}
+          end
+
+          local name = vim.api.nvim_buf_get_name(buf)
+          if name == '' then
+            name = '[No Name]'
+          else
+            name = vim.fn.fnamemodify(name, ':t')
+          end
+
+          local parts = {}
+          if devicons_ok then
+            local ext = vim.fn.fnamemodify(name, ':e')
+            local icon, icon_color =
+              devicons.get_icon_color(name, ext, { default = true })
+            if icon then
+              table.insert(parts, { icon .. ' ', guifg = icon_color })
+            end
+          else
+            table.insert(
+              parts,
+              { icons.documents.file .. ' ', group = 'InclineTitle' }
+            )
+          end
+
+          table.insert(parts, { name, group = 'InclineTitle' })
+
+          if vim.bo[buf].modified then
+            table.insert(parts, {
+              ' ' .. icons.misc.circle,
+              group = 'InclineModified',
+            })
+          end
+
+          return parts
+        end,
+      })
+    end,
+  },
+
+  {
     'uga-rosa/ccc.nvim',
     cmd = { 'CccPick' },
     tag = 'v2.0.3',
