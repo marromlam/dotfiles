@@ -51,3 +51,14 @@ launch_jupyter() {
 alias kill_jupyter="kill $(netstat -tulpn 2>&1 | pgrep jupyter)"
 
 # vim: fdm=marker ft=zsh
+
+# Get current environment name
+get_env() {
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    echo "('$(basename "$VIRTUAL_ENV")') "
+  elif [[ -n "$CONDA_DEFAULT_ENV" ]]; then
+    echo "${CONDA_DEFAULT_ENV}"
+  else
+    echo "syst"
+  fi
+}
