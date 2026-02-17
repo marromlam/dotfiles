@@ -50,4 +50,70 @@ launch_jupyter() {
 # Kill jupyter sessions
 alias kill_jupyter="kill $(netstat -tulpn 2>&1 | pgrep jupyter)"
 
+# ==============================================================================
+# AI Assistant Functions
+# ==============================================================================
+
+# GitHub Copilot quick helper - concise command suggestions
+# Usage: ? how to commit
+'?' () {
+  if [ $# -eq 0 ]; then
+    echo "Usage: ? <question>"
+    echo "Example: ? how to commit"
+    return 1
+  fi
+  
+  local query="$*"
+  
+  # Use copilot in print mode for non-interactive output
+  /opt/homebrew/bin/copilot -p "$query" 2>/dev/null | \
+    # Remove common fluff
+    sed -E '
+      /^(Sure|Here|Certainly|Of course|To|You can|Simply)/d;
+      /^$/d;
+      s/^[[:space:]]+//;
+      s/[[:space:]]+$//
+    ' | \
+    head -5
+}
+
+# Claude quick helper - concise answers
+# Usage: ?? how to commit
+'??' () {
+  if [ $# -eq 0 ]; then
+    echo "Usage: ?? <question>"
+    echo "Example: ?? how to commit"
+    return 1
+  fi
+  
+  local query="$*"
+  
+  # Use claude in print mode with brevity system prompt
+  /opt/homebrew/bin/claude \
+    --print \
+    --append-system-prompt "Be extremely concise. If it's a command question, respond with ONLY the command(s), no explanation unless asked. If it's a concept question, respond in 1-2 sentences max." \
+    "$query" 2>/dev/null | \
+    sed -E '
+      /^(Sure|Here|Certainly|Of course|Here is|Here are)/d;
+      /^$/d;
+      s/^[[:space:]]+//;
+      s/[[:space:]]+$//;
+      /^```/d
+    ' | \
+    head -10
+}
+
+# Verbose version - get full explanation
+# Usage: ??? explain git rebase
+'???' () {
+  if [ $# -eq 0 ]; then
+    echo "Usage: ??? <question>"
+    echo "Example: ??? explain how git rebase works"
+    return 1
+  fi
+  
+  local query="$*"
+  /opt/homebrew/bin/claude --print "$query"
+}
+
 # vim: fdm=marker ft=zsh
