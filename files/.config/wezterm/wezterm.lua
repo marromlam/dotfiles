@@ -476,7 +476,7 @@ return {
   --[[ enable_wayland = false, ]]
   pane_focus_follows_mouse = false,
   warn_about_missing_glyphs = false,
-  enable_kitty_graphics = false,
+  enable_kitty_graphics = true,
   check_for_updates = false,
   -- window_decorations = "RESIZE",
   -- window_decorations = 'INTEGRATED_BUTTONS|RESIZE',
@@ -581,5 +581,40 @@ return {
   -- default_gui_startup_args = { 'connect', 'wsl' },
   -- }}}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- BEGIN_WEZTERM_THEME: carbon-mist
+config.color_scheme = 'carbon-mist'
+-- END_WEZTERM_THEME: carbon-mist
 
 -- vim: fdm=marker ts=2 sw=2 sts=2 et
