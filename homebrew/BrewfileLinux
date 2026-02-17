@@ -12,6 +12,7 @@ tap "Rigellute/tap"
 tap "Schniz/tap"
 tap "rlue/utils"
 tap "epk/epk"
+tap "marromlam/custom"
 
 # Homebrew essentials
 brew "bat" # alternative to cat
@@ -60,16 +61,18 @@ brew "tmux"                     # terminal multiplexer
 #brew "tmuxinator"
 #brew "tmuxinator-fzf-start"
 brew "tree"
-brew "vifm"
 brew "wget"                     # like curl
 brew "yarn"
+brew "marromlam/custom/xmlformat"
 # brew "sshfs"                    # mount ssh volumes
 brew "mupdf-tools"
 brew "ffmpeg"                   # video converter
 
 brew "shfmt"
-brew "lsd"
-brew "exa"
+brew "eza"
 brew "gcc"
 # npm install fixjson 
 # brew install clang-format
+
+# WSL-only cask for the `cursor-agent` binary
+cask "cursor-cli"

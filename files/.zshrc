@@ -251,6 +251,11 @@ bindkey -e # emacs
 # source my aliases
 source $HOME/.config/zsh/aliases.sh
 
+# AI helper aliases - disable globbing for ? ?? ??? functions
+alias '?'='noglob ?'
+alias '??'='noglob ??'
+alias '???'='noglob ???'
+
 # common settings for bash and zsh
 source $HOME/.config/zsh/common.sh
 source $HOME/.config/zsh/tmux_aliases.sh
@@ -274,3 +279,18 @@ alias docker-cleanup='docker system prune -a --volumes'
 
 
 # vim: fdm=marker ft=zsh
+
+# bun completions
+[ -s "/Users/marcos/.bun/_bun" ] && source "/Users/marcos/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# BEGIN_FZF_THEME: carbon-mist
+source ~/.config/fzf/themes/carbon-mist.sh
+# END_FZF_THEME: carbon-mist

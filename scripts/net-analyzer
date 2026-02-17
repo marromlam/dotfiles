@@ -1,16 +1,324 @@
 #!/bin/bash
 
-# Define your subnet (replace with your actual subnet)
 SUBNET="192.168.1.0/24"
+OUTPUT="text"
+VENDOR_LOOKUP=1
+IDENTIFY=1
+DEEP=0
+REPORT_RE='for[[:space:]]+([^[:space:]]+)[[:space:]]+\(([^)]+)\)'
+IS_ROOT=0
+if [[ $(id -u) -eq 0 ]]; then
+    IS_ROOT=1
+fi
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    --json)
+        OUTPUT="json"
+        shift
+        ;;
+    --no-vendor)
+        VENDOR_LOOKUP=0
+        shift
+        ;;
+    --identify)
+        IDENTIFY=1
+        shift
+        ;;
+    --no-identify)
+        IDENTIFY=0
+        shift
+        ;;
+    --deep)
+        DEEP=1
+        shift
+        ;;
+    *)
+        SUBNET="$1"
+        shift
+        ;;
+    esac
+done
+
+needs() {
+    local cmd="$1"
+    local pkg="$2"
+    if command -v "$cmd" >/dev/null 2>&1; then
+        return 0
+    fi
+    if command -v brew >/dev/null 2>&1; then
+        brew install "$pkg"
+    else
+        echo "Missing $cmd and Homebrew is not installed."
+        return 1
+    fi
+}
+
+DEVICE_LIST="$(mktemp)"
+ARP_TABLE="$(mktemp)"
+VENDOR_CACHE="$(mktemp)"
+IDENTIFY_OUT="$(mktemp)"
+MDNS_INFO="$(mktemp)"
+SSDP_SERVER="$(mktemp)"
+SSDP_LOCATION="$(mktemp)"
+UPNP_INFO="$(mktemp)"
+trap 'rm -f "$DEVICE_LIST" "$ARP_TABLE" "$VENDOR_CACHE" "$IDENTIFY_OUT" "$MDNS_INFO" "$SSDP_SERVER" "$SSDP_LOCATION" "$UPNP_INFO"' EXIT
+
+refresh_arp() {
+    if ! command -v arp >/dev/null 2>&1; then
+        : >"$ARP_TABLE"
+        return
+    fi
+    arp -a 2>/dev/null | awk '{
+        host=$1;
+        ip=$2;
+        gsub(/[()]/,"",ip);
+        mac=$4;
+        if (mac ~ /incomplete/ || mac == "<incomplete>") mac="";
+        print ip "\t" host "\t" mac;
+    }' >"$ARP_TABLE"
+}
+
+normalize_field() {
+    local value="$1"
+    value="$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+    if [[ -z $value || $value == "?" ]]; then
+        echo "unknown"
+    else
+        echo "$value"
+    fi
+}
+
+normalize_mac() {
+    local mac="$1"
+    if [[ -z $mac || $mac == "?" || $mac == "unknown" || $mac == *"incomplete"* ]]; then
+        echo "unknown"
+        return
+    fi
+    echo "$mac" | awk -F: '{
+        if (NF==6) {
+            for (i=1;i<=6;i++) {
+                if (length($i)==1) $i="0"$i;
+            }
+            printf "%s:%s:%s:%s:%s:%s\n", $1,$2,$3,$4,$5,$6;
+        } else {
+            print $0;
+        }
+    }'
+}
+
+lookup_field() {
+    local ip="$1"
+    local file="$2"
+    awk -v ip="$ip" '$1==ip { $1=""; sub(/^\t/,""); print; exit }' "$file"
+}
+
+lookup_arp_host() {
+    local ip="$1"
+    awk -v ip="$ip" '$1==ip {print $2; exit}' "$ARP_TABLE"
+}
+
+lookup_arp_mac() {
+    local ip="$1"
+    awk -v ip="$ip" '$1==ip {print $3; exit}' "$ARP_TABLE"
+}
+
+lookup_vendor() {
+    local mac="$1"
+    if [[ -z $mac || $VENDOR_LOOKUP -ne 1 ]] || ! command -v curl >/dev/null 2>&1; then
+        echo "unknown"
+        return
+    fi
+
+    local cached
+    cached=$(awk -v mac="$mac" '$1==mac { $1=""; sub(/^\t/,""); print; exit }' "$VENDOR_CACHE")
+    if [[ -n $cached ]]; then
+        echo "$cached"
+        return
+    fi
+
+    local vendor
+    vendor=$(curl -fsS "https://api.macvendors.com/$mac" 2>/dev/null | tr -d '\r' || true)
+    vendor=$(normalize_field "$vendor")
+    printf "%s\t%s\n" "$mac" "$vendor" >>"$VENDOR_CACHE"
+    echo "$vendor"
+}
+
+lookup_os() {
+    local ip="$1"
+    if [[ $DEEP -ne 1 ]] || ! command -v nmap >/dev/null 2>&1; then
+        echo "unknown"
+        return
+    fi
+
+    local os
+    os=$(nmap -O -sV --osscan-guess --host-timeout 30s "$ip" 2>/dev/null | awk -F': ' \
+        '/OS details:|Running:|Service Info: OS:/{print $2; exit}')
+    echo "$(normalize_field "$os")"
+}
+
+parse_mdns() {
+    awk '
+        /^\| mdns-discovery:/ {in_block=1; next}
+        in_block && $1 == "|" && $2 ~ /^[0-9]+\./ {ip=$2; next}
+        in_block && $1 == "|" && $2 == "Hostname:" && ip != "" {
+            $1=""; $2="";
+            sub(/^[[:space:]]+/, "", $0);
+            print ip "\t" $0;
+            next
+        }
+    ' "$IDENTIFY_OUT" >"$MDNS_INFO"
+}
+
+parse_ssdp() {
+    awk '
+        /^\| broadcast-upnp-discovery:/ {in_block=1; next}
+        in_block && $1 == "|" && $2 == "Server:" {
+            $1=""; $2="";
+            sub(/^[[:space:]]+/, "", $0);
+            server=$0;
+            next
+        }
+        in_block && $1 == "|" && $2 == "Location:" {
+            loc=$3;
+            ip=loc;
+            sub(/^https?:\/\//, "", ip);
+            sub(/[:\/].*$/, "", ip);
+            if (ip != "") {
+                print ip "\t" server > "'"$SSDP_SERVER"'";
+                print ip "\t" loc > "'"$SSDP_LOCATION"'";
+            }
+            server="";
+            next
+        }
+    ' "$IDENTIFY_OUT"
+}
+
+fetch_upnp_details() {
+    local location="$1"
+    if [[ -z $location ]] || ! command -v curl >/dev/null 2>&1; then
+        printf "%s\t%s\t%s\n" "unknown" "unknown" "unknown"
+        return
+    fi
+    local xml
+    xml=$(curl -fsS --max-time 2 "$location" 2>/dev/null | tr -d '\r' || true)
+    local friendly manufacturer model
+    friendly=$(echo "$xml" | sed -n 's:.*<friendlyName>\(.*\)</friendlyName>.*:\1:p' | head -n 1)
+    manufacturer=$(echo "$xml" | sed -n 's:.*<manufacturer>\(.*\)</manufacturer>.*:\1:p' | head -n 1)
+    model=$(echo "$xml" | sed -n 's:.*<modelName>\(.*\)</modelName>.*:\1:p' | head -n 1)
+    printf "%s\t%s\t%s\n" "$(normalize_field "$friendly")" "$(normalize_field "$manufacturer")" "$(normalize_field "$model")"
+}
+
+if [[ $DEEP -eq 1 && $IS_ROOT -ne 1 ]]; then
+    echo "Deep scans require sudo on macOS. Disabling --deep." >&2
+    DEEP=0
+fi
 
 echo "Scanning network $SUBNET..."
-echo -e "IP Address\t\tHostname"
 
-# Run nmap ping scan and parse output
-nmap -sn $SUBNET | while read line; do
-    if [[ $line == *"Nmap scan report for"* ]]; then
-        ip=$(echo $line | awk '{print $5}')
-        host=$(echo $line | cut -d ' ' -f 5-)
-        echo -e "$ip\t\t$host"
+needs nmap nmap || true
+
+if command -v nmap >/dev/null 2>&1; then
+    nmap_args=("-sn")
+    if [[ $IS_ROOT -ne 1 ]]; then
+        nmap_args+=("--unprivileged")
     fi
-done
+    nmap "${nmap_args[@]}" "$SUBNET" 2>/dev/null | while read -r line; do
+        if [[ $line == *"Nmap scan report for"* ]]; then
+            if [[ $line =~ $REPORT_RE ]]; then
+                host="${BASH_REMATCH[1]}"
+                ip="${BASH_REMATCH[2]}"
+            else
+                ip="${line##*for }"
+                host="unknown"
+            fi
+            printf "%s\t%s\n" "$ip" "$host"
+        fi
+    done >"$DEVICE_LIST"
+    refresh_arp
+    if [[ ! -s $DEVICE_LIST ]]; then
+        awk '$3 != "" {print $1 "\t" $2}' "$ARP_TABLE" >"$DEVICE_LIST"
+    fi
+else
+    refresh_arp
+    awk '$3 != "" {print $1 "\t" $2}' "$ARP_TABLE" >"$DEVICE_LIST"
+fi
+
+if [[ $IDENTIFY -eq 1 ]] && command -v nmap >/dev/null 2>&1; then
+    if [[ $IS_ROOT -eq 1 ]]; then
+        nmap -sU -p 1900,5353 --script broadcast-upnp-discovery,mdns-discovery --script-timeout 10s \
+            2>/dev/null >"$IDENTIFY_OUT" || true
+        parse_mdns
+        parse_ssdp
+    else
+        echo "Skipping UDP discovery (requires sudo for nmap -sU on macOS)." >&2
+    fi
+fi
+
+if [[ $DEEP -eq 1 && -s "$SSDP_LOCATION" ]]; then
+    while IFS=$'\t' read -r ip location; do
+        if grep -q "^$ip\t" "$UPNP_INFO" 2>/dev/null; then
+            continue
+        fi
+        IFS=$'\t' read -r friendly manufacturer model < <(fetch_upnp_details "$location")
+        printf "%s\t%s\t%s\t%s\n" "$ip" "$friendly" "$manufacturer" "$model" >>"$UPNP_INFO"
+    done <"$SSDP_LOCATION"
+fi
+
+if [[ $OUTPUT == "text" ]]; then
+    echo -e "IP Address\tHostname\tMAC Address\tVendor\tOS\tmDNS\tSSDP\tFriendly\tManufacturer\tModel"
+else
+    echo "["
+fi
+
+is_ignored_mac() {
+    local mac="$1"
+    case "$mac" in
+    ff:ff:ff:ff:ff:ff | 01:00:5e:* | 33:33:*)
+        return 0
+        ;;
+    esac
+    return 1
+}
+
+first=1
+while IFS=$'\t' read -r ip host; do
+    [[ -z $ip ]] && continue
+    arp_host=$(lookup_arp_host "$ip")
+    if [[ $host == "unknown" || $host == "?" || -z $host ]]; then
+        host="$arp_host"
+    fi
+    host=$(normalize_field "$host")
+    mac=$(normalize_mac "$(lookup_arp_mac "$ip")")
+    if is_ignored_mac "$mac"; then
+        continue
+    fi
+    vendor=$(lookup_vendor "$mac")
+    os=$(lookup_os "$ip")
+    mdns=$(normalize_field "$(lookup_field "$ip" "$MDNS_INFO")")
+    ssdp=$(normalize_field "$(lookup_field "$ip" "$SSDP_SERVER")")
+    upnp_line=$(lookup_field "$ip" "$UPNP_INFO")
+    IFS=$'\t' read -r friendly manufacturer model <<<"$upnp_line"
+    friendly=$(normalize_field "$friendly")
+    manufacturer=$(normalize_field "$manufacturer")
+    model=$(normalize_field "$model")
+
+    if [[ $OUTPUT == "json" ]]; then
+        if [[ $first -eq 0 ]]; then
+            echo ","
+        fi
+        first=0
+        printf '  {"ip":"%s","hostname":"%s","mac":"%s","vendor":"%s","os":"%s","mdns":"%s","ssdp":"%s","friendly":"%s","manufacturer":"%s","model":"%s"}' \
+            "$ip" "$host" "$mac" "$vendor" "$os" "$mdns" "$ssdp" "$friendly" "$manufacturer" "$model"
+    else
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+            "$ip" "$host" "$mac" "$vendor" "$os" "$mdns" "$ssdp" "$friendly" "$manufacturer" "$model"
+    fi
+done <"$DEVICE_LIST"
+
+if [[ $OUTPUT == "json" ]]; then
+    echo
+    echo "]"
+fi
+
+# vim: ft=bash
