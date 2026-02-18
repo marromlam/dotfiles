@@ -10,7 +10,6 @@ return {
     persist_mode = true,
     insert_mappings = false,
     start_in_insert = true,
-    winbar = { enabled = mrl.ui.winbar.enable },
     highlights = {
       FloatBorder = { link = 'FloatBorder' },
       -- Make floating terminals match the main Normal background.

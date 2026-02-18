@@ -1,6 +1,5 @@
 {
-  "TINT_COLOR": "yellowgreen",
   "KITTYCMD": "kitty @launch --type overlay",
-  "ALPHA": true,
-  "TINT_COLOR": "yellowgreen"
+  "TINT_COLOR": "antiquewhite",
+  "NOTE_PATH": "$HOME/notes"
 }
