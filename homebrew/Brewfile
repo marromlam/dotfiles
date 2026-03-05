@@ -151,6 +151,8 @@ cask "orion"                       # browser
 
 cask "obsidian"                    # knowledge
 cask "rectangle"                   # window manager
+cask "amethyst"                    # tiling window manager
+cask "hammerspoon"                 # automation + custom window actions
 cask "grandperspective"            # tools to show up large files
 cask "keycastr"                    # cast keys on screen
 cask "ghostty"
