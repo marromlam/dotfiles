@@ -613,8 +613,16 @@ return {
 
 
 
--- BEGIN_WEZTERM_THEME: carbon-mist
-config.color_scheme = 'carbon-mist'
--- END_WEZTERM_THEME: carbon-mist
+
+
+
+
+
+
+
+
+-- BEGIN_WEZTERM_THEME
+config.color_scheme = 'horizon'
+-- END_WEZTERM_THEME
 
 -- vim: fdm=marker ts=2 sw=2 sts=2 et

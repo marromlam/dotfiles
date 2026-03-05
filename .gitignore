@@ -97,3 +97,5 @@ files/.config/browsh/firefox_profile
 files/.config/kitty/kitty.conf.bak
 files/.config/go/telemetry
 files/.config/tmux/themes/backups
+files/.config/O2Espana
+files/.config/nvim/.backups

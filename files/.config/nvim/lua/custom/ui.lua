@@ -152,15 +152,9 @@ function mrl.ui.refresh_palette()
   end
 end
 
-mrl.ui.border = {
-  -- Custom border style:
-  -- ▗▄▄▄▖
-  -- ▐   ▌
-  -- ▝▀▀▀▘
-  box = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-  line = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-  rectangle = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-}
+-- Simplified border configuration - use "rounded" everywhere
+-- This is the standard Neovim border style name that works with most plugins
+mrl.ui.border = 'rounded'
 
 mrl.ui.icons = {
   separators = {
@@ -466,7 +460,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 mrl.ui.current = {
-  border = mrl.ui.border.box, -- Global border style
+  border = 'rounded', -- Global border style - use Neovim's built-in "rounded" style
   -- Float/popup background color source of truth.
   -- Kept as a function so it always matches the active colorscheme's Normal bg.
   float_bg = function()
