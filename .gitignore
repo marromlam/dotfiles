@@ -99,3 +99,6 @@ files/.config/go/telemetry
 files/.config/tmux/themes/backups
 files/.config/O2Espana
 files/.config/nvim/.backups
+files/.config/bat/themes/backups
+files/.config/eza/themes/backups
+files/.config/*/themes/backups
