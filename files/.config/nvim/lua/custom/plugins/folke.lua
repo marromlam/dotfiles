@@ -1,23 +1,5 @@
 return {
   {
-    'folke/twilight.nvim',
-    enabled = false,
-    cond = false,
-    opts = {
-      -- Dim inactive code
-    },
-  },
-  {
-    'folke/ts-comments.nvim',
-    enabled = false,
-    cond = false,
-    opts = {
-      langs = {
-        dts = '// %s',
-      },
-    },
-  },
-  {
     'folke/snacks.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
     opts = {

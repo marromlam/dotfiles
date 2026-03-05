@@ -72,6 +72,19 @@ sudo sed -i -E 's/nameserver [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/nameserver 8.8.8.8/'
 sudo apt update && sudo apt install curl -y
 ```
 
+## macOS window manager (Amethyst + Hammerspoon)
+
+- Install apps from the Brewfile (`amethyst`, `hammerspoon`).
+- Dotbot links:
+  - `~/.amethyst.yml` -> `files/.amethyst.yml`
+  - `~/.hammerspoon` -> `files/.hammerspoon`
+- Required macOS permissions:
+  - `System Settings > Privacy & Security > Accessibility`
+  - Enable both `Amethyst` and `Hammerspoon`
+- Suggested if you switch from other tilers:
+  - disable `yabai`/`skhd` services to avoid conflicts
+  - keep only one tiler active at a time
+
 ## Contributions
 
 This files should be used as a template to create your own configuration. I do

@@ -18,6 +18,7 @@ vim.filetype.add({
     ['.*%.map'] = 'xml', -- interchange
     ['.*%.cnk'] = 'xml', -- interchange
     ['.*%.avsc'] = 'json', -- avro schema
+    ['.*%.avro'] = 'json', -- avro schema
     ['.*%.conf'] = 'conf',
     ['.*%.theme'] = 'conf',
     ['.*%.gradle'] = 'groovy',

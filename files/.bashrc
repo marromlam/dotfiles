@@ -95,3 +95,7 @@ fi
 # }}}
 
 # vim: ft=bash fdm=marker
+
+# BEGIN_FZF_THEME
+source ~/.config/fzf/themes/carbon-mist.sh
+# END_FZF_THEME
