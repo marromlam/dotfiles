@@ -259,29 +259,29 @@ local function general_overrides(dim_factor)
     -- Ensure no highlight-level transparency ("blend") affects floats.
     { NormalFloat = { bg = float_bg, blend = 0 } },
     -- A popup background that matches the main editor (`Normal`) background.
-    -- Use this for UIs that should not look like "floats" (e.g. fzf-lua).
+    -- Use this for UIs that should not look like "floats" (e.g. fzf-lua, Mason, Lazy).
     {
       NormalPopup = {
-        bg = popup_bg,
+        bg = { from = 'Normal', attr = 'bg' },
         fg = { from = 'Normal', attr = 'fg' },
         blend = 0,
       },
     },
     {
       PopupBorder = {
-        -- Border background should match the main Normal background.
+        -- Border background: Normal bg
+        -- Border foreground: Normal fg
         bg = { from = 'Normal', attr = 'bg' },
-        -- Border foreground uses the popup background tint.
-        fg = popup_bg,
+        fg = { from = 'Normal', attr = 'fg' },
         blend = 0,
       },
     },
     {
       FloatBorder = {
-        -- Border background should match the main Normal background (not NormalFloat).
+        -- Border background: Normal bg
+        -- Border foreground: Normal fg
         bg = { from = 'Normal', attr = 'bg' },
-        -- bg = { from = 'NormalFloat', attr = 'bg' },
-        fg = { from = 'NormalFloat', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
         blend = 0,
       },
     },
@@ -296,41 +296,48 @@ local function general_overrides(dim_factor)
     { MasonNormal = { link = 'NormalPopup' } },
     { MasonNormalNC = { link = 'NormalPopup' } },
     { MasonBorder = { clear = true, link = 'PopupBorder' } },
+    { MasonBackdrop = { bg = { from = 'Normal', attr = 'bg' }, blend = 100 } },
     { MasonHeading = { inherit = 'MasonNormal', bold = true } },
     { MasonHeader = { inherit = 'MasonNormal', bold = true } },
     { MasonHeaderSecondary = { inherit = 'MasonNormal', bold = true } },
     {
       MasonHighlight = {
         fg = { from = 'DiagnosticInfo', attr = 'fg' },
-        bg = popup_bg,
+        bg = { from = 'Normal', attr = 'bg' },
       },
     },
     {
       MasonHighlightSecondary = {
         fg = { from = 'DiagnosticHint', attr = 'fg' },
-        bg = popup_bg,
+        bg = { from = 'Normal', attr = 'bg' },
       },
     },
-    { MasonMuted = { fg = { from = 'Comment', attr = 'fg' }, bg = popup_bg } },
+    {
+      MasonMuted = {
+        fg = { from = 'Comment', attr = 'fg' },
+        bg = { from = 'Normal', attr = 'bg' },
+      },
+    },
     {
       MasonWarning = {
         fg = { from = 'DiagnosticWarn', attr = 'fg' },
-        bg = popup_bg,
+        bg = { from = 'Normal', attr = 'bg' },
       },
     },
     {
       MasonError = {
         fg = { from = 'DiagnosticError', attr = 'fg' },
-        bg = popup_bg,
+        bg = { from = 'Normal', attr = 'bg' },
       },
     },
     -- Lazy.nvim UI (doesn't necessarily use NormalFloat directly)
     { LazyNormal = { link = 'NormalPopup' } },
     { LazyBorder = { clear = true, link = 'PopupBorder' } },
-    { LazyButton = { bg = popup_bg } },
-    { LazyButtonActive = { bg = popup_bg } },
-    { LazyH1 = { bg = popup_bg } },
-    { LazyH2 = { bg = popup_bg } },
+    { LazyButton = { bg = { from = 'Normal', attr = 'bg' } } },
+    { LazyButtonActive = { bg = { from = 'Normal', attr = 'bg' } } },
+    { LazyH1 = { bg = { from = 'Normal', attr = 'bg' } } },
+    { LazyH2 = { bg = { from = 'Normal', attr = 'bg' } } },
+    { LazyBackdrop = { bg = { from = 'Normal', attr = 'bg' }, blend = 100 } },
     -- Notify (rcarriga/nvim-notify)
     { NotifyBackground = { bg = float_bg } },
     { NotifyERRORBody = { bg = float_bg } },
@@ -338,11 +345,36 @@ local function general_overrides(dim_factor)
     { NotifyINFOBody = { bg = float_bg } },
     { NotifyDEBUGBody = { bg = float_bg } },
     { NotifyTRACEBody = { bg = float_bg } },
-    { NotifyERRORBorder = { bg = float_bg } },
-    { NotifyWARNBorder = { bg = float_bg } },
-    { NotifyINFOBorder = { bg = float_bg } },
-    { NotifyDEBUGBorder = { bg = float_bg } },
-    { NotifyTRACEBorder = { bg = float_bg } },
+    {
+      NotifyERRORBorder = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      NotifyWARNBorder = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      NotifyINFOBorder = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      NotifyDEBUGBorder = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
+    {
+      NotifyTRACEBorder = {
+        bg = { from = 'Normal', attr = 'bg' },
+        fg = { from = 'Normal', attr = 'fg' },
+      },
+    },
     { NotifyERRORTitle = { bg = float_bg } },
     { NotifyWARNTitle = { bg = float_bg } },
     { NotifyINFOTitle = { bg = float_bg } },
@@ -370,7 +402,7 @@ local function general_overrides(dim_factor)
     },
     { StatusColGitNone = { link = 'StatusColSep' } },
     -- fzf-lua preview scrollbar (float) colors
-    { FzfLuaScrollFloatEmpty = { clear = true, link = 'NormalPopup' } },
+    { FzfLuaScrollFloatEmpty = { clear = true, link = 'NormalFloat' } },
     { FzfLuaScrollFloatFull = { bg = popup_thumb } },
     -- fzf-lua list scrollbar (fzf --scrollbar): uses the fg color of this hl group
     { FzfLuaFzfScrollbar = { fg = popup_thumb, bg = 'NONE' } },
@@ -384,29 +416,29 @@ local function general_overrides(dim_factor)
     -- }}}
     -- Diff {{{
     -- Diff (VSCode-ish): only change backgrounds
-    {
-      DiffAdd = {
-        bg = diff_add_bg,
-      },
-    },
-    { DiffAddText = { inherit = 'DiffAdd', bold = true } },
-    {
-      DiffChange = {
-        bg = diff_change_bg,
-      },
-    },
-    {
-      DiffDelete = {
-        bg = diff_delete_bg,
-        fg = diff_delete_filler_fg,
-      },
-    },
-    { DiffDeleteText = { inherit = 'DiffDelete', bold = true } },
-    {
-      DiffText = {
-        bg = diff_text_bg,
-      },
-    },
+    -- {
+    --   DiffAdd = {
+    --     bg = diff_add_bg,
+    --   },
+    -- },
+    -- { DiffAddText = { inherit = 'DiffAdd', bold = true } },
+    -- {
+    --   DiffChange = {
+    --     bg = diff_change_bg,
+    --   },
+    -- },
+    -- {
+    --   DiffDelete = {
+    --     bg = diff_delete_bg,
+    --     fg = diff_delete_filler_fg,
+    --   },
+    -- },
+    -- { DiffDeleteText = { inherit = 'DiffDelete', bold = true } },
+    -- {
+    --   DiffText = {
+    --     bg = diff_text_bg,
+    --   },
+    -- },
     -- these highlights are syntax groups that are set in diff.vim
     { diffAdded = { inherit = 'DiffAdd' } },
     { diffChanged = { inherit = 'DiffChange' } },
@@ -534,48 +566,48 @@ local function general_overrides(dim_factor)
     -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
     {
       FzfLuaNormal = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       FzfLuaTitle = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       FzfLuaTitle = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       -- Make fzf-lua borders follow FloatBorder exactly.
-      FzfLuaBorder = { clear = true, link = 'PopupBorder' },
+      FzfLuaBorder = { clear = true, link = 'FloatBorder' },
     },
     {
       FzfLuaPreviewNormal = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       FzfLuaPreviewBorder = {
         clear = true,
-        link = 'PopupBorder',
+        link = 'FloatBorder',
       },
     },
     {
       FzfLuaPreviewTitle = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       FzfLuaHelpNormal = {
-        link = 'NormalPopup',
+        link = 'NormalFloat',
       },
     },
     {
       FzfLuaHelpBorder = {
         clear = true,
-        link = 'PopupBorder',
+        link = 'FloatBorder',
       },
     },
     -- FzfLuaBorder Normal  hls.border  Main win border

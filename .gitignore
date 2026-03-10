@@ -102,3 +102,4 @@ files/.config/nvim/.backups
 files/.config/bat/themes/backups
 files/.config/eza/themes/backups
 files/.config/*/themes/backups
+files/.config/wezterm/colors/backups/
