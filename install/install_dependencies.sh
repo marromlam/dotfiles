@@ -5,7 +5,7 @@ set -euo pipefail
 FORCE_INSTALL=0
 MACHINE_OVERRIDE=""
 
-if [[ "${1:-}" == "-f" ]]; then
+if [[ "${1:-}" == "--force" ]]; then
 	FORCE_INSTALL=1
 	shift
 fi
@@ -55,11 +55,9 @@ ensure_prefix_dir() {
 }
 
 install_homebrew_macos() {
-	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
-		if [[ -d "$HOMEBREW_PREFIX" ]]; then
-			# Remove contents without deleting the prefix directory itself.
-			sudo bash -c 'shopt -s dotglob nullglob; rm -rf "$1"/*' _ "$HOMEBREW_PREFIX"
-		fi
+	if [[ "$FORCE_INSTALL" -eq 1 ]] && [[ -d "$HOMEBREW_PREFIX" ]]; then
+		echo "Removing existing Homebrew at $HOMEBREW_PREFIX..."
+		sudo rm -rf "$HOMEBREW_PREFIX"
 	fi
 
 	if [[ ! -d "$HOMEBREW_PREFIX" ]]; then
@@ -71,11 +69,9 @@ install_homebrew_macos() {
 }
 
 install_homebrew_linux() {
-	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
-		if [[ -d "$HOMEBREW_PREFIX" ]]; then
-			# Remove contents without deleting the prefix directory itself.
-			sudo bash -c 'shopt -s dotglob nullglob; rm -rf "$1"/*' _ "$HOMEBREW_PREFIX"
-		fi
+	if [[ "$FORCE_INSTALL" -eq 1 ]] && [[ -d "$HOMEBREW_PREFIX" ]]; then
+		echo "Removing existing Homebrew at $HOMEBREW_PREFIX..."
+		sudo rm -rf "$HOMEBREW_PREFIX"
 	fi
 
 	if [[ -d "$HOMEBREW_PREFIX/bin" ]]; then
@@ -145,8 +141,13 @@ brew_install_cask_once() {
 }
 
 install_kitty_linux() {
-	if [[ "$OS_NAME" == "Darwin" ]]; then
+	# Skip on macOS (installed via cask) and WSL (use Windows-side kitty)
+	if [[ "$OS_NAME" == "Darwin" ]] || [[ "$MACHINE" == "x64-wsl" ]]; then
 		return
+	fi
+
+	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
+		rm -rf "$HOMEBREW_PREFIX/Cellar/kitty" "$HOMEBREW_PREFIX/bin/kitty"
 	fi
 
 	if [[ -d "$HOMEBREW_PREFIX/Cellar/kitty" ]]; then
@@ -165,18 +166,8 @@ install_kitty_linux() {
 }
 
 install_pdfcat() {
-	if [[ -d "$HOMEBREW_PREFIX/Cellar/pdfcat" ]]; then
-		echo "pdfcat is already installed"
-		return
-	fi
-
-	git clone git@github.com:marromlam/pdfcat.git "$HOMEBREW_PREFIX/Cellar/pdfcat"
-	pushd "$HOMEBREW_PREFIX/Cellar/pdfcat" >/dev/null
-	"$HOMEBREW_PREFIX/bin/python3" -m pip install -r requirements.txt
-	"$HOMEBREW_PREFIX/bin/python3" -m pip install -e ../pdfcat
-	ln -sf "$HOMEBREW_PREFIX/Cellar/pdfcat/termpdf.py" "$HOMEBREW_PREFIX/bin/termpdf.py"
-	ln -sf "$HOMEBREW_PREFIX/Cellar/pdfcat/termpdf.py" "$HOMEBREW_PREFIX/bin/pdfcat"
-	popd >/dev/null
+	brew_tap_once "marromlam/pdfcat"
+	brew_install_once "marromlam/pdfcat/pdfcat"
 }
 
 install_rust() {
@@ -199,8 +190,9 @@ install_rust() {
 }
 
 install_ish_packages() {
-	echo "iSH detected. Install these packages manually in iSH:"
-	echo "bash docker ssh curl tar shadow nvim jq aws session-manager-plugin"
+	echo "iSH detected. Installing packages via apk..."
+	apk update
+	apk add bash curl tar shadow git neovim tmux fzf ripgrep jq
 }
 
 if [[ "$MACHINE" == "x32-linux" ]]; then
@@ -210,6 +202,10 @@ fi
 
 bootstrap_homebrew
 
+# shellcheck source=install/install_sonarqube.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/install_sonarqube.sh"
+
 TAPS_COMMON=(
 	"browsh-org/homebrew-browsh"
 	"koekeishiya/formulae"
@@ -217,6 +213,7 @@ TAPS_COMMON=(
 	"Schniz/tap"
 	"rlue/utils"
 	"epk/epk"
+	"marromlam/custom"
 )
 
 TAPS_MAC=(
@@ -258,6 +255,7 @@ BREW_MAC=(
 	"lua"
 	"ncurses"
 	"pkg-config"
+	"pkgconf"
 	"readline"
 	"rlue/utils/timer"
 	"mupdf-tools"
@@ -265,6 +263,15 @@ BREW_MAC=(
 	"docker"
 	"colima"
 	"lazydocker"
+	"cmake"
+	"fswatch"
+	"p7zip"
+	"sevenzip"
+	"tailscale"
+	"timg"
+	"ykman"
+	"yt-dlp"
+	"marromlam/custom/xmlformat"
 )
 
 BREW_LINUX=(
@@ -305,6 +312,11 @@ BREW_LINUX=(
 	"sshfs"
 	"zsh-syntax-highlighting"
 	"zsh-autosuggestions"
+	"bat"
+	"calcurse"
+	"eza"
+	"jq"
+	"marromlam/custom/xmlformat"
 )
 
 CASK_MAC_ONLY=(
@@ -314,8 +326,17 @@ CASK_MAC_ONLY=(
 	"orion"
 	"obsidian"
 	"rectangle"
+	"amethyst"
+	"hammerspoon"
 	"grandperspective"
 	"keycastr"
+	"ghostty"
+	"appcleaner"
+	"chatgpt"
+	"claude-code"
+	"codex"
+	"copilot-cli"
+	"whatsapp"
 	"domzilla-caffeine"
 	"font-hasklug-nerd-font"
 	"font-jetbrains-mono"
@@ -366,10 +387,12 @@ fi
 
 install_pdfcat
 install_rust
+install_sonarqube
 brew_install_once "pixi"
 
-if [[ -x "${HOME}/Projects/personal/dotfiles/homebrew/install_zsh.sh" ]]; then
-	bash "${HOME}/Projects/personal/dotfiles/homebrew/install_zsh.sh"
+DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -x "$DOTFILES_ROOT/install/install_zsh.sh" ]]; then
+	bash "$DOTFILES_ROOT/install/install_zsh.sh"
 elif [[ -x "${HOME}/tmp/install_zsh.sh" ]]; then
 	bash "${HOME}/tmp/install_zsh.sh"
 fi

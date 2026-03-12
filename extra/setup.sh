@@ -14,7 +14,7 @@ step() { echo; echo "==> $*"; }
 # Homebrew packages
 # ------------------------------------------------------------------------------
 step "Installing Homebrew packages"
-brew bundle --file="$DOTFILES/homebrew/Brewfile"
+bash "$DOTFILES/install/install_dependencies.sh"
 
 # ------------------------------------------------------------------------------
 # Git submodules (tpm, zsh plugins, etc.)

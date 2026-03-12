@@ -32,7 +32,7 @@ echo "Machine: $MACHINEOS"
 REPO_URL=https://raw.githubusercontent.com/marromlam/dotfiles
 REPO_BRANCH=main
 mkdir -p ${HOME}/tmp
-curl -o ${HOME}/tmp/homebrew_install.sh $REPO_URL/$REPO_BRANCH/homebrew/install.sh
+curl -o ${HOME}/tmp/homebrew_install.sh $REPO_URL/$REPO_BRANCH/install/install_dependencies.sh
 curl -o ${HOME}/tmp/keys.sh $REPO_URL/$REPO_BRANCH/extra/keys.sh
 curl -o ${HOME}/tmp/dotfiles.sh $REPO_URL/$REPO_BRANCH/extra/dotfiles.sh
 curl -o ${HOME}/tmp/reload_shell $REPO_URL/$REPO_BRANCH/scripts/reload_shell

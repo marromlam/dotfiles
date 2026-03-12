@@ -31,11 +31,12 @@ if command -v pixi >/dev/null; then
     unset _pixi_st
   fi
   _load_pixi_completions() {
-    source "$_pixi_cache"
-    unset _pixi_cache
+    local _cache="$HOME/.cache/zsh/pixi-completion.zsh"
+    [[ -f "$_cache" ]] && source "$_cache"
     add-zsh-hook -d precmd _load_pixi_completions
   }
   add-zsh-hook precmd _load_pixi_completions
+  unset _pixi_cache
 fi
 
 # zsh suggestions
