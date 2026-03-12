@@ -43,7 +43,6 @@ alias dnd='do-not-disturb toggle'
 
 alias md="mkdir -p"
 
-alias cat='bat --paging=never --style=plain'
 
 batdiff() {
         git diff --name-only --relative --diff-filter=d | xargs bat --diff

@@ -4,15 +4,28 @@
 [[ -f "$HOME/.skip" ]] && source $HOME/.skip
 
 # Eval homebrew {{{
-# Homebrew
-if [[ "$(uname -m)" == "x86_64" ]]; then
-  eval "$(/usr/local/bin/brew shellenv)"
+# Get machine operative system
+
+export MACHINEOS=$($HOME/.dotfiles/scripts/machine.sh)
+function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+echo $MACHINEOS
+
+# Set OS-dependent stuff
+if [[ "$MACHINEOS" == "Mac" ]]; then
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        export HOMEBREW_PREFIX="/usr/local"
+    else
+        export HOMEBREW_PREFIX="/opt/homebrew"
+    fi
 else
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 
-# }}}
+export HOMEBREW_PREFIX="/opt/homebrew"
+eval $($HOMEBREW_PREFIX/bin/brew shellenv)
+export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
+# }}}
 
 # source basuc functions
 source $HOME/.dotfiles/zsh/ufunctions.sh
@@ -83,6 +96,7 @@ fi
 
 # vim: ft=bash fdm=marker
 
-# BEGIN_FZF_THEME
+
+# BEGIN_FZF_THEME: carbon-mist
 source ~/.config/fzf/themes/carbon-mist.sh
-# END_FZF_THEME
+# END_FZF_THEME: carbon-mist
