@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main, optim]
+  pull_request:
+    branches: [main]
+
+jobs:
+  install:
+    name: Install (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up dotfiles at ~/.dotfiles
+        run: |
+          ln -sfn "$PWD" "$HOME/.dotfiles"
+          echo "x64-linux" > "$HOME/.machine"
+
+      - name: Install prerequisites
+        run: sudo apt-get update -qq && sudo apt-get install -y stow git
+
+      - name: Run symlinks
+        run: bash extra/symlinks.sh
+
+      - name: Assert key symlinks exist
+        run: |
+          assert_link() {
+            if [[ ! -L "$1" ]]; then
+              echo "FAIL: expected symlink at $1"
+              exit 1
+            fi
+            echo "OK: $1 -> $(readlink "$1")"
+          }
+          # Root dotfiles
+          assert_link "$HOME/.zshrc"
+          assert_link "$HOME/.zshenv"
+          assert_link "$HOME/.zprofile"
+          assert_link "$HOME/.gitconfig"
+          assert_link "$HOME/.bashrc"
+          # .config entries
+          assert_link "$HOME/.config/nvim"
+          assert_link "$HOME/.config/zsh"
+          assert_link "$HOME/.config/tmux"
+          assert_link "$HOME/.config/git"
+          # ~/.dotfiles self-link (created by symlinks.sh)
+          assert_link "$HOME/.dotfiles"
+
+      - name: Assert ~/.machine is set
+        run: |
+          [[ -f "$HOME/.machine" ]] && echo "OK: ~/.machine = $(cat ~/.machine)" || { echo "FAIL: ~/.machine missing"; exit 1; }
+
+      - name: Assert zshenv sets ZDOTDIR
+        run: |
+          result=$(bash -c 'source "$HOME/.zshenv" 2>/dev/null; echo $ZDOTDIR')
+          [[ "$result" == "$HOME/.config/zsh" ]] \
+            && echo "OK: ZDOTDIR=$result" \
+            || { echo "FAIL: ZDOTDIR not set correctly (got: $result)"; exit 1; }
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: ShellCheck
+        run: |
+          find . \
+            -not \( -path './.git' -prune \) \
+            -not \( -path './files/.config/zsh/plugins' -prune \) \
+            -not \( -path './node_modules' -prune \) \
+            -name '*.sh' \
+            | xargs shellcheck --severity=error
+
+      - name: Bash syntax
+        run: |
+          find . \
+            -not \( -path './.git' -prune \) \
+            -not \( -path './files/.config/zsh/plugins' -prune \) \
+            -not \( -path './node_modules' -prune \) \
+            -name '*.sh' \
+            | xargs -I{} bash -n {}
+
+  lua-lint:
+    name: Lua Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install luacheck
+        run: sudo apt-get install -y luarocks && sudo luarocks install luacheck
+
+      - name: Install stylua
+        run: |
+          curl -sL "https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip" -o stylua.zip
+          unzip -q stylua.zip -d /usr/local/bin/
+          chmod +x /usr/local/bin/stylua
+
+      - name: luacheck
+        run: luacheck files/.config/nvim --config .luacheckrc
+
+      - name: stylua --check
+        run: stylua --check files/.config/nvim

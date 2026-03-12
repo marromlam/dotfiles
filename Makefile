@@ -21,7 +21,10 @@ homebrew:
 
 install: homebrew
 	bash ${FC}/extra/symlinks.sh
-	rm -rf ~/Downloads; ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads
+	@if [[ "$$(uname)" == "Darwin" ]]; then \
+	  rm -rf ~/Downloads; \
+	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \
+	fi
 
 setup:
 	bash ${FC}/extra/setup.sh
@@ -31,7 +34,7 @@ projects:
 	stow --ignore ".DS_Store" --target="${HOME}/Projects/icloud" --dir="${HOME}/Library/Mobile Documents/com~apple~CloudDocs/" Projects
 
 brew:
-	brew bundle --file="${FC}/homebrew/Brewfile"
+	bash ${FC}/install/install_dependencies.sh
 	python3 -m pip install pynvim neovim-remote mcphub[all] --upgrade
 	npm install -g mcp-hub@latest
 

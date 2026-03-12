@@ -6,7 +6,7 @@ This directory contains a setup script for installing Java (OpenJDK) which is re
 
 ```bash
 # From the dotfiles directory
-./homebrew/install-java-sonarqube.sh
+./install/install-java-sonarqube.sh
 ```
 
 ## What It Does
@@ -49,7 +49,7 @@ Check status in Neovim:
 ## Troubleshooting
 
 **"Unable to locate a Java Runtime"**
-- Run the installation script: `./homebrew/install-java-sonarqube.sh`
+- Run the installation script: `./install/install-java-sonarqube.sh`
 - Restart your terminal
 - Verify: `java -version`
 

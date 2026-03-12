@@ -13,7 +13,6 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 export LG_CONFIG_FILE=$HOME/.config/lazygit/config.yml
 export MACHINE=$(cat ~/.machine)
 export BROWSER="$HOMEBREW_PREFIX/bin/browsh"
-export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s"
 export DISPLAY=:0
 
 # Manual pages
@@ -22,6 +21,10 @@ if which nvim >/dev/null; then
   export MANPAGER='nvim +Man!'
 fi
 export BAT_PAGER="less -RF"
+if command -v bat >/dev/null; then
+  export LESSOPEN="|bat --color=always --style=plain --paging=never %s"
+  export LESS="-R"
+fi
 
 # Locale
 export LC_ALL=en_US.UTF-8
@@ -60,6 +63,20 @@ export FZF_TMUX=0  # Don't open FZF in a separate split in tmux
 # ==============================================================================
 
 export PYTHONSTARTUP=$HOME/.config/python/pythonrc.py
+
+# ==============================================================================
+# Conda lazy-loader
+# ==============================================================================
+
+load_conda() {
+  source $HOME/.config/zsh/conda.sh
+  unset -f conda
+  unset -f load_conda
+}
+conda() {
+  load_conda
+  conda "$@"
+}
 
 # ==============================================================================
 # Source Additional Configurations
