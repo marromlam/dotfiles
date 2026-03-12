@@ -39,7 +39,7 @@ fi
 export USE_EDITOR=$EDITOR
 
 # Bat theme (fallback if bat not available)
-if ! type "$bat" > /dev/null; then
+if ! command -v bat >/dev/null; then
   export BAT_THEME="base16"
 fi
 
@@ -65,5 +65,13 @@ export PYTHONSTARTUP=$HOME/.config/python/pythonrc.py
 # Source Additional Configurations
 # ==============================================================================
 
-source ~/.config/zsh/ufunctions.sh
+source ~/.config/zsh/utils.sh
 source ~/.config/zsh/common.sh
+
+# History configuration
+export HISTFILE=$HOME/.zsh_history
+export HISTSIZE=999999999
+export SAVEHIST=999999999
+export CONDA_AUTO_ACTIVATE_BASE=false
+export CONDA_ALWAYS_YES=true
+export VIRTUAL_ENV_DISABLE_PROMPT=1
