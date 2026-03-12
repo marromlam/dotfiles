@@ -5,7 +5,7 @@
 FC=${HOME}/.dotfiles
 TMUX_SHARE=${HOME}/.local/share/tmux
 
-all: brew macos kitty nvim vim tmux fzf-marks private zsh-plugins
+all: install setup
 
 test:
 	${HOME}/.dotfiles/tests/zsh/sanity.sh
@@ -17,8 +17,11 @@ macos:
 	bash extra/keyboard.sh
 
 install:
-	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
+	bash ${FC}/extra/symlinks.sh
 	rm -rf ~/Downloads; ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads
+
+setup:
+	bash ${FC}/extra/setup.sh
 
 projects:
 	mkdir -p "${HOME}/Projects/icloud"
@@ -98,4 +101,4 @@ zsh-plugins:
 	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
 	
 
-.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
+.PHONY: all install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
