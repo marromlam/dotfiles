@@ -5,7 +5,7 @@
 FC=${HOME}/.dotfiles
 TMUX_SHARE=${HOME}/.local/share/tmux
 
-all: install setup
+all: brew install setup
 
 test:
 	${HOME}/.dotfiles/tests/zsh/sanity.sh
@@ -19,7 +19,7 @@ macos:
 homebrew:
 	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-install: homebrew
+install:
 	bash ${FC}/extra/symlinks.sh
 	@if [[ "$$(uname)" == "Darwin" ]]; then \
 	  rm -rf ~/Downloads; \
