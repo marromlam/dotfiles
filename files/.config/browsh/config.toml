@@ -4,7 +4,7 @@
 browsh_supporter = "♥"
 
 # The page to show at startup. Browsh will fail to boot if this URL is not accessible
-startup-url = "http://www.brow.sh"
+startup-url = "https://www.google.com"
 
 # The base query when a non-URL is entered into the URL bar
 default_search_engine_base = "https://www.google.com/search?q="
@@ -58,12 +58,12 @@ small_pixel_frame_rate = 250
 
 [http-server]
 port = 4333
-bind = "0.0.0.0"
+bind = "127.0.0.1"
 
 # The time to wait in milliseconds after the DOM is ready before
 # trying to parse and render the page's text. Too soon and text risks not being
 # parsed, too long and you wait unecessarily.
-render_delay = 100
+render_delay = 300
 
 # The length of time in seconds to wait before aborting the page load
 timeout = 30

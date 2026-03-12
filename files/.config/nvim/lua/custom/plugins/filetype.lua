@@ -131,13 +131,13 @@ return {
     'marromlam/nvim-docx.nvim',
     name = 'nvim-docx',
     dir = '~/Workspaces/personal/nvim-docx',
-    disable = true,
-    cond = false,
+    -- disable = true,
+    -- cond = false,
     dev = true,
     lazy = false,
     keys = {
-      -- '<S-CR>',
-      '<leader>X',
+      '<S-CR>',
+      -- '<leader>X',
       ':ReloadXMLFromZip<CR>',
       desc = 'Reload MS Word',
     },
@@ -150,6 +150,8 @@ return {
   {
     -- vimtex
     'lervag/vimtex',
+    -- cond = false,
+    -- disable = true,
     ft = { 'tex' },
     config = function() require('custom.config.vimtex').config() end,
   },
@@ -157,10 +159,10 @@ return {
   {
     'marromlam/tex-kitty',
     ft = 'tex',
-    dir = '/Users/marcos/Projects/personal/tex-kitty',
+    dir = '/Users/marcos/Projects/personal/pdfcat.nvim/',
     dev = true,
-    cond = false,
-    disable = true,
+    -- cond = false,
+    -- disable = true,
     dependencies = { 'lervag/vimtex' },
     config = function()
       require('tex-kitty').setup({
@@ -176,19 +178,31 @@ return {
     dev = true,
     cond = false,
     disable = true,
-    dependencies = { 'lervag/vimtex' },
+    -- dependencies = { 'lervag/vimtex' },
     config = function()
       require('livetex').setup({
-        engine = 'pdflatex', -- or "lualatex"
-        fmt = 'fastfmt.fmt', -- path to your precompiled preamble
+        engine = 'auto', -- TS-program magic selects pdflatex/xelatex/lualatex
+        ramdisk_enabled = true,
+        ramdisk_volume_name = 'LiveTeXRAM',
+        ramdisk_size_mb = 1024,
+        ramdisk_auto_out_dir = true,
+        -- fmt = 'fastfmt.fmt', -- path to your precompiled preamble
+        -- fmt = '/Users/marcos/tmp/livetex/fastfmt.fmt',
         -- out_dir = '/dev/shm/livetex', -- RAM disk for fast output
-        out_dir = '/Users/marcos/tmp/livetex', -- or any writable path
+        -- out_dir = '/Users/marcos/tmp/livetex', -- or any writable path
+        -- fmt = '/Volumes/LiveTeXRAM/livetex/fastfmt.fmt',
+        -- out_dir = '/Volumes/LiveTeXRAM/livetex',
         live = true,
-        reload_cmd = '', -- auto reload PDF
+        reload_cmd = false, -- auto reload PDF
         -- reload_cmd = 'osascript -e \'tell application "Skim" to revert front document\'', -- auto reload PDF
-        debounce_ms = 600,
+        debounce_ms = 300,
+        live_interaction = 'batchmode',
         show_spinner = true,
-        pdf_target = 'same', -- (default) copy next to .tex
+        -- pdf_target = 'same', -- (default) copy next to .tex
+        copy_pdf_on_live = true, -- copy PDF on each live compilation (even if pdf_target is "same")
+        pdf_target = 'symlink',
+        copy_on_save = true,
+        synctex = 1,
       })
     end,
   },

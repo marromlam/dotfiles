@@ -1,19 +1,5 @@
 return {
   {
-    'folke/twilight.nvim',
-    opts = {
-      -- Dim inactive code
-    },
-  },
-  {
-    'folke/ts-comments.nvim',
-    opts = {
-      langs = {
-        dts = '// %s',
-      },
-    },
-  },
-  {
     'folke/snacks.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
     opts = {
@@ -38,6 +24,8 @@ return {
   },
   {
     'folke/zen-mode.nvim',
+    enabled = false,
+    cond = false,
     opts = {
       window = {
         backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal

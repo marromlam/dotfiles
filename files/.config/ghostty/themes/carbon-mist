@@ -1,0 +1,34 @@
+# Carbon Mist
+# Carbon Mist theme based on a soft retro ANSI palette.
+# Author: Marcos Romero Lamas
+# Version: 1.0.0
+
+# Basic colors
+background = 1D1F21
+foreground = C4C8C6
+
+# Cursor colors
+cursor-color = 666666
+cursor-text = 1D1F21
+
+# Selection colors
+selection-background = 353A44
+selection-foreground = C4C8C6
+
+# The 16 terminal colors (palette 0-15)
+palette = 0=1D1F21
+palette = 1=CC6566
+palette = 2=B6BD68
+palette = 3=F0C674
+palette = 4=82A2BE
+palette = 5=B294BB
+palette = 6=8ABEB7
+palette = 7=C4C8C6
+palette = 8=666666
+palette = 9=D54E53
+palette = 10=B9CA4B
+palette = 11=E7C547
+palette = 12=7AA6DA
+palette = 13=C397D8
+palette = 14=70C0B1
+palette = 15=EAEAEA

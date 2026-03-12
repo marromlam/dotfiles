@@ -1,5 +1,4 @@
 local icons = mrl.ui.icons.lsp
-local border = mrl.ui.current.border
 
 return { -- LSP Configuration & Plugins
   {
@@ -7,7 +6,34 @@ return { -- LSP Configuration & Plugins
     event = { 'BufReadPre' },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'mason-org/mason.nvim', opts = { ui = { border = border } } },
+      {
+        'mason-org/mason.nvim',
+        opts = {
+          ui = {
+            border = 'rounded',
+            width = 0.8,
+            height = 0.8,
+            backdrop = 100, -- 100 = fully transparent (no dimming), 0 = fully opaque
+          },
+        },
+        config = function(_, opts)
+          require('mason').setup(opts)
+          -- Disable columns in Mason windows after setup
+          vim.api.nvim_create_autocmd('FileType', {
+            pattern = 'mason',
+            callback = function()
+              vim.schedule(function()
+                local win = vim.api.nvim_get_current_win()
+                vim.wo[win].statuscolumn = ''
+                vim.wo[win].signcolumn = 'no'
+                vim.wo[win].foldcolumn = '0'
+                vim.wo[win].number = false
+                vim.wo[win].relativenumber = false
+              end)
+            end,
+          })
+        end,
+      },
       { 'mason-org/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
 
@@ -28,8 +54,17 @@ return { -- LSP Configuration & Plugins
         ---@diagnostic disable-next-line: duplicate-set-field
         function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
           opts = opts or {}
-          opts.border = opts.border or border
-          return orig(contents, syntax, opts, ...)
+          opts.border = opts.border or 'rounded'
+          -- Disable all columns in LSP floating windows
+          local bufnr, winnr = orig(contents, syntax, opts, ...)
+          if winnr and vim.api.nvim_win_is_valid(winnr) then
+            vim.wo[winnr].statuscolumn = ''
+            vim.wo[winnr].signcolumn = 'no'
+            vim.wo[winnr].foldcolumn = '0'
+            vim.wo[winnr].number = false
+            vim.wo[winnr].relativenumber = false
+          end
+          return bufnr, winnr
         end
       end
 
@@ -38,7 +73,7 @@ return { -- LSP Configuration & Plugins
       local function with_border(handler)
         return function(err, result, ctx, config)
           config = config or {}
-          config.border = config.border or border
+          config.border = config.border or 'rounded'
           return handler(err, result, ctx, config)
         end
       end
@@ -47,7 +82,6 @@ return { -- LSP Configuration & Plugins
         with_border(vim.lsp.handlers['textDocument/hover'])
       vim.lsp.handlers['textDocument/signatureHelp'] =
         with_border(vim.lsp.handlers['textDocument/signatureHelp'])
-      vim.diagnostic.config({ float = { border = border } })
 
       -- Brief aside: **What is LSP?**  #234523
       --
@@ -84,6 +118,10 @@ return { -- LSP Configuration & Plugins
           { clear = true }
         ),
         callback = function(event)
+          -- Prevent duplicate keymap setup when multiple LSP servers attach
+          if vim.b[event.buf].lsp_keymaps_attached then return end
+          vim.b[event.buf].lsp_keymaps_attached = true
+
           -- NOTE: Remember that Lua is a real programming language, and as such it is possible
           -- to define small helper and utility functions so you don't have to repeat yourself.
           --
@@ -104,55 +142,6 @@ return { -- LSP Configuration & Plugins
             )
           end
 
-          -- -- Jump to the definition of the word under your cursor.
-          -- --  This is where a variable was first declared, or where a function is defined, etc.
-          -- --  To jump back, press <C-t>.
-          -- map(
-          --   'gD',
-          --   require('telescope.builtin').lsp_definitions,
-          --   '[G]oto [D]efinition'
-          -- )
-          --
-          -- -- Find references for the word under your cursor.
-          -- map(
-          --   'gR',
-          --   require('telescope.builtin').lsp_references,
-          --   '[G]oto [R]eferences'
-          -- )
-          --
-          -- -- Jump to the implementation of the word under your cursor.
-          -- --  Useful when your language has ways of declaring types without an actual implementation.
-          -- map(
-          --   'gI',
-          --   require('telescope.builtin').lsp_implementations,
-          --   '[G]oto [I]mplementation'
-          -- )
-          --
-          -- -- Jump to the type of the word under your cursor.
-          -- --  Useful when you're not sure what type a variable is and you want to see
-          -- --  the definition of its *type*, not where it was *defined*.
-          -- map(
-          --   '<leader>Y',
-          --   require('telescope.builtin').lsp_type_definitions,
-          --   'Type [D]efinition'
-          -- )
-          --
-          -- -- Fuzzy find all the symbols in your current document.
-          -- --  Symbols are things like variables, functions, types, etc.
-          -- map(
-          --   '<leader>ds',
-          --   require('telescope.builtin').lsp_document_symbols,
-          --   '[D]ocument [S]ymbols'
-          -- )
-          --
-          -- -- Fuzzy find all the symbols in your current workspace.
-          -- --  Similar to document symbols, except searches over your entire project.
-          -- map(
-          --   '<leader>ws',
-          --   require('telescope.builtin').lsp_dynamic_workspace_symbols,
-          --   '[W]orkspace [S]ymbols'
-          -- )
-
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -169,31 +158,30 @@ return { -- LSP Configuration & Plugins
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
+          -- DISABLED: Document highlight on CursorMove causes severe scrolling lag
+          -- The CursorMoved autocmds fire on every scroll step, causing expensive LSP operations
+          -- To re-enable, uncomment the code below and adjust updatetime for better performance
           --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if
-            client and client.server_capabilities.documentHighlightProvider
-          then
-            local highlight_augroup = vim.api.nvim_create_augroup(
-              'kickstart-lsp-highlight',
-              { clear = false }
-            )
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-          end
+          -- local client = vim.lsp.get_client_by_id(event.data.client_id)
+          -- if
+          --   client and client.server_capabilities.documentHighlightProvider
+          -- then
+          --   local highlight_augroup = vim.api.nvim_create_augroup(
+          --     'kickstart-lsp-highlight',
+          --     { clear = false }
+          --   )
+          --   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.document_highlight,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.clear_references,
+          --   })
+          -- end
 
           -- The following autocommand is used to enable inlay hints in your
           -- code, if the language server you are using supports them
@@ -241,13 +229,12 @@ return { -- LSP Configuration & Plugins
       local original_capabilities = vim.lsp.protocol.make_client_capabilities()
       local capabilities =
         require('blink.cmp').get_lsp_capabilities(original_capabilities)
-      if vim.g.use_cmp then
-        local capabilities = vim.tbl_deep_extend(
-          'force',
-          original_capabilities,
-          require('cmp_nvim_lsp').default_capabilities()
-        )
-      end
+
+      -- Disable file watchers for performance (especially in large projects)
+      capabilities.workspace = capabilities.workspace or {}
+      capabilities.workspace.didChangeWatchedFiles = capabilities.workspace.didChangeWatchedFiles
+        or {}
+      capabilities.workspace.didChangeWatchedFiles.dynamicRegistration = false
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -298,6 +285,9 @@ return { -- LSP Configuration & Plugins
           -- capabilities = {},
           settings = {
             Lua = {
+              diagnostics = {
+                globals = { 'vim' },
+              },
               completion = {
                 callSnippet = 'Replace',
               },
@@ -357,21 +347,22 @@ return { -- LSP Configuration & Plugins
     },
     config = true,
   },
-  {
-    'zeioth/garbage-day.nvim',
-    dependencies = 'neovim/nvim-lspconfig',
-    event = 'LspAttach',
-    opts = {
-      excluded_lsp_clients = {
-        'null-ls',
-        'jdtls',
-        'marksman',
-        'lua_ls',
-        'copilot',
-      },
-      timout = 3000, -- Timeout in milliseconds for the garbage collection
-    },
-  },
+  -- Disabled due to deprecated :LspStart command usage
+  -- {
+  --   'zeioth/garbage-day.nvim',
+  --   dependencies = 'neovim/nvim-lspconfig',
+  --   event = 'LspAttach',
+  --   opts = {
+  --     excluded_lsp_clients = {
+  --       'null-ls',
+  --       'jdtls',
+  --       'marksman',
+  --       'lua_ls',
+  --       'copilot',
+  --     },
+  --     timout = 3000, -- Timeout in milliseconds for the garbage collection
+  --   },
+  -- },
   {
     'rachartier/tiny-inline-diagnostic.nvim',
     event = 'LspAttach',
@@ -415,7 +406,7 @@ return { -- LSP Configuration & Plugins
           -- Time (in milliseconds) to throttle updates while moving the cursor
           -- Increase this value for better performance if your computer is slow
           -- or set to 0 for immediate updates and better visual
-          throttle = 20,
+          throttle = 100, -- Increased from 20 to reduce update frequency during scrolling
 
           -- Minimum message length before wrapping to a new line
           softwrap = 30,
@@ -481,90 +472,104 @@ return { -- LSP Configuration & Plugins
     dependencies = {
       'mason-org/mason.nvim',
     },
-    config = function() require('sonarqube').setup({}) end,
+    cond = function()
+      -- Only load if Java is available (required for SonarLint)
+      return vim.fn.executable('java') == 1
+    end,
+    config = function()
+      -- Configure with Mason-installed sonarlint-language-server
+      local extension_path = vim.fn.stdpath('data')
+        .. '/mason/packages/sonarlint-language-server/extension'
+
+      -- Check if extension exists
+      if vim.fn.isdirectory(extension_path) == 0 then
+        vim.notify(
+          'SonarLint extension not found. Run :MasonInstall sonarlint-language-server',
+          vim.log.levels.WARN
+        )
+        return
+      end
+
+      require('sonarqube').setup({
+        lsp = {
+          cmd = {
+            vim.fn.exepath('java'),
+            '-jar',
+            extension_path .. '/server/sonarlint-ls.jar',
+            '-stdio',
+            '-analyzers',
+            extension_path .. '/analyzers/sonargo.jar',
+            extension_path .. '/analyzers/sonarhtml.jar',
+            extension_path .. '/analyzers/sonariac.jar',
+            extension_path .. '/analyzers/sonarjava.jar',
+            extension_path .. '/analyzers/sonarjavasymbolicexecution.jar',
+            extension_path .. '/analyzers/sonarjs.jar',
+            extension_path .. '/analyzers/sonarphp.jar',
+            extension_path .. '/analyzers/sonarpython.jar',
+            extension_path .. '/analyzers/sonartext.jar',
+            extension_path .. '/analyzers/sonarxml.jar',
+          },
+        },
+        python = {
+          enabled = true,
+        },
+      })
+    end,
   },
 
-  -- return {
-  --   {
-  --     "neovim/nvim-lspconfig",
-  --     event = "VeryLazy",
-  --     init = function()
-  --       local keys = require("lazyvim.plugins.lsp.keymaps").get()
-  --       -- change a keymap
-  --       keys[#keys + 1] = { "gh", "<cmd>lua vim.lsp.buf.hover()<cr>" }
-  --       -- disable a keymap
-  --       keys[#keys + 1] = { "gD", false }
-  --       keys[#keys + 1] = { "gK", false }
-  --     end,
-  --   },
-  --   {
-  --     "DNLHC/glance.nvim",
-  --     opts = {
-  --       preview_win_opts = { relativenumber = false },
-  --       theme = { enable = true },
-  --     },
-  --     keys = {
-  --       { "gD", "<Cmd>Glance definitions<CR>", desc = "lsp: glance definitions" },
-  --       { "gR", "<Cmd>Glance references<CR>", desc = "lsp: glance references" },
-  --       {
-  --         "gY",
-  --         "<Cmd>Glance type_definitions<CR>",
-  --         desc = "lsp: glance type definitions",
-  --       },
-  --       {
-  --         "gM",
-  --         "<Cmd>Glance implementations<CR>",
-  --         desc = "lsp: glance implementations",
-  --       },
-  --     },
-  --   },
-  --   {
+  {
+    'kosayoda/nvim-lightbulb',
+    event = 'LspAttach',
+    keys = {
+      {
+        '<leader>lb',
+        ":lua require('nvim-lightbulb').get_status_text()<cr>",
+        desc = 'LSP: Lightbulb status',
+      },
+    },
+    opts = {
+      autocmd = { enabled = true },
+      sign = { enabled = false },
+      float = {
+        enabled = true,
+        win_opts = { border = 'none' },
+      },
+    },
+  },
+  {
+    'DNLHC/glance.nvim',
+    event = 'LspAttach',
+    opts = {
+      preview_win_opts = { relativenumber = false },
+      theme = { enable = true, mode = 'darken' },
+    },
+    keys = {
+      { 'gd', '<Cmd>Glance definitions<CR>', desc = 'LSP: Glance definitions' },
+      { 'gr', '<Cmd>Glance references<CR>', desc = 'LSP: Glance references' },
+      {
+        'gy',
+        '<Cmd>Glance type_definitions<CR>',
+        desc = 'LSP: Glance type definitions',
+      },
+      {
+        'gm',
+        '<Cmd>Glance implementations<CR>',
+        desc = 'LSP: Glance implementations',
+      },
+    },
+  },
   {
     'smjonas/inc-rename.nvim',
     cmd = 'IncRename',
-    config = true,
+    opts = { hl_group = 'Visual', preview_empty_name = true },
+    keys = {
+      {
+        '<leader>rn',
+        function() return vim.fmt(':IncRename %s', vim.fn.expand('<cword>')) end,
+        expr = true,
+        silent = false,
+        desc = 'lsp: incremental rename',
+      },
+    },
   },
-  --     opts = { hl_group = "Visual", preview_empty_name = true },
-  --     keys = {
-  --       {
-  --         "<leader>rn",
-  --         function()
-  --           return vim.fmt(":IncRename %s", vim.fn.expand("<cword>"))
-  --         end,
-  --         expr = true,
-  --         silent = false,
-  --         desc = "lsp: incremental rename",
-  --       },
-  --     },
-  --   },
-  --   {
-  --     "lvimuser/lsp-inlayhints.nvim",
-  --     init = function()
-  --       mrl.augroup("InlayHintsSetup", {
-  --         event = "LspAttach",
-  --         command = function(args)
-  --           local id = vim.tbl_get(args, "data", "client_id") --[[@as lsp.Client]]
-  --           if not id then
-  --             return
-  --           end
-  --           local client = vim.lsp.get_client_by_id(id)
-  --           require("lsp-inlayhints").on_attach(client, args.buf)
-  --         end,
-  --       })
-  --     end,
-  --     opts = {
-  --       inlay_hints = {
-  --         highlight = "Comment",
-  --         labels_separator = " ⏐ ",
-  --         parameter_hints = { prefix = "󰊕" },
-  --         type_hints = { prefix = "=> ", remove_colon_start = true },
-  --       },
-  --     },
-  --   },
-  --   {
-  --     "simrat39/rust-tools.nvim",
-  --     dependencies = { "nvim-lspconfig" },
-  --     ft = "rust",
-  --   },
-  -- }
 }

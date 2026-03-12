@@ -1,6 +1,0 @@
-column_width = 80
-indent_type = 'Spaces'
-quote_style = 'AutoPreferSingle'
-indent_width = 4
-call_parentheses = 'Always'
-collapse_simple_statement = 'Always'

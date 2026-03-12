@@ -762,6 +762,7 @@ vim.keymap.set('n', '<Esc>', function()
 end, { desc = 'clean hl' })
 
 -- Diagnostic keymaps
+-- Diagnostic navigation (prev/next)
 vim.keymap.set(
   'n',
   '[d',
@@ -774,6 +775,22 @@ vim.keymap.set(
   vim.diagnostic.goto_next,
   { desc = 'Go to next [D]iagnostic message' }
 )
+
+-- Enhanced diagnostic navigation (first/last, severity filtering)
+vim.keymap.set(
+  'n',
+  '[D',
+  function() vim.diagnostic.goto_prev({ count = 999999, wrap = false }) end,
+  { desc = 'Go to first diagnostic' }
+)
+
+vim.keymap.set(
+  'n',
+  ']D',
+  function() vim.diagnostic.goto_next({ count = 999999, wrap = false }) end,
+  { desc = 'Go to last diagnostic' }
+)
+
 vim.keymap.set(
   'n',
   '<leader>se',

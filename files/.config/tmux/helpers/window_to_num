@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Helper script to convert window numbers to fancy Unicode numerals
+# Usage: window_to_num <number>
+
+# Fancy number format - Unicode circled numbers
+NUMFMT="🄌➊➋➌➍➎➏➐➑➒➓"
+
+# Alternative formats (uncomment to use):
+# NUMFMT="󰎡󰎤󰎧󰎪󰎭󰎱󰎳󰎶󰎹󰎼"  # Nerd Font numbers
+# NUMFMT="0123456789"              # Plain numbers
+# NUMFMT="❶➋➌➍➎➏➐➑➒➓"            # Alternative style
+
+ID=$1
+echo "${NUMFMT:$ID:1}"

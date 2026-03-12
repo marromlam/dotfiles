@@ -1,6 +1,5 @@
 local fn = vim.fn
-local border, highlight, L =
-  mrl.ui.current.border, mrl.highlight, vim.log.levels
+local highlight, L = mrl.highlight, vim.log.levels
 
 return {
   'folke/noice.nvim',
@@ -31,10 +30,13 @@ return {
       backend = 'nui',
     },
     lsp = {
+      -- message = {
+      --   enabled = true, -- Enable Noice to handle LSP messages
+      -- },
       documentation = {
         enabled = false,
         opts = {
-          border = { style = border },
+          border = { style = 'rounded' },
           position = { row = 2 },
         },
       },
@@ -57,20 +59,20 @@ return {
       vsplit = { size = { width = 'auto' } },
       split = { win_options = { winhighlight = { Normal = 'Normal' } } },
       popup = {
-        border = { style = border, padding = { 0, 1 } },
+        border = { style = 'rounded', padding = { 0, 1 } },
         win_options = { winblend = 0 },
       },
       cmdline_popup = {
         position = { row = 5, col = '50%' },
         size = { width = 'auto', height = 'auto' },
-        border = { style = border, padding = { 0, 1 } },
+        border = { style = 'rounded', padding = { 0, 1 } },
         win_options = {
           winblend = 0,
           winhighlight = { Normal = 'NormalPopup', FloatBorder = 'PopupBorder' },
         },
       },
       confirm = {
-        border = { style = border, padding = { 0, 1 }, text = { top = '' } },
+        border = { style = 'rounded', padding = { 0, 1 }, text = { top = '' } },
         win_options = {
           winblend = 0,
           winhighlight = { Normal = 'NormalPopup', FloatBorder = 'PopupBorder' },
@@ -80,7 +82,7 @@ return {
         relative = 'editor',
         position = { row = 9, col = '50%' },
         size = { width = 60, height = 10 },
-        border = { style = border, padding = { 0, 1 } },
+        border = { style = 'rounded', padding = { 0, 1 } },
         win_options = {
           winblend = 0,
           -- Treat cmdline/popupmenu as "popup-normal" (not float-normal)
@@ -193,6 +195,13 @@ return {
       },
       opts = { skip = true },
     })
+    table.insert(opts.routes, {
+      filter = {
+        event = 'notify',
+        find = 'LSP%[ruff%] Ruff failed to handle a request',
+      },
+      opts = { skip = true },
+    })
 
     -- Focus-aware notifications (send to notify_send when not focused)
     local focused = true
@@ -227,11 +236,15 @@ return {
 
     require('noice').setup(opts)
 
-    vim.api.nvim_create_user_command('NotifyTest', function()
-      vim.notify(('Noice mini toast\n'):rep(6), vim.log.levels.INFO, {
-        title = 'Noice Mini',
-      })
-    end, { desc = 'Test Noice mini notifications' })
+    vim.api.nvim_create_user_command(
+      'NotifyTest',
+      function()
+        vim.notify(('Noice mini toast\n'):rep(6), vim.log.levels.INFO, {
+          title = 'Noice Mini',
+        })
+      end,
+      { desc = 'Test Noice mini notifications' }
+    )
 
     -- Noice uses `winhighlight` to map FloatBorder -> NoiceCmdlinePopupBorder.
     -- Force these border groups to link to PopupBorder immediately (no scheduling),
@@ -250,101 +263,6 @@ return {
     }) do
       pcall(vim.api.nvim_set_hl, 0, name, { link = 'PopupBorder' })
     end
-
-    highlight.plugin('noice', {
-      { NoiceMini = { inherit = 'MsgArea', bg = { from = 'Normal' } } },
-      {
-        NoicePopupBaseGroup = {
-          inherit = 'NormalPopup',
-          fg = { from = 'DiagnosticSignInfo' },
-        },
-      },
-      {
-        NoicePopupWarnBaseGroup = {
-          inherit = 'NormalPopup',
-          fg = { from = 'Float' },
-        },
-      },
-      {
-        NoicePopupInfoBaseGroup = {
-          inherit = 'NormalPopup',
-          fg = { from = 'Conditional' },
-        },
-      },
-      { NoiceCmdlinePopup = { link = 'NormalPopup' } },
-      { NoiceCmdlinePopupBorder = { link = 'PopupBorder' } },
-      {
-        NoiceCmdlinePopupTitleCmdline = {
-          inherit = 'NoicePopupBaseGroup',
-          reverse = true,
-        },
-      },
-      -- Ensure command-line borders actually use PopupBorder (bg/fg).
-      {
-        NoiceCmdlinePopupBorderCmdline = { clear = true, link = 'PopupBorder' },
-      },
-      {
-        NoiceCmdlinePopupBorderSearch = { clear = true, link = 'PopupBorder' },
-      },
-      {
-        NoiceCmdlinePopupTitleSearch = {
-          inherit = 'NoicePopupWarnBaseGroup',
-          reverse = true,
-        },
-      },
-      {
-        NoiceCmdlinePopupBorderFilter = { clear = true, link = 'PopupBorder' },
-      },
-      {
-        NoiceCmdlinePopupTitleFilter = {
-          inherit = 'NoicePopupWarnBaseGroup',
-          reverse = true,
-        },
-      },
-      { NoiceCmdlinePopupBorderHelp = { clear = true, link = 'PopupBorder' } },
-      {
-        NoiceCmdlinePopupTitleHelp = {
-          inherit = 'NoicePopupInfoBaseGroup',
-          reverse = true,
-        },
-      },
-      {
-        NoiceCmdlinePopupBorderSubstitute = {
-          clear = true,
-          link = 'PopupBorder',
-        },
-      },
-      {
-        NoiceCmdlinePopupTitleSubstitute = {
-          inherit = 'NoicePopupWarnBaseGroup',
-          reverse = true,
-        },
-      },
-      {
-        NoiceCmdlinePopupBorderIncRename = {
-          clear = true,
-          link = 'PopupBorder',
-        },
-      },
-      {
-        NoiceCmdlinePopupTitleIncRename = {
-          inherit = 'NoicePopupWarnBaseGroup',
-          reverse = true,
-        },
-      },
-      { NoiceCmdlinePopupBorderInput = { clear = true, link = 'PopupBorder' } },
-      { NoiceCmdlinePopupBorderLua = { clear = true, link = 'PopupBorder' } },
-      { NoiceCmdlineIconCmdline = { link = 'NoicePopupBaseGroup' } },
-      { NoiceCmdlineIconSearch = { link = 'NoicePopupWarnBaseGroup' } },
-      { NoiceCmdlineIconFilter = { link = 'NoicePopupWarnBaseGroup' } },
-      { NoiceCmdlineIconHelp = { link = 'NoicePopupInfoBaseGroup' } },
-      { NoiceCmdlineIconIncRename = { link = 'NoicePopupWarnBaseGroup' } },
-      { NoiceCmdlineIconSubstitute = { link = 'NoicePopupWarnBaseGroup' } },
-      { NoiceCmdlineIconInput = { link = 'NoicePopupBaseGroup' } },
-      { NoiceCmdlineIconLua = { link = 'NoicePopupBaseGroup' } },
-      { NoiceConfirm = { link = 'NormalPopup' } },
-      { NoiceConfirmBorder = { clear = true, link = 'PopupBorder' } },
-    })
 
     vim.keymap.set({ 'n', 'i', 's' }, '<c-f>', function()
       if not require('noice.lsp').scroll(4) then return '<c-f>' end

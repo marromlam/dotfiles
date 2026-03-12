@@ -56,6 +56,7 @@ local identifiers = {
   },
   filetypes = mrl.p_table({
     ['fzf'] = '󱁴', -- '',
+    ['fzf-lua'] = '󱁴',
     ['log'] = '',
     ['org'] = '',
     ['orgagenda'] = '',
@@ -80,6 +81,7 @@ local identifiers = {
   }),
   names = mrl.p_table({
     ['fzf'] = 'FZF',
+    ['fzf-lua'] = 'FZF',
     ['orgagenda'] = 'Org',
     ['mail'] = 'Mail',
     ['dbui'] = 'Dadbod UI',
@@ -260,6 +262,7 @@ end
 local function special_buffers(ctx)
   if ctx.preview then return 'preview' end
   if ctx.buftype == 'quickfix' then return 'Quickfix List' end
+  if ctx.bufname and ctx.bufname:match('^fzf%-lua') then return 'FZF' end
   if ctx.filetype == 'AvanteInput' then return 'Avante' end
   if ctx.filetype == 'AvanteSelectedFiles' then return 'Avante' end
   if ctx.filetype == 'Avante' then return 'Avante' end
@@ -296,8 +299,10 @@ local function dir_env(directory)
     ['~/Workspaces/work/'] = '$WORK',
     ['/home/marcos/Workspaces/work/'] = '$WORK',
     [vim.env.VIMRUNTIME] = '$VIMRUNTIME',
-    [vim.g.projects_directory] = '$PROJECTS',
+    [vim.g.projects_directory] = '$WORKSPACES',
     ['/home/marcos/Projects/'] = '$WORKSPACES',
+    ['/home/marcos/Workspaces/personal/dotfiles/'] = '$DOTFILES',
+    ['/Users/marcos/Workspaces/personal/dotfiles/'] = '$DOTFILES',
     ['/home/marcos/Projects/personal/dotfiles/'] = '$DOTFILES',
     ['~/Projects/personal/dotfiles/'] = '$DOTFILES',
     ['/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
@@ -591,6 +596,7 @@ local function git_updates() run_task_on_interval(10000, update_git_status) end
 ----------------------------------------------------------------------------------------------------
 
 local function is_plain(ctx)
+  if ctx.filetype == 'fzf' then return false end
   local decor = decorations.get({
     ft = ctx.filetype,
     bt = ctx.buftype,

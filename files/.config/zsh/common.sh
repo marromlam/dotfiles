@@ -13,8 +13,9 @@ export TEXINPUTS=".:~/beamer-compostela:"
 # ==============================================================================
 
 # System paths (prepended to PATH)
+path_exists() { [[ -d "$1" ]]; }
+
 SYS_PATHS=(
-  "$HOME/.dotfiles/scripts"
   "$HOME/.local/share/nvim/mason/bin"
   "$HOME/go/bin"
   "$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin"
@@ -29,6 +30,11 @@ USER_PATHS=(
   "$HOME/.local/bin"
   "$HOME/.cargo/bin"
 )
+
+
+# Filter paths that exist
+SYS_PATHS=($(for p in "${SYS_PATHS[@]}"; do path_exists "$p" && echo "$p"; done))
+USER_PATHS=($(for p in "${USER_PATHS[@]}"; do path_exists "$p" && echo "$p"; done))
 
 # Set PATH with ordering: SYS:PATH:USER (removes duplicates)
 export PATH=$(dedup "$(join $SYS_PATHS):$PATH:$(join $USER_PATHS)")

@@ -42,6 +42,12 @@
     ~/.config:
       force: true
       path: files/.config
+    ~/.hammerspoon:
+      force: true
+      path: files/.hammerspoon
+    ~/.amethyst.yml:
+      force: true
+      path: files/.amethyst.yml
     ~/.dotfiles:
       force: true
       path: ~/Projects/personal/dotfiles

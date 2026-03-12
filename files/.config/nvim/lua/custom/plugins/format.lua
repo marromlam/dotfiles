@@ -2,14 +2,13 @@ return {
   {
     'stevearc/conform.nvim',
     -- lazy = false,
-    event = { 'BufReadPre', 'BufNewFile', 'BufWritePre' },
+    event = { 'BufReadPre', 'BufNewFile' },
     cmd = { 'ConformInfo' },
     keys = {
       {
         '<leader>lf',
         function()
-          require('conform').format({ async = true, lsp_fallback = true })
-          local a = 2
+          require('conform').format({ async = true, lsp_format = 'fallback' })
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -20,15 +19,21 @@ return {
       conform.setup({
         notify_on_error = true,
         format_on_save = function(bufnr)
-          -- Disable "format_on_save lsp_fallback" for languages that don't
+          -- Disable LSP fallback for languages that don't
           -- have a well standardized coding style. You can add additional
           -- languages here or re-enable it for the disabled ones.
-          if vim.g.disable_autoformat then return nil end
+          if vim.g.disable_autoformat or vim.g.formatting_disabled then
+            return nil
+          end
+          if vim.b[bufnr] and vim.b[bufnr].formatting_disabled then
+            return nil
+          end
           local disable_filetypes =
             { c = true, cpp = true, xml = true, cnk = true, map = true }
           return {
             timeout_ms = 5000,
-            lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+            lsp_format = disable_filetypes[vim.bo[bufnr].filetype] and 'never'
+              or 'fallback',
           }
         end,
         formatters_by_ft = {
@@ -60,6 +65,13 @@ return {
           shfmt = {
             prepend_args = { '-i', '2' },
           },
+          -- Only run prettier if config file exists
+          prettier = {},
+          prettierd = {},
+          -- Only run isort if config file exists
+          isort = {},
+          -- Only run stylua if config file exists
+          stylua = {},
         },
       })
 

@@ -1,0 +1,36 @@
+# Amethyst baseline:
+# - Amethyst handles tiling/layout logic.
+# - Hammerspoon handles custom automation/hotkeys.
+
+layouts:
+  - tall
+  - wide
+  - fullscreen
+  - column
+  - row
+
+window-margins: true
+window-margin-size: 8
+smart-window-margins: true
+smart-window-margins-on-focused-monitor: false
+
+focus-follows-mouse: false
+mouse-follows-focus: false
+mouse-swaps-windows: false
+mouse-resizes-windows: false
+
+enables-layout-hud: true
+enables-layout-hud-on-space-change: false
+restore-layouts-on-launch: true
+
+# Keep these apps floating.
+floating:
+  - com.apple.finder
+  - com.apple.systempreferences
+  - com.apple.SystemSettings
+  - com.apple.Preview
+  - com.apple.ActivityMonitor
+  - com.apple.PhotoBooth
+  - com.apple.AppStore
+  - us.zoom.xos
+

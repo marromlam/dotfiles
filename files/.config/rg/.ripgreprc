@@ -1,15 +1,20 @@
---colors=path:fg:0x50,0xfa,0x7b
---colors=path:fg:0xbd,0x93,0xf9
-
---type-add
-web:*.{html,css,js,jsx,ts,tsx,less}
-
---type-add
-js:*.{ts,tsx}
-
---type-add
-ts:*.{ts,tsx}
-
+--color=auto
 --smart-case
 --hidden
 --glob=!.git/
+--heading
+--line-number
+
+# File types
+--type-add=web:*.{html,htm,css,js,jsx,ts,tsx,less,scss,sass,svelte,vue}
+--type-add=js:*.{js,jsx}
+--type-add=ts:*.{ts,tsx}
+
+# Colors (Gruvbox Dark)
+--colors=path:fg:0xfb,0x49,0x34
+--colors=line:fg:0x98,0x97,0x1a
+--colors=match:fg:0xd7,0x99,0x21
+--colors=match:style:bold
+--colors=match:style:underline
+--colors=section:fg:0x83,0xa5,0x98
+--colors=section:style:bold

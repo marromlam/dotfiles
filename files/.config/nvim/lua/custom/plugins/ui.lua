@@ -12,11 +12,6 @@ return {
     },
   },
 
-  -- {
-  --   'tpope/vim-sleuth',
-  --   event = { 'BufReadPre', 'BufNewFile' },
-  -- },
-
   {
     'SmiteshP/nvim-navic',
     event = 'LspAttach',
@@ -168,7 +163,6 @@ return {
   {
     'uga-rosa/ccc.nvim',
     cmd = { 'CccPick' },
-    tag = 'v2.0.3',
     opts = function()
       local ccc = require('ccc')
       local p = ccc.picker
@@ -245,7 +239,7 @@ return {
       { '<leader>u', '<Cmd>UndotreeToggle<CR>', desc = 'undotree: toggle' },
     },
     config = function()
-      vim.g.undotree_TreeNodeShape = '◦' -- Alternative: '◉'
+      vim.g.undotree_TreeNodeShape = '◉' -- Alternative: '◉' ◦
       vim.g.undotree_SetFocusWhenToggle = 1
     end,
   },
@@ -323,13 +317,5 @@ return {
         callback = set_hls,
       })
     end,
-  },
-
-  {
-    'goolord/alpha-nvim',
-    -- event = 'VimEnter',
-    cond = false,
-    disable = true,
-    config = function() require('custom.config.alpha').config() end,
   },
 }

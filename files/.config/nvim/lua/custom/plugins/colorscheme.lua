@@ -1,7 +1,41 @@
 -- COLORSCHEME
 --
 local enable_italics = true
+-- check if /Users/marcos/Workspaces/personal/theme-builder exists as a folder
+local is_dev = vim.fn.isdirectory(
+  '/Users/marcos/Workspaces/personal/theme-builder'
+) == 1
+
 return {
+
+  {
+    'vague2k/vague.nvim',
+    lazy = false,
+    enabled = not is_dev, -- Don't enable in dev, since it's not the main focus and adds startup time.
+    cond = not is_dev,
+    priority = 1000,
+    config = function()
+      require('vague').setup({
+        transparent = false,
+        style = {
+          boolean = 'none',
+          number = 'none',
+          float = 'none',
+          error = 'none',
+          comments = enable_italics and 'italic' or 'none',
+          conditionals = 'none',
+          functions = 'none',
+          headings = 'bold',
+          operators = 'none',
+          strings = 'none',
+          variables = 'none',
+          keywords = enable_italics and 'italic' or 'none',
+        },
+      })
+
+      vim.cmd('colorscheme vague')
+    end,
+  },
 
   {
     'ellisonleao/gruvbox.nvim',
@@ -9,7 +43,7 @@ return {
     enabled = false,
     cond = false,
     -- enabled = false,
-    priority = 1000,
+    priority = 900,
     config = function()
       -- Setup basic colorscheme first (fast path)
       require('gruvbox').setup({
@@ -110,68 +144,19 @@ return {
       vim.cmd('colorscheme gruvbox')
     end,
   },
-  -- Horizon (default)
+
   {
-    'akinsho/horizon.nvim',
+    'marromlam/theme-builder.nvim',
     lazy = false,
+    dev = true,
+    enabled = is_dev,
+    cond = is_dev,
+    dir = '/Users/marcos/Workspaces/personal/theme-builder/generated/carbon-mist/nvim',
     priority = 1000,
     config = function()
-      vim.o.termguicolors = true
-      vim.cmd('colorscheme horizon')
-    end,
-  },
-
-  -- Keep Catppuccin available, but not enabled by default.
-  {
-    'catppuccin/nvim',
-    name = 'catppuccin',
-    enabled = false,
-    cond = false,
-    lazy = true,
-    priority = 900,
-    config = function()
-      require('catppuccin').setup({
-        flavour = 'mocha',
-        transparent_background = false,
-        term_colors = true,
-        dim_inactive = { enabled = false },
-        styles = {
-          comments = enable_italics and { 'italic' } or {},
-          keywords = { 'bold' },
-          functions = {},
-          variables = {},
-        },
-        integrations = {
-          treesitter = true,
-          native_lsp = { enabled = true },
-          gitsigns = true,
-          telescope = true,
-          nvimtree = false,
-          notify = true,
-          mini = true,
-        },
-      })
-
-      vim.cmd('colorscheme catppuccin')
-    end,
-  },
-
-  -- Keep Nightfox available, but not enabled by default.
-  {
-    'EdenEast/nightfox.nvim',
-    enabled = false,
-    cond = false,
-    lazy = true,
-    priority = 900,
-    config = function()
-      require('nightfox').setup({
-        options = {
-          transparent = false,
-          terminal_colors = true,
-          dim_inactive = false,
-        },
-      })
-      vim.cmd('colorscheme carbonfox')
+      vim.cmd.colorscheme('carbon-mist')
+      -- vim.cmd.colorscheme('horizon')
+      -- vim.cmd.colorscheme('catppuccin')
     end,
   },
 }

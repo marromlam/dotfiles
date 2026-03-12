@@ -33,7 +33,9 @@ end
 
 local function get_nightfox_palette()
   local ok, nightfox_palette = pcall(require, 'nightfox.palette')
-  if not ok or not nightfox_palette or not nightfox_palette.load then return nil end
+  if not ok or not nightfox_palette or not nightfox_palette.load then
+    return nil
+  end
   return nightfox_palette.load(vim.g.colors_name or 'carbonfox')
 end
 
@@ -105,15 +107,19 @@ function mrl.ui.refresh_palette()
   else
     -- Generic fallback: derive from highlight groups
     derived.pale_red = hex_from_hl('DiagnosticError', 'fg', defaults.pale_red)
-    derived.red = hex_from_hl('GitSignsDelete', 'fg', derived.pale_red or defaults.red)
-    derived.dark_orange = hex_from_hl('DiagnosticWarn', 'fg', defaults.dark_orange)
+    derived.red =
+      hex_from_hl('GitSignsDelete', 'fg', derived.pale_red or defaults.red)
+    derived.dark_orange =
+      hex_from_hl('DiagnosticWarn', 'fg', defaults.dark_orange)
     derived.teal = hex_from_hl('DiagnosticInfo', 'fg', defaults.teal)
-    derived.bright_blue = hex_from_hl('DiagnosticHint', 'fg', defaults.bright_blue)
+    derived.bright_blue =
+      hex_from_hl('DiagnosticHint', 'fg', defaults.bright_blue)
     derived.green = hex_from_hl('GitSignsAdd', 'fg', defaults.green)
     derived.blue = hex_from_hl('Function', 'fg', defaults.blue)
     derived.magenta = hex_from_hl('Statement', 'fg', defaults.magenta)
     derived.pale_pink = hex_from_hl('Special', 'fg', defaults.pale_pink)
-    derived.bright_yellow = hex_from_hl('WarningMsg', 'fg', defaults.bright_yellow)
+    derived.bright_yellow =
+      hex_from_hl('WarningMsg', 'fg', defaults.bright_yellow)
     derived.light_yellow = derived.bright_yellow
     derived.comment_grey = hex_from_hl('Comment', 'fg', defaults.comment_grey)
     derived.whitesmoke = hex_from_hl('Normal', 'fg', defaults.whitesmoke)
@@ -146,15 +152,9 @@ function mrl.ui.refresh_palette()
   end
 end
 
-mrl.ui.border = {
-  -- Custom border style:
-  -- ▗▄▄▄▖
-  -- ▐   ▌
-  -- ▝▀▀▀▘
-  box = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-  line = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-  rectangle = { '▗', '▄', '▖', '▌', '▘', '▀', '▝', '▐' },
-}
+-- Simplified border configuration - use "rounded" everywhere
+-- This is the standard Neovim border style name that works with most plugins
+mrl.ui.border = 'rounded'
 
 mrl.ui.icons = {
   separators = {
@@ -460,7 +460,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 mrl.ui.current = {
-  border = mrl.ui.border.box, -- Global border style
+  border = 'rounded', -- Global border style - use Neovim's built-in "rounded" style
   -- Float/popup background color source of truth.
   -- Kept as a function so it always matches the active colorscheme's Normal bg.
   float_bg = function()

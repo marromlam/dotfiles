@@ -613,6 +613,16 @@ return {
 
 
 
+
+
+
+
+
+
+
+
+
+
 -- BEGIN_WEZTERM_THEME: carbon-mist
 config.color_scheme = 'carbon-mist'
 -- END_WEZTERM_THEME: carbon-mist

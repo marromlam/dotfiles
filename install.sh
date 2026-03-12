@@ -32,8 +32,7 @@ echo "Machine: $MACHINEOS"
 REPO_URL=https://raw.githubusercontent.com/marromlam/dotfiles
 REPO_BRANCH=main
 mkdir -p ${HOME}/tmp
-curl -o ${HOME}/tmp/linuxbrew.sh $REPO_URL/$REPO_BRANCH/homebrew/linuxbrew.sh
-curl -o ${HOME}/tmp/homebrew.sh $REPO_URL/$REPO_BRANCH/homebrew/homebrew.sh
+curl -o ${HOME}/tmp/homebrew_install.sh $REPO_URL/$REPO_BRANCH/homebrew/install.sh
 curl -o ${HOME}/tmp/keys.sh $REPO_URL/$REPO_BRANCH/extra/keys.sh
 curl -o ${HOME}/tmp/dotfiles.sh $REPO_URL/$REPO_BRANCH/extra/dotfiles.sh
 curl -o ${HOME}/tmp/reload_shell $REPO_URL/$REPO_BRANCH/scripts/reload_shell
@@ -54,12 +53,12 @@ echo "Machine: $MACHINE"
 # if MACHINE is 'x64-wsl' then install wsl
 if [[ "$MACHINE" == "x64-wsl" ]]; then
 	bash $HOME/tmp/preflight_wsl.sh
+	bash $HOME/.dotfiles/setup/wsl_network_setup.sh
 	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-	ln -sf $HOME/Projects/personal/dotfiles/homebrew/BrewfileLinux $HOME/.Brewfile
 	sudo mkdir -p /home/linuxbrew/.linuxbrew
 	sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew
 	echo "Installing homebrew on Linux (forced=$0)"
-	bash ${HOME}/tmp/linuxbrew.sh $0
+	bash ${HOME}/tmp/homebrew_install.sh "$1"
 fi
 
 mkdir -p ~/Projects/{work,personal}

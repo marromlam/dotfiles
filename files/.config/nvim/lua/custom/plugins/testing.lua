@@ -46,7 +46,7 @@ return {
       require('neotest').setup({
         discovery = { enabled = true },
         diagnostic = { enabled = true },
-        floating = { border = mrl.ui.current.border },
+        floating = { border = 'rounded' },
         quickfix = { enabled = false, open = true },
         adapters = {
           require('neotest-plenary'),
