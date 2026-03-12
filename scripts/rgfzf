@@ -20,7 +20,7 @@ IFS=: read -ra selected < <(
 )
 
 if [[ ${selected[0]} == *.pdf ]]; then
-	[ -n "${selected[0]}" ] && termpdf.py "${selected[0]}" "+${selected[1]}"
+	[ -n "${selected[0]}" ] && pdfcat "${selected[0]}" "+${selected[1]}"
 else
 	[ -n "${selected[0]}" ] && $EDITOR "${selected[0]}" "+${selected[1]}"
 fi

@@ -10,7 +10,7 @@ def main(args):
 @result_handler(no_ui=True)
 def handle_result(args, result, target_window_id, boss):
     window_title = "live_preview"
-    termpdf_cmd = "termpdf.py"
+    pdfcat_cmd = "pdfcat"
 
     page = None
     if len(args) > 2:
@@ -19,7 +19,7 @@ def handle_result(args, result, target_window_id, boss):
     cmd = " ".join(
         [
             " ",  # this is intended, so it is not saved in history
-            termpdf_cmd,
+            pdfcat_cmd,
             # "--invert-colors",
             # "--transparent",
             f"--page-number {page}" if len(args) > 2 else "",
@@ -41,11 +41,10 @@ def handle_result(args, result, target_window_id, boss):
         if cmd in fg_cmd:
             # Send refresh
             boss.child_monitor.needs_write(window.id, b"\x12")
-        elif termpdf_cmd in fg_cmd:
-            # There is a termpdf.py running, but with a different doc
+        elif pdfcat_cmd in fg_cmd:
+            # There is a pdfcat running, but with a different doc
             # Send safe quit
             boss.child_monitor.needs_write(window.id, "q")
-            # boss.child_monitor.needs_write(window.id, "\x03")
             # Open the pdf
             run_cmd(window)
         else:
@@ -66,8 +65,7 @@ def handle_result(args, result, target_window_id, boss):
     active_window = tab.active_window
     # Create the new window
     window = tab.new_window(override_title=window_title, location="vsplit")
-    # Write the termpdf.py command
-    # boss.child_monitor.needs_write(window.id, "ssh gpu219\x0d")
+    # Write the pdfcat command
     run_cmd(window)
     # Switch the active window back to what it was
     boss.set_active_window(active_window)

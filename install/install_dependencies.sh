@@ -107,7 +107,7 @@ brew_tap_once() {
 	if brew tap | grep -qx "$tap"; then
 		return
 	fi
-	brew tap "$tap"
+	GIT_TERMINAL_PROMPT=0 brew tap "$tap" || echo "Warning: failed to tap $tap; skipping."
 }
 
 brew_install_once() {
@@ -166,8 +166,22 @@ install_kitty_linux() {
 }
 
 install_pdfcat() {
-	brew_tap_once "marromlam/pdfcat"
-	brew_install_once "marromlam/pdfcat/pdfcat"
+	local dest="$HOMEBREW_PREFIX/Cellar/pdfcat"
+
+	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
+		rm -rf "$dest" "$HOMEBREW_PREFIX/bin/pdfcat"
+	fi
+
+	if [[ -d "$dest" ]]; then
+		echo "pdfcat is already installed"
+		return
+	fi
+
+	git clone https://github.com/marromlam/pdfcat.git "$dest"
+	pushd "$dest" >/dev/null
+	"$HOMEBREW_PREFIX/bin/python3" -m pip install -e .
+	ln -sf "$dest/pdfcat" "$HOMEBREW_PREFIX/bin/pdfcat"
+	popd >/dev/null
 }
 
 install_rust() {
@@ -202,8 +216,8 @@ fi
 
 bootstrap_homebrew
 
-# shellcheck source=install/install_sonarqube.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=install/install_sonarqube.sh
 source "$SCRIPT_DIR/install_sonarqube.sh"
 
 TAPS_COMMON=(
