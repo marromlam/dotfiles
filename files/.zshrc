@@ -1,6 +1,7 @@
 # zsh shell config file
 
-[[ -f "$HOME/.zprofile" ]] && source "$HOME/.zprofile"
+# Source .zprofile for non-login interactive shells (login shells source it automatically)
+[[ -o login ]] || { [[ -f "$HOME/.zprofile" ]] && source "$HOME/.zprofile"; }
 source $HOME/.config/zsh/conda.sh
 
 # Use a minimal prompt in Cursor to avoid command detection issues

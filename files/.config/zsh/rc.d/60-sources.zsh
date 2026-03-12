@@ -1,5 +1,6 @@
 # Aliases and helpers
 source $HOME/.config/zsh/aliases.sh
+source $HOME/.config/zsh/utils.sh
 
 # common settings for bash and zsh
 source $HOME/.config/zsh/common.sh

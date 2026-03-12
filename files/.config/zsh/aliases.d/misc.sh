@@ -62,3 +62,5 @@ alias localip="ipconfig getifaddr en0"
 if which kitty >/dev/null; then
         alias icat="kitty +kitten icat"
 fi
+
+alias docker-cleanup='docker system prune -a --volumes'

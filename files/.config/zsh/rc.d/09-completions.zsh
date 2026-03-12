@@ -1,24 +1,22 @@
 # Completions
 [[ -o interactive ]] || return
 
+# Regenerate zcompdump at most once per day (login shells only)
+# Uses zsh/stat builtin to avoid forking date/stat subprocesses
 zcompdump_refresh() {
+  [[ -o login ]] || return
   local dump="$HOME/.cache/zsh/zcompdump"
   local stamp="$HOME/.cache/zsh/.zcompdump_refresh"
-  [[ -o login ]] || return
-  if [[ -f $stamp ]]; then
-    local now=$(date +%s)
-    local mtime=$(stat -f %m $stamp 2>/dev/null || echo 0)
-    (( now - mtime < 86400 )) && return
+  zmodload -F zsh/stat b:zstat 2>/dev/null || return
+  local -A st
+  if zstat -H st "$stamp" 2>/dev/null; then
+    (( EPOCHSECONDS - st[mtime] < 86400 )) && return
   fi
-  if [[ -f $dump ]]; then
-    local now=$(date +%s)
-    local mtime=$(stat -f %m $dump 2>/dev/null || echo 0)
-    if (( now - mtime > 604800 )); then
-      rm -f $dump
-    fi
+  if zstat -H st "$dump" 2>/dev/null; then
+    (( EPOCHSECONDS - st[mtime] > 604800 )) && rm -f "$dump"
   fi
   mkdir -p "$HOME/.cache/zsh"
-  date +%s > "$stamp"
+  touch "$stamp"
 }
 
 zcompdump_refresh
