@@ -42,6 +42,15 @@ if [[ -f "$DOTFILES/requirements.txt" ]]; then
 fi
 
 # ------------------------------------------------------------------------------
+# Local gitconfig (machine-specific overrides, not tracked)
+# ------------------------------------------------------------------------------
+if [[ ! -f ~/.gitconfig.local ]]; then
+  step "Creating ~/.gitconfig.local from template"
+  cp "$DOTFILES/files/config.template" ~/.gitconfig.local
+  echo "  Edit ~/.gitconfig.local to set your name/email"
+fi
+
+# ------------------------------------------------------------------------------
 # tmux plugins via TPM
 # ------------------------------------------------------------------------------
 step "Installing tmux plugins"

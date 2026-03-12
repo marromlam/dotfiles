@@ -58,6 +58,14 @@ if [[ -d "$PRIVATE_SSH" && ( ! -e ~/.ssh || $FORCE -eq 1 ) ]]; then
   echo "  link  ~/.ssh -> $PRIVATE_SSH"
 fi
 
+# ------------------------------------------------------------------------------
+# Clean broken symlinks in $HOME (equivalent to dotbot's clean: ["~"])
+# ------------------------------------------------------------------------------
+echo "==> Cleaning broken symlinks in $HOME"
+find "$HOME" -maxdepth 1 -type l | while read -r link; do
+  [[ -e "$link" ]] || { echo "  clean $link"; rm "$link"; }
+done
+
 echo
 echo "Done."
 
