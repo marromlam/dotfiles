@@ -105,4 +105,12 @@ files/.config/bat/themes/backups
 files/.config/eza/themes/backups
 files/.config/*/themes/backups
 files/.config/wezterm/colors/backups/
-files/.claude/
+.claude/
+
+files/.config/cagent/.cagent_first_run
+
+files/.config/*/themes/*
+files/.config/*/colors/*
+
+
+
