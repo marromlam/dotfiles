@@ -1,0 +1,17 @@
+## Minimal calcurse config (terminal theme drives colors)
+appearance.theme=default on default
+appearance.notifybar=yes
+format.notifydate=%a %F
+format.notifytime=%T
+
+general.autosave=yes
+general.confirmquit=yes
+general.confirmdelete=yes
+general.firstdayofweek=monday
+
+format.inputdate=1
+format.outputdate=%D
+
+notification.warning=300
+notification.command=printf '\a'
+notification.notifyall=flagged-only

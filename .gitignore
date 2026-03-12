@@ -68,7 +68,7 @@ zsh/plugins/*
 # 
 files/.config/google-chrome
 files/.config/pulse
-files/.config/browsh/firefox_profile/*
+files/.config/browsh/firefox_profile/
 package-lock.json
 yarn.lock
 node_modules/*
@@ -95,7 +95,7 @@ package.sjon
 
 # other stuff
 files/.config/pdftex-figures/roots
-files/.config/browsh/firefox_profile
+files/.config/browsh/firefox_profile/
 files/.config/kitty/kitty.conf.bak
 files/.config/go/telemetry
 files/.config/tmux/themes/backups

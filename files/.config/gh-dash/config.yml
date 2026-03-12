@@ -1,17 +1,17 @@
 prSections:
-  - title: My Pull Requests
-    filters: is:open author:marromlam author:propylon-marcos
-  - title: Needs My Review
-    filters: is:pr is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos
-  - title: Neovim Issues
-    filters: is:open repo:neovim/neovim
+  - title: "My PRs"
+    filters: "is:open author:marromlam"
+  - title: "My Work PRs"
+    filters: "is:open author:propylon-marcos"
+  - title: "Needs My Review"
+    filters: "is:pr is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos"
+  - title: "Neovim Issues"
+    filters: "is:open repo:neovim/neovim"
 issuesSections:
-  - title: My Open Source Projects
-    filters: is:issue is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos
-  - title: My Issues
-    filters: is:open author:marromlam author:propylon-marcos
-  - title: Neovim Issues
-    filters: is:open repo:neovim/neovim
+  - title: "My Open Source Projects"
+    filters: "is:issue is:open archived:false sort:updated-desc user:marromlam user:propylon-marcos"
+  - title: "My Issues (marromlam)"
+    filters: "is:open author:marromlam"
 defaults:
   preview:
     open: true

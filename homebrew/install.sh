@@ -56,7 +56,10 @@ ensure_prefix_dir() {
 
 install_homebrew_macos() {
 	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
-		sudo rm -rf "$HOMEBREW_PREFIX"
+		if [[ -d "$HOMEBREW_PREFIX" ]]; then
+			# Remove contents without deleting the prefix directory itself.
+			sudo bash -c 'shopt -s dotglob nullglob; rm -rf "$1"/*' _ "$HOMEBREW_PREFIX"
+		fi
 	fi
 
 	if [[ ! -d "$HOMEBREW_PREFIX" ]]; then
@@ -69,7 +72,10 @@ install_homebrew_macos() {
 
 install_homebrew_linux() {
 	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
-		sudo rm -rf "$HOMEBREW_PREFIX"
+		if [[ -d "$HOMEBREW_PREFIX" ]]; then
+			# Remove contents without deleting the prefix directory itself.
+			sudo bash -c 'shopt -s dotglob nullglob; rm -rf "$1"/*' _ "$HOMEBREW_PREFIX"
+		fi
 	fi
 
 	if [[ -d "$HOMEBREW_PREFIX/bin" ]]; then
@@ -113,7 +119,14 @@ brew_install_once() {
 	if brew list --formula "$pkg" >/dev/null 2>&1; then
 		return
 	fi
-	brew install "$pkg"
+	if brew install "$pkg"; then
+		return
+	fi
+	echo "brew install failed for ${pkg}; attempting reinstall..."
+	if brew reinstall "$pkg"; then
+		return
+	fi
+	echo "brew reinstall failed for ${pkg}; continuing."
 }
 
 brew_install_cask_once() {
@@ -121,7 +134,14 @@ brew_install_cask_once() {
 	if brew list --cask "$pkg" >/dev/null 2>&1; then
 		return
 	fi
-	brew install --cask "$pkg"
+	if brew install --cask "$pkg"; then
+		return
+	fi
+	echo "brew install --cask failed for ${pkg}; attempting reinstall..."
+	if brew reinstall --cask "$pkg"; then
+		return
+	fi
+	echo "brew reinstall --cask failed for ${pkg}; continuing."
 }
 
 install_kitty_linux() {
@@ -227,6 +247,7 @@ BREW_MAC=(
 	"stow"
 	"eza"
 	"otree"
+	"coreutils"
 	"gd"
 	"asdf"
 	"node"

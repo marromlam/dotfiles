@@ -58,7 +58,6 @@ brew "yt-dlp"
 # brew "mosh"                       # similar to ssh
 
 # Window manager
-# brew "yabai"
 # brew "skhd"                     # control
 
 #brew "starship"

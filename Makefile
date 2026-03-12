@@ -9,6 +9,7 @@ all: brew macos kitty nvim vim tmux fzf-marks private zsh-plugins
 
 test:
 	${HOME}/.dotfiles/tests/zsh/sanity.sh
+	${HOME}/.dotfiles/tests/tmux/sanity.sh
 
 macos:
 	${FC}/extra/macos/macos_settings.sh
