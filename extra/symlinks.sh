@@ -9,6 +9,20 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# ------------------------------------------------------------------------------
+# Ensure stow is available (installed by Homebrew, which may not have run yet)
+# ------------------------------------------------------------------------------
+if ! command -v stow >/dev/null 2>&1; then
+  if command -v brew >/dev/null 2>&1; then
+    echo "==> Installing stow via Homebrew"
+    brew install stow
+  else
+    echo "Error: stow not found and Homebrew is not available." >&2
+    echo "Install stow manually (e.g. brew install stow) and re-run." >&2
+    exit 1
+  fi
+fi
 FORCE=0
 [[ "${1:-}" == "--force" ]] && FORCE=1
 

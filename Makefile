@@ -16,7 +16,10 @@ macos:
 	# now we change the keymaps
 	bash extra/keyboard.sh
 
-install:
+homebrew:
+	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+install: homebrew
 	bash ${FC}/extra/symlinks.sh
 	rm -rf ~/Downloads; ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads
 
@@ -101,4 +104,4 @@ zsh-plugins:
 	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
 	
 
-.PHONY: all install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
