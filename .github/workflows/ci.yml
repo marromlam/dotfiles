@@ -15,50 +15,45 @@ jobs:
         with:
           submodules: false
 
-      - name: Set up dotfiles at ~/.dotfiles
+      - name: Set up machine identifier
+        run: echo "x64-linux" > "$HOME/.machine"
+
+      - name: install_dependencies.sh (Homebrew + packages)
+        run: bash install/install_dependencies.sh
+
+      - name: make install (symlinks)
         run: |
-          ln -sfn "$PWD" "$HOME/.dotfiles"
-          echo "x64-linux" > "$HOME/.machine"
-
-      - name: Install prerequisites
-        run: sudo apt-get update -qq && sudo apt-get install -y stow git
-
-      - name: Run symlinks
-        run: bash extra/symlinks.sh
+          mkdir -p "$HOME/Projects/personal"
+          ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
+          make install
 
       - name: Assert key symlinks exist
         run: |
           assert_link() {
             if [[ ! -L "$1" ]]; then
               echo "FAIL: expected symlink at $1"
+              ls -la "$(dirname "$1")" || true
               exit 1
             fi
             echo "OK: $1 -> $(readlink "$1")"
           }
-          # Root dotfiles
           assert_link "$HOME/.zshrc"
           assert_link "$HOME/.zshenv"
           assert_link "$HOME/.zprofile"
           assert_link "$HOME/.gitconfig"
           assert_link "$HOME/.bashrc"
-          # .config entries
           assert_link "$HOME/.config/nvim"
           assert_link "$HOME/.config/zsh"
           assert_link "$HOME/.config/tmux"
           assert_link "$HOME/.config/git"
-          # ~/.dotfiles self-link (created by symlinks.sh)
           assert_link "$HOME/.dotfiles"
-
-      - name: Assert ~/.machine is set
-        run: |
-          [[ -f "$HOME/.machine" ]] && echo "OK: ~/.machine = $(cat ~/.machine)" || { echo "FAIL: ~/.machine missing"; exit 1; }
 
       - name: Assert zshenv sets ZDOTDIR
         run: |
-          result=$(bash -c 'source "$HOME/.zshenv" 2>/dev/null; echo $ZDOTDIR')
+          result=$(bash -c 'source "$HOME/.zshenv" 2>/dev/null; echo "$ZDOTDIR"')
           [[ "$result" == "$HOME/.config/zsh" ]] \
             && echo "OK: ZDOTDIR=$result" \
-            || { echo "FAIL: ZDOTDIR not set correctly (got: $result)"; exit 1; }
+            || { echo "FAIL: ZDOTDIR='$result'"; exit 1; }
 
   lint:
     name: Lint
