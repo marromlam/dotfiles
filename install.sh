@@ -14,7 +14,7 @@ step() { echo; echo "==> $*"; }
 # ------------------------------------------------------------------------------
 detect_machine() {
 	if [[ -f "$HOME/.machine" ]]; then
-		echo "~/.machine already set: $(cat "$HOME/.machine")"
+		echo "$HOME/.machine already set: $(cat "$HOME/.machine")"
 		return
 	fi
 
