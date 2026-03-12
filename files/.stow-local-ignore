@@ -1,0 +1,5 @@
+# Files to ignore when stowing
+\.DS_Store
+\.git
+config\.template
+others\.md
