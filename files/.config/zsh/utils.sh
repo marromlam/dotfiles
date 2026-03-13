@@ -116,7 +116,6 @@ alias kill_jupyter="kill $(netstat -tulpn 2>&1 | pgrep jupyter)"
   /opt/homebrew/bin/claude --print "$query"
 }
 
-# vim: fdm=marker ft=zsh
 
 # Get current environment name
 get_env() {
@@ -128,3 +127,5 @@ get_env() {
     echo "syst"
   fi
 }
+
+# vim: fdm=marker ft=bash
