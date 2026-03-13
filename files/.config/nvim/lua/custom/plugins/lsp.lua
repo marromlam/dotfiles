@@ -187,6 +187,7 @@ return { -- LSP Configuration & Plugins
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
           if
             client
             and client.server_capabilities.inlayHintProvider

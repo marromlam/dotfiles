@@ -693,7 +693,7 @@ end
 -- Window dimming: Dim inactive windows for better focus
 do
   local group = vim.api.nvim_create_augroup('WindowDimming', { clear = true })
-  
+
   vim.api.nvim_create_autocmd('WinLeave', {
     group = group,
     callback = function()
@@ -704,7 +704,7 @@ do
       end
     end,
   })
-  
+
   vim.api.nvim_create_autocmd('WinEnter', {
     group = group,
     callback = function()
