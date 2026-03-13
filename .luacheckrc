@@ -11,6 +11,7 @@ ignore = {
     "213", -- unused loop variable
     "311", -- value assigned to variable is overwritten
     "312", -- value of field is overwritten
+    "314", -- value assigned to field is overwritten before use
     "411", -- redefining a local variable
     "412", -- redefining an argument
     "421", -- shadowing a local variable
