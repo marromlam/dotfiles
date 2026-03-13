@@ -16,6 +16,9 @@ macos:
 	# now we change the keymaps
 	bash extra/keyboard.sh
 
+update:
+	brew update && brew upgrade && brew update && brew upgrade && brew cleanup
+
 homebrew:
 	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
