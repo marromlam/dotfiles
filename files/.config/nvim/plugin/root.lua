@@ -1,18 +1,5 @@
-if not mrl then return end
-
--- Helper to safely call augroup, deferring if not available yet
-local function augroup(name, ...)
-  local args = { ... }
-  if mrl and mrl.augroup then
-    return mrl.augroup(name, unpack(args))
-  else
-    vim.schedule(function()
-      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
-    end)
-  end
-end
-
-local fn, fs, api = vim.fn, vim.fs, vim.api
+local augroup = require('tools').augroup
+local fn, fs = vim.fn, vim.fs
 
 -------------------------------------------------------------------------------
 --  Project root finder
@@ -50,7 +37,7 @@ local function get_lsp_root(buf)
 end
 
 local function set_root_directory(args)
-  local path = api.nvim_buf_get_name(args.buf)
+  local path = vim.api.nvim_buf_get_name(args.buf)
   if path == '' then return end
   path = fs.dirname(path)
 

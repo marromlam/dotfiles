@@ -18,7 +18,7 @@ augroup quickfix
 augroup END
 ]])
 
-function mrl.external_grep(word, no_ignore)
+local function external_grep(word, no_ignore)
   local word0 = (word or vim.fn.input('RG  '))
   if no_ignore then
     vim.cmd((('silent grep ' .. word0) .. ' --no-ignore'))
@@ -31,7 +31,7 @@ end
 vim.keymap.set(
   'n',
   '<leader>fS',
-  mrl.external_grep,
+  external_grep,
   { desc = 'Ripgrep to QuickFix' }
 )
 

@@ -1,9 +1,10 @@
-local fn, api, v, fmt =
-  vim.fn, vim.api, vim.v, string.format
+local fn, api, fmt = vim.fn, vim.api, string.format
+
+local M = {}
 
 -- colors {{{
 
-function mrl.get_hi(name, id)
+function M.get_hi(name, id)
   id = id or 0
   local hi = vim.api.nvim_get_hl(0, { name = name })
   -- hi is a table with bg and fg keys. for those we want to return the hex
@@ -18,7 +19,7 @@ end
 --------------------------------------------------------------------------------
 
 -- Commands {{{
-function mrl.command(name, rhs, opts)
+function M.command(name, rhs, opts)
   opts = opts or {}
   api.nvim_create_user_command(name, rhs, opts)
 end
@@ -31,7 +32,7 @@ end
 ---@param ... any
 ---@return boolean, any
 ---@overload fun(func: function, ...): boolean, any
-function mrl.pcall(msg, func, ...)
+function M.pcall(msg, func, ...)
   local args = { ... }
   if type(msg) == 'function' then
     local arg = func --[[@as any]]
@@ -48,7 +49,7 @@ function mrl.pcall(msg, func, ...)
 end
 
 local LATEST_NIGHTLY_MINOR = 10
-function mrl.nightly() return vim.version().minor >= LATEST_NIGHTLY_MINOR end
+function M.nightly() return vim.version().minor >= LATEST_NIGHTLY_MINOR end
 
 -- }}}
 
@@ -58,7 +59,7 @@ function mrl.nightly() return vim.version().minor >= LATEST_NIGHTLY_MINOR end
 ---Determine if a value of any type is empty
 ---@param item any
 ---@return boolean?
-function mrl.falsy(item)
+function M.falsy(item)
   if not item then return true end
   local item_type = type(item)
   if item_type == 'boolean' then return not item end
@@ -71,7 +72,7 @@ end
 ---@generic T:table
 ---@param callback fun(item: T, key: any)
 ---@param list table<any, T>
-function mrl.foreach(callback, list)
+function M.foreach(callback, list)
   for k, v in pairs(list) do
     callback(v, k)
   end
@@ -81,7 +82,7 @@ end
 ---@param target string
 ---@param list string[]
 ---@return boolean
-function mrl.any(target, list)
+function M.any(target, list)
   for _, item in ipairs(list) do
     if target:match(item) then return true end
   end
@@ -93,7 +94,7 @@ end
 ---@param matcher fun(arg: T):boolean
 ---@param haystack T[]
 ---@return T?
-function mrl.find(matcher, haystack)
+function M.find(matcher, haystack)
   for _, needle in ipairs(haystack) do
     if matcher(needle) then return needle end
   end
@@ -104,7 +105,7 @@ end
 ---all the table's keys for a match using `string.match`
 ---@param map T
 ---@return T
-function mrl.p_table(map)
+function M.p_table(map)
   return setmetatable(map, {
     __index = function(tbl, key)
       if not key then return end
@@ -118,13 +119,13 @@ end
 ---check if a certain feature/version/commit exists in nvim
 ---@param feature string
 ---@return boolean
-function mrl.has(feature) return fn.has(feature) > 0 end
+function M.has(feature) return fn.has(feature) > 0 end
 
 -- }}}
 --------------------------------------------------------------------------------
 
 -- Functional utilities {{{
-function mrl.fold(callback, list, accum)
+function M.fold(callback, list, accum)
   accum = accum or {}
   for k, v in pairs(list) do
     accum = callback(accum, v, k)
@@ -137,8 +138,8 @@ end
 ---@param callback fun(item: T, key: string | number, list: T[]): T
 ---@param list T[]
 ---@return T[]
-function mrl.map(callback, list)
-  return mrl.fold(function(accum, v, k)
+function M.map(callback, list)
+  return M.fold(function(accum, v, k)
     accum[#accum + 1] = callback(v, k, accum)
     return accum
   end, list, {})
@@ -150,11 +151,11 @@ end
 
 local autocmd_keys =
   { 'event', 'buffer', 'pattern', 'desc', 'command', 'group', 'once', 'nested' }
---- Validate the keys passed to mrl.augroup are valid
+--- Validate the keys passed to M.augroup are valid
 ---@param name string
 ---@param command Autocommand
 local function validate_autocmd(name, command)
-  local incorrect = mrl.fold(function(accum, _, key)
+  local incorrect = M.fold(function(accum, _, key)
     if not vim.tbl_contains(autocmd_keys, key) then table.insert(accum, key) end
     return accum
   end, command, {})
@@ -172,7 +173,7 @@ end
 ---@param name string The name of the autocommand group
 ---@param ... Autocommand A list of autocommands to create
 ---@return number
-function mrl.augroup(name, ...)
+function M.augroup(name, ...)
   local commands = { ... }
   assert(name ~= 'User', 'The name of an augroup CANNOT be User')
   assert(
@@ -211,7 +212,7 @@ end
 ---
 --- Will only require the module after the first index of a module.
 --- Only works for modules that export a table.
-function mrl.require_for_later_index(require_path)
+function M.require_for_later_index(require_path)
   return setmetatable({}, {
     __index = function(_, key) return require(require_path)[key] end,
     __newindex = function(_, key, value) require(require_path)[key] = value end,
@@ -235,7 +236,7 @@ end
 --- ```
 ---@param require_path string
 ---@return table<string, fun(...): any>
-function mrl.require_for_later_call(require_path)
+function M.require_for_later_call(require_path)
   return setmetatable({}, {
     __index = function(_, k)
       return function(...) return require(require_path)[k](...) end
@@ -251,7 +252,7 @@ end
 --- https://vim.fandom.com/wiki/Automatically_fitting_a_quickfix_window_height
 ---@param min_height number
 ---@param max_height number
-function mrl.adjust_split_height(min_height, max_height)
+function M.adjust_split_height(min_height, max_height)
   api.nvim_win_set_height(
     0,
     math.max(math.min(fn.line('$'), max_height), min_height)
@@ -266,10 +267,12 @@ end
 ---@param str string
 ---@param max_len integer
 ---@return string
-function mrl.truncate(str, max_len)
+function M.truncate(str, max_len)
   assert(str and max_len, 'string and max_len must be provided')
-  return api.nvim_strwidth(str) > max_len
-      and str:sub(1, max_len) .. mrl.ui.icons.misc.ellipsis
+  local ellipsis = require('custom.ui').icons.misc.ellipsis
+  return api.nvim_strwidth(str) > max_len and str:sub(1, max_len) .. ellipsis
     or str
 end
 -- }}}
+
+return M
