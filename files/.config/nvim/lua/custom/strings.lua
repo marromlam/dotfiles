@@ -1,7 +1,8 @@
 --  FORMAT STRINGS
 
+local T = require('tools')
 local api, L = vim.api, vim.log.levels
-local fmt, falsy = string.format, mrl.falsy
+local fmt, falsy = string.format, T.falsy
 
 ---@alias StringComponent {component: string, length: integer, priority: integer}
 
@@ -94,8 +95,8 @@ local function chunks_to_string(chunks)
       if type(text) ~= 'string' then text = tostring(text) end
       if item.max_size then text = truncate_string(text, item.max_size) end
       text = text:gsub('%%', '%%%1')
-      strings[#strings + 1] =
-        not falsy(hl) and ('%%#%s#%s%%*'):format(hl, text) or text
+      strings[#strings + 1] = not falsy(hl) and ('%%#%s#%s%%*'):format(hl, text)
+        or text
     end
   end
   return table.concat(strings, '')
@@ -154,7 +155,7 @@ end
 -------------------------------------------------------------------------------
 
 local function sum_lengths(list)
-  return mrl.fold(
+  return T.fold(
     function(acc, item) return acc + (item.length or 0) end,
     list,
     0
@@ -200,14 +201,14 @@ end
 --- @param available_space number?
 --- @return string
 function M.display(sections, available_space)
-  local components = mrl.fold(function(acc, section, count)
+  local components = T.fold(function(acc, section, count)
     if #section == 0 then
       table.insert(acc, separator())
       return acc
     end
-    mrl.foreach(function(args, index)
+    T.foreach(function(args, index)
       if not args then return end
-      local ok, str = mrl.pcall('Error creating component', component, args)
+      local ok, str = T.pcall('Error creating component', component, args)
       if not ok then return end
       table.insert(acc, str)
       if #section == index and count ~= #sections then
