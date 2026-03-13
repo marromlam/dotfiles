@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-@CURSOR@
 set -eou pipefail
+
+@CURSOR@
 
 # vim:foldmethod=marker

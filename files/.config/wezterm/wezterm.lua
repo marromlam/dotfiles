@@ -623,8 +623,16 @@ return {
 
 
 
--- BEGIN_WEZTERM_THEME: carbon-mist
-config.color_scheme = 'carbon-mist'
--- END_WEZTERM_THEME: carbon-mist
+
+
+
+
+
+
+
+
+-- BEGIN_WEZTERM_THEME: amberglow
+config.color_scheme = 'amberglow'
+-- END_WEZTERM_THEME: amberglow
 
 -- vim: fdm=marker ts=2 sw=2 sts=2 et

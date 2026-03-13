@@ -20,7 +20,6 @@ alias x="exit" # Exit Terminal
 alias del="rm -rf"
 alias dots="cd $DOTFILES"
 alias coding="cd $PROJECTS_DIR"
-alias lp="lsp"
 
 # ssh aliases {{{
 
