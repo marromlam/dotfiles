@@ -1,26 +1,19 @@
-if
-  not mrl
-  or not mrl.ui
-  or not mrl.ui.statuscolumn
-  or not mrl.ui.statuscolumn.enable
-then
-  return
-end
+local UI = require('tools').ui
 
--- Custom statuscolumn inspired by akinsho:
--- - separates git signs from other signs
--- - shows fold marker
--- - can be disabled per buffer via your "decorations" presets
-
-mrl.ui.statuscolumn = mrl.ui.statuscolumn or {}
+_G.Stlcol = {}
 
 local api, fn = vim.api, vim.fn
 local v = vim.v
 local space = ' '
-local icons = (mrl.ui and mrl.ui.icons and mrl.ui.icons.separators) or {}
-local diag_icons = (mrl.ui and mrl.ui.icons and mrl.ui.icons.lsp) or {}
+local icons = UI.icons.separators or {}
+local diag_icons = UI.icons.lsp or {}
 local diag_warn_icon = diag_icons.warn or 'W'
 local diag_err_icon = diag_icons.error or 'E'
+
+local cfg = {
+  number_width = 3,
+  hide_diag_on_cursorline = true,
+}
 
 local function hl(hl_group, text)
   if not hl_group or hl_group == '' then return text end
@@ -72,7 +65,7 @@ local function fold_mark(lnum)
 end
 
 local function format_number(win, lnum, relnum, virtnum, line_count)
-  local min_width = mrl.ui.statuscolumn.number_width or vim.o.numberwidth or 0
+  local min_width = cfg.number_width or vim.o.numberwidth or 0
   local col_width = math.max(api.nvim_strwidth(tostring(line_count)), min_width)
   if virtnum and virtnum ~= 0 then
     -- virtual line: show a subtle placeholder
@@ -178,8 +171,8 @@ end
 
 local function should_disable(buf, ft)
   if vim.bo[buf].buftype ~= '' then return true end
-  if not mrl.ui.decorations or not mrl.ui.decorations.get then return false end
-  local decor = mrl.ui.decorations.get({
+  if not UI.decorations or not UI.decorations.get then return false end
+  local decor = UI.decorations.get({
     ft = ft,
     bt = vim.bo[buf].buftype,
     setting = 'statuscolumn',
@@ -188,7 +181,7 @@ local function should_disable(buf, ft)
     and (decor.ft == false or decor.bt == false or decor.fname == false)
 end
 
-function mrl.ui.statuscolumn.render()
+function Stlcol.render()
   local win = tonumber(vim.g.statusline_winid) or api.nvim_get_current_win()
   local buf = api.nvim_win_get_buf(win)
   local ft = vim.bo[buf].filetype
@@ -198,7 +191,7 @@ function mrl.ui.statuscolumn.render()
   local line_count = api.nvim_buf_line_count(buf)
   local cursor_line = api.nvim_win_get_cursor(win)[1]
 
-  local hide_diag_on_cursorline = mrl.ui.statuscolumn.hide_diag_on_cursorline
+  local hide_diag_on_cursorline = cfg.hide_diag_on_cursorline
   local diag = (hide_diag_on_cursorline and lnum == cursor_line) and ' '
     or best_diag(buf, lnum - 1)
   local git = best_sign(buf, lnum - 1, true)
@@ -216,11 +209,11 @@ function mrl.ui.statuscolumn.render()
   })
 end
 
-vim.o.statuscolumn = '%{%v:lua.mrl.ui.statuscolumn.render()%}'
+vim.o.statuscolumn = '%{%v:lua.Stlcol.render()%}'
 
 -- Disable statuscolumn for buffers where your decorations preset says so.
 api.nvim_create_autocmd({ 'BufEnter', 'FileType' }, {
-  group = api.nvim_create_augroup('MrlStatusColumn', { clear = true }),
+  group = api.nvim_create_augroup('StatusColumn', { clear = true }),
   callback = function(args)
     local buf = args.buf
     local ft = vim.bo[buf].filetype
@@ -259,7 +252,7 @@ api.nvim_create_autocmd({ 'BufEnter', 'FileType' }, {
 
 -- Clear extmark cache when signs/diagnostics update to ensure fresh data
 api.nvim_create_autocmd({ 'DiagnosticChanged', 'User' }, {
-  group = api.nvim_create_augroup('MrlStatusColumnCache', { clear = true }),
+  group = api.nvim_create_augroup('StatusColumnCache', { clear = true }),
   pattern = { '*', 'GitSignsUpdate' },
   callback = function()
     -- Clear the cache on diagnostic/sign changes

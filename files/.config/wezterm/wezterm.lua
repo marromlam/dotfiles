@@ -580,59 +580,10 @@ return {
   },
   -- default_gui_startup_args = { 'connect', 'wsl' },
   -- }}}
+
+  -- BEGIN_WEZTERM_THEME
+  color_scheme = 'amberglow',
+  -- END_WEZTERM_THEME
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- BEGIN_WEZTERM_THEME: amberglow
-config.color_scheme = 'amberglow'
--- END_WEZTERM_THEME: amberglow
 
 -- vim: fdm=marker ts=2 sw=2 sts=2 et
