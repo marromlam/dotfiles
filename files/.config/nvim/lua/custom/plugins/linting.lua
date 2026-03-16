@@ -33,9 +33,7 @@ return {
       for _, name in ipairs(names) do
         local linter = lint.linters and lint.linters[name] or nil
         local cmd = linter and (linter.cmd or linter.command) or nil
-        if exe(cmd) then
-          return true
-        end
+        if exe(cmd) then return true end
       end
       return false
     end
@@ -57,6 +55,14 @@ return {
       text = { 'vale' },
     }
     lint.linters_by_ft['clojure'] = nil -- example on how to disable
+
+    lint.linters.flake8 = lint.linters.flake8 or {}
+
+    lint.linters.mypy = lint.linters.mypy or {}
+
+    lint.linters.eslint_d = lint.linters.eslint_d or {}
+
+    lint.linters.luacheck = lint.linters.luacheck or {}
 
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 

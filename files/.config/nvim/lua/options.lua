@@ -29,7 +29,7 @@ vim.o.background = 'dark' -- or "light"
 -- }}}
 
 -- Timings {{{
-vim.opt.updatetime = 500
+vim.opt.updatetime = 1000  -- Increased from 500 to reduce CursorHold frequency (improves scrolling perf)
 vim.opt.timeout = true
 vim.opt.timeoutlen = 500
 -- }}}
@@ -296,8 +296,32 @@ vim.g.netrw_winsize = 25
 
 vim.opt.isfname:append('@-@')
 
--- Diagnostics
-vim.diagnostic.config({ virtual_text = false })
+-- Diagnostics and default borders
+-- Global border style: Use 'rounded' for all floating windows
+-- This sets the default for diagnostic floats. Individual plugins are configured
+-- to use 'rounded' borders in their respective plugin files (see lua/custom/plugins/).
+vim.diagnostic.config({
+  virtual_text = false,
+  float = { border = 'rounded' },
+})
+
+-- Wrap vim.diagnostic.open_float to disable all columns in diagnostic floats
+do
+  local orig_open_float = vim.diagnostic.open_float
+  ---@diagnostic disable-next-line: duplicate-set-field
+  vim.diagnostic.open_float = function(opts, ...)
+    opts = opts or {}
+    local bufnr, winnr = orig_open_float(opts, ...)
+    if winnr and vim.api.nvim_win_is_valid(winnr) then
+      vim.wo[winnr].statuscolumn = ''
+      vim.wo[winnr].signcolumn = 'no'
+      vim.wo[winnr].foldcolumn = '0'
+      vim.wo[winnr].number = false
+      vim.wo[winnr].relativenumber = false
+    end
+    return bufnr, winnr
+  end
+end
 
 -- Custom filetype detection (Folke's pattern)
 vim.filetype.add({

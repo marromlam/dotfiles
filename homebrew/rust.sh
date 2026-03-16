@@ -13,7 +13,6 @@
 
 # brew install rust   # only one version of rust
 # brew install rustup # several versions fo rust
-brew install rust-analyzer
 rustup-init
 
 rustup component add rustfmt

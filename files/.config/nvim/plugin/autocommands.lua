@@ -22,57 +22,57 @@ local fn, api, v, env, cmd, fmt =
 
 -- Highlight lines starting with '##' (headings) using a lightweight sign group.
 -- This replaces the old Vimscript that unplaced/placed signs across 1000 ids.
-do
-  local group = api.nvim_create_augroup('HeadingLineSign', { clear = true })
-  local sign_name = 'highlightline'
-  local sign_group = 'headingline'
-  local debounce_ms = 120
-  local pending = {} ---@type table<integer, uv_timer_t?>
-
-  -- Define sign once (safe to call multiple times).
-  pcall(fn.sign_define, sign_name, { linehl = 'Match' })
-
-  local function update(bufnr)
-    if not api.nvim_buf_is_valid(bufnr) then return end
-    if vim.bo[bufnr].buftype ~= '' then return end
-
-    local ft = vim.bo[bufnr].filetype
-    if ft ~= 'markdown' and ft ~= 'org' and ft ~= 'norg' then return end
-
-    pcall(fn.sign_unplace, sign_group, { buffer = bufnr })
-
-    local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    for i, line in ipairs(lines) do
-      if line:match('^%s*##') then
-        -- id=0 lets Vim allocate IDs; placing is scoped to sign_group+buffer.
-        pcall(fn.sign_place, 0, sign_group, sign_name, bufnr, {
-          lnum = i,
-          priority = 10,
-        })
-      end
-    end
-  end
-
-  local function schedule(bufnr)
-    if pending[bufnr] then
-      pending[bufnr]:stop()
-      pending[bufnr]:close()
-      pending[bufnr] = nil
-    end
-    pending[bufnr] = vim.defer_fn(function()
-      pending[bufnr] = nil
-      update(bufnr)
-    end, debounce_ms)
-  end
-
-  api.nvim_create_autocmd(
-    { 'BufWinEnter', 'TextChanged', 'TextChangedI', 'TextChangedP' },
-    {
-      group = group,
-      callback = function(args) schedule(args.buf) end,
-    }
-  )
-end
+-- do
+--   local group = api.nvim_create_augroup('HeadingLineSign', { clear = true })
+--   local sign_name = 'highlightline'
+--   local sign_group = 'headingline'
+--   local debounce_ms = 120
+--   local pending = {} ---@type table<integer, uv_timer_t?>
+--
+--   -- Define sign once (safe to call multiple times).
+--   pcall(fn.sign_define, sign_name, { linehl = 'Match' })
+--
+--   local function update(bufnr)
+--     if not api.nvim_buf_is_valid(bufnr) then return end
+--     if vim.bo[bufnr].buftype ~= '' then return end
+--
+--     local ft = vim.bo[bufnr].filetype
+--     if ft ~= 'markdown' and ft ~= 'org' and ft ~= 'norg' then return end
+--
+--     pcall(fn.sign_unplace, sign_group, { buffer = bufnr })
+--
+--     local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
+--     for i, line in ipairs(lines) do
+--       if line:match('^%s*##') then
+--         -- id=0 lets Vim allocate IDs; placing is scoped to sign_group+buffer.
+--         pcall(fn.sign_place, 0, sign_group, sign_name, bufnr, {
+--           lnum = i,
+--           priority = 10,
+--         })
+--       end
+--     end
+--   end
+--
+--   local function schedule(bufnr)
+--     if pending[bufnr] then
+--       pending[bufnr]:stop()
+--       pending[bufnr]:close()
+--       pending[bufnr] = nil
+--     end
+--     pending[bufnr] = vim.defer_fn(function()
+--       pending[bufnr] = nil
+--       update(bufnr)
+--     end, debounce_ms)
+--   end
+--
+--   api.nvim_create_autocmd(
+--     { 'BufWinEnter', 'TextChanged', 'TextChangedI', 'TextChangedP' },
+--     {
+--       group = group,
+--       callback = function(args) schedule(args.buf) end,
+--     }
+--   )
+-- end
 
 -- Better terminal UX inside fzf-lua: allow Esc to abort.
 api.nvim_create_autocmd('FileType', {
@@ -236,35 +236,8 @@ local function stop_hl()
   api.nvim_feedkeys(vim.keycode('<Plug>(StopHL)'), 'm', false)
 end
 
-local function hl_search()
-  local col = api.nvim_win_get_cursor(0)[2]
-  local curr_line = api.nvim_get_current_line()
-  local ok, match = pcall(fn.matchstrpos, curr_line, fn.getreg('/'), 0)
-  if not ok then return end
-  local _, p_start, p_end = unpack(match)
-  -- if the cursor is in a search result, leave highlighting on
-  if col < p_start or col > p_end then stop_hl() end
-end
-
-augroup('VimrcIncSearchHighlight', {
-  event = { 'CursorMoved' },
-  command = function() hl_search() end,
-}, {
-  event = { 'InsertEnter' },
-  command = function() stop_hl() end,
-}, {
-  event = { 'OptionSet' },
-  pattern = { 'hlsearch' },
-  command = function()
-    vim.schedule(function() cmd.redrawstatus() end)
-  end,
-}, {
-  event = 'RecordingEnter',
-  command = function() vim.o.hlsearch = false end,
-}, {
-  event = 'RecordingLeave',
-  command = function() vim.o.hlsearch = true end,
-})
+-- REMOVED DUPLICATE: This function and autocmd group was already defined above (lines 180-209)
+-- Duplicate removed to fix scrolling lag caused by double CursorMoved events
 
 -- }}}
 
@@ -685,56 +658,59 @@ vim.api.nvim_create_autocmd({ 'InsertEnter', 'WinLeave' }, {
   end,
 })
 
--- Copy pyrightconfig.json to git repo root
-local function copy_pyrightconfig()
-  local buf_path = api.nvim_buf_get_name(api.nvim_get_current_buf())
-  if buf_path == '' then return end
+-- Disable statuscolumn and other columns in floating windows
+do
+  local group = vim.api.nvim_create_augroup('DisableColumnsInFloats', { clear = true })
 
-  -- Find git root using vim.fs.find (more efficient)
-  local git_root_file = vim.fs.find('.git', {
-    path = vim.fs.dirname(buf_path),
-    upward = true,
-  })[1]
-
-  -- If no .git found, skip
-  if not git_root_file then return end
-
-  local git_root = vim.fs.dirname(git_root_file)
-
-  -- Source and destination paths
-  local source = vim.g.vim_dir .. '/../pyright/pyrightconfig.json'
-  local dest = git_root .. '/pyrightconfig.json'
-
-  -- Check if source exists
-  if fn.filereadable(source) ~= 1 then return end
-
-  -- Copy file if destination doesn't exist or is different
-  local should_copy = false
-  if fn.filereadable(dest) ~= 1 then
-    should_copy = true
-  else
-    -- Compare file contents (simple check)
-    local source_content = fn.readfile(source)
-    local dest_content = fn.readfile(dest)
-    if
-      table.concat(source_content, '\n') ~= table.concat(dest_content, '\n')
-    then
-      should_copy = true
+  local function disable_columns_in_float()
+    local win = vim.api.nvim_get_current_win()
+    local win_config = vim.api.nvim_win_get_config(win)
+    if win_config.relative ~= '' then
+      -- This is a floating window - disable all column decorations
+      vim.wo[win].statuscolumn = ''
+      vim.wo[win].signcolumn = 'no'
+      vim.wo[win].foldcolumn = '0'
+      vim.wo[win].number = false
+      vim.wo[win].relativenumber = false
     end
   end
 
-  if should_copy then fn.writefile(fn.readfile(source), dest) end
+  -- Apply on multiple events to catch Mason, Lazy, and other plugin floats
+  vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter', 'FileType' }, {
+    group = group,
+    callback = disable_columns_in_float,
+  })
+
+  -- Also apply with a slight delay to override plugin settings
+  vim.api.nvim_create_autocmd('WinEnter', {
+    group = group,
+    callback = function()
+      vim.schedule(disable_columns_in_float)
+    end,
+  })
 end
 
-augroup('CopyPyrightConfig', {
-  event = { 'BufEnter' },
-  pattern = { '*.py' },
-  command = function()
-    -- Only run once per buffer to avoid excessive copying
-    if vim.b.pyrightconfig_copied then return end
-    vim.b.pyrightconfig_copied = true
-    copy_pyrightconfig()
-  end,
-})
+-- Window dimming: Dim inactive windows for better focus
+do
+  local group = vim.api.nvim_create_augroup('WindowDimming', { clear = true })
+  
+  vim.api.nvim_create_autocmd('WinLeave', {
+    group = group,
+    callback = function()
+      -- Only dim non-floating windows
+      local win_config = vim.api.nvim_win_get_config(0)
+      if win_config.relative == '' then
+        vim.cmd [[setlocal winhl=CursorLine:CursorLineNC]]
+      end
+    end,
+  })
+  
+  vim.api.nvim_create_autocmd('WinEnter', {
+    group = group,
+    callback = function()
+      vim.cmd [[setlocal winhl=]]
+    end,
+  })
+end
 
 -- }}

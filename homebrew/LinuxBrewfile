@@ -4,6 +4,7 @@ tap "Rigellute/tap"
 tap "Schniz/tap"
 tap "rlue/utils"
 tap "epk/epk"
+tap "marromlam/custom"
 
 
 # Homebrew essentials
@@ -11,7 +12,6 @@ brew "gcc"
 brew "ruby"
 brew "glibc"
 brew "bat"                           # alternative to cat
-brew "bottom"                        # alternative to htop
 brew "calcurse"
 brew "fpp"                          # facebook path picker
 brew "fzf"                          # fuzzy finder
@@ -22,6 +22,7 @@ brew "git-delta"                    # pretty git diffs
 brew "ncurses"                      # needed for a bunch of stuff
 brew "neovim"                       # best editor on Earth
 brew "node"
+brew "marromlam/custom/xmlformat"
 brew "pandoc"
 brew "pkg-config"
 brew "python"
@@ -31,6 +32,3 @@ brew "stow"                         # to create symbolic links
 brew "tmux"                       # terminal multiplexer
 brew "tree"                         # shows directory tree
 brew "wget"                       # like curl
-brew "sshfs"                        # mount ssh volumes
-brew "zsh-syntax-highlighting"
-brew "zsh-autosuggestions"

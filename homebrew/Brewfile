@@ -17,6 +17,7 @@ tap "Rigellute/tap"
 tap "Schniz/tap"
 tap "rlue/utils"
 tap "epk/epk"
+tap "marromlam/custom"
 
 # Homebrew essentials --------------------------------------------------------
 #
@@ -42,11 +43,21 @@ brew "wget"                       # like curl
 brew "stow"                       # linking files and folders
 brew "eza"                        # like ls but better
 brew "otree"                      # explore json, yaml and toml
+brew "asdf"
+brew "cmake"
+brew "fswatch"
+brew "p7zip"
+brew "pixi"
+brew "pkgconf"
+brew "sevenzip"
+brew "tailscale"
+brew "timg"
+brew "ykman"
+brew "yt-dlp"
 
 # brew "mosh"                       # similar to ssh
 
 # Window manager
-# brew "yabai"
 # brew "skhd"                     # control
 
 #brew "starship"
@@ -67,7 +78,9 @@ brew "gd"    # TODO: what is this
 #
 brew "node"
 brew "yarn"
-# brew "xmlformat"  # web
+# brew "openjdk"                    # Required for Neovim SonarLint plugin
+                                   # Run: ./homebrew/install-java-sonarqube.sh
+brew "marromlam/custom/xmlformat"
 # brew "prettier"
 # npm install fixjson 
 
@@ -137,8 +150,18 @@ cask "orion"                       # browser
 
 cask "obsidian"                    # knowledge
 cask "rectangle"                   # window manager
+cask "amethyst"                    # tiling window manager
+cask "hammerspoon"                 # automation + custom window actions
 cask "grandperspective"            # tools to show up large files
 cask "keycastr"                    # cast keys on screen
+cask "ghostty"
+cask "appcleaner"
+cask "chatgpt"
+cask "claude-code"
+cask "codex"
+cask "copilot-cli"
+cask "whatsapp"
+# cask "cursor"                    # intentionally not tracked; WSL tracks `cursor-cli` for cursor-agent
 
 
 # Others ----------------------------------------------------------------------

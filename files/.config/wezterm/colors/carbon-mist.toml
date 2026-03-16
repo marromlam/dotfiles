@@ -1,0 +1,55 @@
+# Carbon Mist
+# Carbon Mist theme based on a soft retro ANSI palette.
+# Author: Marcos Romero Lamas
+# Version: 1.0.0
+
+[metadata]
+name = "carbon-mist"
+author = "Marcos Romero Lamas"
+
+[colors]
+foreground = "#C4C8C6"
+background = "#1D1F21"
+
+cursor_bg = "#666666"
+cursor_fg = "#1D1F21"
+cursor_border = "#666666"
+
+selection_fg = "#C4C8C6"
+selection_bg = "#353A44"
+
+# ANSI colors (0-7)
+ansi = [
+  "#1D1F21",      # Black
+  "#CC6566",        # Red
+  "#B6BD68",      # Green
+  "#F0C674",     # Yellow
+  "#82A2BE",       # Blue
+  "#B294BB",    # Magenta
+  "#8ABEB7",       # Cyan
+  "#C4C8C6",      # White
+]
+
+# Bright ANSI colors (8-15)
+brights = [
+  "#666666",      # Bright Black
+  "#D54E53",        # Bright Red
+  "#B9CA4B",      # Bright Green
+  "#E7C547",     # Bright Yellow
+  "#7AA6DA",       # Bright Blue
+  "#C397D8",    # Bright Magenta
+  "#70C0B1",       # Bright Cyan
+  "#EAEAEA",      # Bright White
+]
+
+# Tab bar colors
+[colors.tab_bar]
+background = "#03060A"
+
+[colors.inactive_tab]
+bg_color = "#03060A"
+fg_color = "#666666"
+
+[colors.active_tab]
+bg_color = "#1D1F21"
+fg_color = "#C4C8C6"

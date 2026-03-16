@@ -72,7 +72,8 @@ local function fold_mark(lnum)
 end
 
 local function format_number(win, lnum, relnum, virtnum, line_count)
-  local col_width = api.nvim_strwidth(tostring(line_count))
+  local min_width = mrl.ui.statuscolumn.number_width or vim.o.numberwidth or 0
+  local col_width = math.max(api.nvim_strwidth(tostring(line_count)), min_width)
   if virtnum and virtnum ~= 0 then
     -- virtual line: show a subtle placeholder
     return space:rep(math.max(col_width - 1, 0)) .. '░'
@@ -84,7 +85,24 @@ local function format_number(win, lnum, relnum, virtnum, line_count)
   return space:rep(math.max(pad, 0)) .. ln
 end
 
-local function best_sign(buf, lnum0, want_git)
+-- Cache for extmarks to avoid repeated queries during rapid redraws
+local extmark_cache = {}
+local cache_tick = {}
+
+local function get_cached_extmarks(buf, lnum0)
+  local current_tick = vim.b[buf].changedtick or 0
+  local cache_key = buf .. '_' .. lnum0
+
+  -- Invalidate cache if buffer changed
+  if cache_tick[buf] ~= current_tick then
+    extmark_cache = {}
+    cache_tick[buf] = current_tick
+  end
+
+  -- Return cached result if available
+  if extmark_cache[cache_key] then return extmark_cache[cache_key] end
+
+  -- Query and cache
   local marks = api.nvim_buf_get_extmarks(
     buf,
     -1,
@@ -92,6 +110,12 @@ local function best_sign(buf, lnum0, want_git)
     { lnum0, -1 },
     { details = true, type = 'sign' }
   )
+  extmark_cache[cache_key] = marks
+  return marks
+end
+
+local function best_sign(buf, lnum0, want_git)
+  local marks = get_cached_extmarks(buf, lnum0)
 
   local best_text, best_hl, best_prio = '', nil, -math.huge
   for _, item in ipairs(marks) do
@@ -128,13 +152,7 @@ local function best_sign(buf, lnum0, want_git)
 end
 
 local function best_diag(buf, lnum0)
-  local marks = api.nvim_buf_get_extmarks(
-    buf,
-    -1,
-    { lnum0, 0 },
-    { lnum0, -1 },
-    { details = true, type = 'sign' }
-  )
+  local marks = get_cached_extmarks(buf, lnum0)
 
   -- Prefer Error over Warn regardless of priority (narrow "warn/error status").
   local best_text, best_hl, best_sev, best_prio = '', nil, 99, -math.huge
@@ -178,8 +196,11 @@ function mrl.ui.statuscolumn.render()
 
   local lnum, relnum, virtnum = v.lnum, v.relnum, v.virtnum
   local line_count = api.nvim_buf_line_count(buf)
+  local cursor_line = api.nvim_win_get_cursor(win)[1]
 
-  local diag = best_diag(buf, lnum - 1)
+  local hide_diag_on_cursorline = mrl.ui.statuscolumn.hide_diag_on_cursorline
+  local diag = (hide_diag_on_cursorline and lnum == cursor_line) and ' '
+    or best_diag(buf, lnum - 1)
   local git = best_sign(buf, lnum - 1, true)
   local num = format_number(win, lnum, relnum, virtnum, line_count)
   local fold = fold_mark(lnum)
@@ -233,5 +254,16 @@ api.nvim_create_autocmd({ 'BufEnter', 'FileType' }, {
       -- our statuscolumn already renders them.
       vim.opt_local.signcolumn = 'no'
     end
+  end,
+})
+
+-- Clear extmark cache when signs/diagnostics update to ensure fresh data
+api.nvim_create_autocmd({ 'DiagnosticChanged', 'User' }, {
+  group = api.nvim_create_augroup('MrlStatusColumnCache', { clear = true }),
+  pattern = { '*', 'GitSignsUpdate' },
+  callback = function()
+    -- Clear the cache on diagnostic/sign changes
+    extmark_cache = {}
+    cache_tick = {}
   end,
 })

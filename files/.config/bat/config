@@ -1,8 +1,13 @@
---style="changes,numbers"
+# Display
+--style=changes,numbers
 --color=always
+--wrap=auto
 --italic-text=always
---theme="Gruvbox Dark"  # COLORSCHEME
-# --theme="Github"
---map-syntax "*.cnk:HTML"
---wrap auto
+
+# Theme
+--theme="Gruvbox Dark"
+
+# Syntax
+--map-syntax="*.cnk:HTML"
+
 # vim:ft=sh

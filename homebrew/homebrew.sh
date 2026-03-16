@@ -5,15 +5,21 @@ echo "--------------------------------------------------------------------------
 set -e
 
 if [[ "$(uname -m)" == "x86_64" ]]; then
-  # intel / rosseta
-  export HOMEBREW_PREFIX="/usr/local/homebrew"
+  # intel / rossetta
+  export HOMEBREW_PREFIX="/usr/local"
 else
   # running on Apple Silicon
   export HOMEBREW_PREFIX="/opt/homebrew"
 fi
 
+unset HOMEBREW_CELLAR
+export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+
 if test "$1" = "-f"; then
-  sudo rm -rf $HOMEBREW_PREFIX
+  if [[ -d "$HOMEBREW_PREFIX" ]]; then
+    # Remove contents without deleting the prefix directory itself.
+    sudo bash -c 'shopt -s dotglob nullglob; rm -rf "$1"/*' _ "$HOMEBREW_PREFIX"
+  fi
   echo "Forcing homebrew install"
 else
   echo "Not forcing homebrew install..."

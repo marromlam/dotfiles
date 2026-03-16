@@ -1,0 +1,7 @@
+{
+  "bin": "/opt/homebrew/bin/ykman",
+  "key_mapping": {
+    "propylon-staging-ccms.auth.us-east-1.amazoncognito.com": "Propylon Staging CCMS",
+    "FIDO2": "FIDO"
+  }
+}

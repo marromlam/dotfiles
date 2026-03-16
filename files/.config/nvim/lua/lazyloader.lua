@@ -69,8 +69,8 @@ require('lazy').setup({
   },
 
   ui = {
-    border = (mrl.ui and mrl.ui.current and mrl.ui.current.border) or 'single',
-    backdrop = 100,
+    border = 'rounded',
+    backdrop = false, -- Disable backdrop dimming
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
     icons = {
@@ -89,4 +89,19 @@ require('lazy').setup({
       lazy = icons.sleep,
     },
   },
+})
+
+-- Disable columns in Lazy.nvim windows
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'lazy',
+  callback = function()
+    vim.schedule(function()
+      local win = vim.api.nvim_get_current_win()
+      vim.wo[win].statuscolumn = ''
+      vim.wo[win].signcolumn = 'no'
+      vim.wo[win].foldcolumn = '0'
+      vim.wo[win].number = false
+      vim.wo[win].relativenumber = false
+    end)
+  end,
 })

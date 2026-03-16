@@ -19,46 +19,4 @@ return {
       })
     end,
   },
-
-  {
-    'danymat/neogen',
-    cmd = 'Neogen',
-    keys = {
-      {
-        '<leader>cn',
-        function() require('neogen').generate() end,
-        desc = 'Generate Annotations (Neogen)',
-      },
-    },
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-      'L3MON4D3/LuaSnip',
-    },
-    opts = function(_, opts)
-      if opts.snippet_engine ~= nil then return end
-
-      local map = {
-        ['LuaSnip'] = 'luasnip',
-        ['nvim-snippy'] = 'snippy',
-        ['vim-vsnip'] = 'vsnip',
-      }
-
-      opts.snippet_engine = 'luasnip'
-
-      if vim.snippet then opts.snippet_engine = 'nvim' end
-
-      opts.languages = {
-        lua = {
-          template = {
-            annotation_convention = 'emmylua', -- for a full list of annotation_conventions, see supported-languages below,
-          },
-        },
-        python = {
-          template = {
-            annotation_convention = 'numpydoc',
-          },
-        },
-      }
-    end,
-  },
 }

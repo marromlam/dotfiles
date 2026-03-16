@@ -104,31 +104,31 @@ return { -- Collection of various small independent plugins/modules
       })
     end,
   },
-  {
-    'echasnovski/mini.jump',
-    version = false,
-    event = { 'BufReadPre', 'BufNewFile' },
-    config = function()
-      require('mini.jump').setup({
-        -- Delay values (in ms) for different functionalities. Set any to `false` to disable
-        delay = {
-          -- Delay between jump and highlighting all possible jumps
-          highlight = 250,
-          -- Delay between jump and automatic stop if idle (no jump key was pressed)
-          idle_stop = 1000000,
-        },
-        -- Function to create labels for all available jumps
-        -- For more information, see `:h mini.jump`
-        mappings = {
-          forward = 'f',
-          backward = 'F',
-          forward_till = 't',
-          backward_till = 'T',
-          repeat_jump = ';',
-        },
-      })
-    end,
-  },
+  -- {
+  --   'echasnovski/mini.jump',
+  --   version = false,
+  --   event = { 'BufReadPre', 'BufNewFile' },
+  --   config = function()
+  --     require('mini.jump').setup({
+  --       -- Delay values (in ms) for different functionalities. Set any to `false` to disable
+  --       delay = {
+  --         -- Delay between jump and highlighting all possible jumps
+  --         highlight = 250,
+  --         -- Delay between jump and automatic stop if idle (no jump key was pressed)
+  --         idle_stop = 1000000,
+  --       },
+  --       -- Function to create labels for all available jumps
+  --       -- For more information, see `:h mini.jump`
+  --       mappings = {
+  --         forward = 'f',
+  --         backward = 'F',
+  --         forward_till = 't',
+  --         backward_till = 'T',
+  --         repeat_jump = ';',
+  --       },
+  --     })
+  --   end,
+  -- },
 
   -- Icons
   {
@@ -399,5 +399,18 @@ return { -- Collection of various small independent plugins/modules
         },
       })
     end,
+  },
+
+  {
+    'echasnovski/mini.bufremove',
+    version = '*',
+    keys = {
+      {
+        '<leader>bD',
+        '<cmd> lua MiniBufremove.unshow()<cr>',
+        'buffer: close buffer',
+      },
+    },
+    config = function() require('mini.bufremove').setup() end,
   },
 }
