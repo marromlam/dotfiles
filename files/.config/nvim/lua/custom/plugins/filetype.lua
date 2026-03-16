@@ -1,3 +1,7 @@
+local is_dev = vim.fn.isdirectory(
+  '/Users/marcos/Workspaces/personal/pdfcat.nvim'
+) == 1
+
 return {
 
   -- markdown support
@@ -159,8 +163,9 @@ return {
   {
     'marromlam/tex-kitty',
     ft = 'tex',
-    dir = '/Users/marcos/Projects/personal/pdfcat.nvim/',
-    dev = true,
+    -- if is_dev then return the path, otherwise return nil
+    dir = is_dev and '/Users/marcos/Projects/personal/tex-kitty' or nil,
+    dev = is_dev,
     -- cond = false,
     -- disable = true,
     dependencies = { 'lervag/vimtex' },
