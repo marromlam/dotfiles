@@ -33,14 +33,16 @@ return {
       vim.cmd('colorscheme vague')
     end,
   },
+  -- BEGIN_NEOVIM_THEME
   {
     'marromlam/theme-builder.nvim',
     lazy = false,
     dev = true,
     enabled = is_dev,
     cond = is_dev,
-    dir = '/Users/marcos/Workspaces/personal/theme-builder/generated/amberglow/nvim',
     priority = 1000,
+    dir = '/Users/marcos/Workspaces/personal/theme-builder/generated/amberglow/nvim',
     config = function() vim.cmd.colorscheme('amberglow') end,
   },
+  -- END_NEOVIM_THEME
 }

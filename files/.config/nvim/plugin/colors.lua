@@ -1,43 +1,5 @@
-if not mrl then return end
-
--- Helper to safely call augroup, deferring if not available yet
-local function augroup(name, ...)
-  local args = { ... }
-  if mrl and mrl.augroup then
-    return mrl.augroup(name, unpack(args))
-  else
-    vim.schedule(function()
-      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
-    end)
-  end
-end
-
-local highlight = mrl.highlight
-
-local function blend_colors(fg_hex, bg_hex, alpha)
-  alpha = alpha or 0.5
-
-  -- Remove '#' if present
-  fg_hex = fg_hex:gsub('#', '')
-  bg_hex = bg_hex:gsub('#', '')
-
-  -- Parse hex colors to RGB
-  local fg_r = tonumber(fg_hex:sub(1, 2), 16)
-  local fg_g = tonumber(fg_hex:sub(3, 4), 16)
-  local fg_b = tonumber(fg_hex:sub(5, 6), 16)
-
-  local bg_r = tonumber(bg_hex:sub(1, 2), 16)
-  local bg_g = tonumber(bg_hex:sub(3, 4), 16)
-  local bg_b = tonumber(bg_hex:sub(5, 6), 16)
-
-  -- Alpha blend: out = fg * alpha + bg * (1 - alpha)
-  local out_r = math.floor(fg_r * alpha + bg_r * (1 - alpha) + 0.5)
-  local out_g = math.floor(fg_g * alpha + bg_g * (1 - alpha) + 0.5)
-  local out_b = math.floor(fg_b * alpha + bg_b * (1 - alpha) + 0.5)
-
-  -- Convert back to hex
-  return string.format('#%02x%02x%02x', out_r, out_g, out_b)
-end
+local highlight = require('highlight')
+local augroup = require('tools').augroup
 
 local function general_overrides(dim_factor)
   local is_dark = vim.g.high_contrast_theme
@@ -45,10 +7,11 @@ local function general_overrides(dim_factor)
   local normal_fg = highlight.get('Normal', 'fg', '#ffffff')
   local bg_color = highlight.tint(normal_bg, -dim_factor)
   local bg_color2 = highlight.tint(normal_bg, 0.5 * dim_factor)
-  local stl_bg = highlight.darken_hsl(normal_bg, -0.20)
+  -- local stl_bg = highlight.darken_hsl(normal_bg, -0.20)
+  local stl_bg = highlight.get('Statusline', 'bg')
   local float_bg = highlight.darken_hsl(normal_bg, 0)
   local popup_bg = highlight.darken_hsl(normal_bg, -0.20)
-  local pal = (mrl.ui and mrl.ui.palette) or {}
+  local pal = require('tools').ui.palette or {}
   -- Deleted-line diff background should track the theme's GitSignsDelete color.
   -- Fall back to palette red/pale_red if GitSignsDelete isn't available yet.
   local diff_delete_fg = highlight.get(
@@ -112,10 +75,10 @@ local function general_overrides(dim_factor)
   -- end
   highlight.all({
     -- Status line
-    { PanelSt = { link = 'StatusLine' } },
+    { PanelSt = { link = 'Normal' } },
     { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
-    { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
+    -- { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     {
       StDevEnv = {
@@ -562,107 +525,6 @@ local function general_overrides(dim_factor)
     -- {DiagnosticSignInfoLine = { bg = mrl.get_hi('SignColumn').bg }},
     -- { DiagnosticSignInfo = { bg = mrl.get_hi('Normal').bg, fg = mrl.get_hi('MoreMsg').fg } },
     -- }}}
-    -- FzfLua {{{
-    -- FzfLuaNormal Normal  hls.normal  Main win fg/bg
-    {
-      FzfLuaNormal = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      FzfLuaTitle = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      FzfLuaTitle = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      -- Make fzf-lua borders follow FloatBorder exactly.
-      FzfLuaBorder = { clear = true, link = 'FloatBorder' },
-    },
-    {
-      FzfLuaPreviewNormal = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      FzfLuaPreviewBorder = {
-        clear = true,
-        link = 'FloatBorder',
-      },
-    },
-    {
-      FzfLuaPreviewTitle = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      FzfLuaHelpNormal = {
-        link = 'NormalFloat',
-      },
-    },
-    {
-      FzfLuaHelpBorder = {
-        clear = true,
-        link = 'FloatBorder',
-      },
-    },
-    -- FzfLuaBorder Normal  hls.border  Main win border
-    -- FzfLuaTitle  FzfLuaNormal    hls.title   Main win title
-    -- FzfLuaBackdrop   *bg=Black   hls.backdrop    Backdrop color
-    -- FzfLuaPreviewNormal  FzfLuaNormal    hls.preview_normal  Builtin preview fg/bg
-    -- FzfLuaPreviewBorder  FzfLuaBorder    hls.preview_border  Builtin preview border
-    -- FzfLuaPreviewTitle   FzfLuaTitle hls.preview_title   Builtin preview title
-    -- { FzfLuaCursor = { bg = "#ff00ff", fg = "#00ff00"} },
-    -- { FzfLuaCursor = { bg =  "#ff00ff" , fg = { from = 'Normal', attr = 'fg' } } },
-    -- { FzfLuaCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
-    -- FzfLuaCursor Cursor  hls.cursor  Builtin preview Cursor
-    -- FzfLuaCursorLine CursorLine  hls.cursorline  Builtin preview Cursorline
-    -- FzfLuaCursorLineNr   CursorLineNr    hls.cursorlinenr    Builtin preview CursorLineNr
-    -- FzfLuaSearch IncSearch   hls.search  Builtin preview search matches
-    -- FzfLuaScrollBorderEmpty  FzfLuaBorder    hls.scrollborder_e  Builtin preview border scroll empty
-    -- FzfLuaScrollBorderFull   FzfLuaBorder    hls.scrollborder_f  Builtin preview border scroll full
-    -- FzfLuaScrollFloatEmpty   PmenuSbar   hls.scrollfloat_e   Builtin preview float scroll empty
-    -- FzfLuaScrollFloatFull    PmenuThumb  hls.scrollfloat_f   Builtin preview float scroll full
-    -- FzfLuaHelpNormal FzfLuaNormal    hls.help_normal Help win fg/bg
-    -- FzfLuaHelpBorder FzfLuaBorder    hls.help_border Help win border
-    -- FzfLuaHeaderBind *BlanchedAlmond hls.header_bind Header keybind
-    -- FzfLuaHeaderText *Brown1 hls.header_text Header text
-    -- FzfLuaPathColNr  *CadetBlue1 hls.path_colnr  Path col nr (lines,qf,lsp,diag)
-    -- FzfLuaPathLineNr *LightGreen hls.path_linenr Path line nr (lines,qf,lsp,diag)
-    -- FzfLuaBufName    *LightMagenta   hls.buf_name    Buffer name (lines)
-    -- FzfLuaBufNr  *BlanchedAlmond hls.buf_nr  Buffer number (all buffers)
-    -- FzfLuaBufFlagCur *Brown1 hls.buf_flag_cur    Buffer line (buffers)
-    -- FzfLuaBufFlagAlt *CadetBlue1 hls.buf_flag_alt    Buffer line (buffers)
-    -- FzfLuaTabTitle   *LightSkyBlue1  hls.tab_title   Tab title (tabs)
-    -- FzfLuaTabMarker  *BlanchedAlmond hls.tab_marker  Tab marker (tabs)
-    -- FzfLuaDirIcon    Directory   hls.dir_icon    Paths directory icon
-    -- FzfLuaDirPart    Comment hls.dir_part    Path formatters directory hl group
-    -- FzfLuaFilePart   @none   hls.file_part   Path formatters file hl group
-    -- FzfLuaLiveSym    *Brown1 hls.live_sym    LSP live symbols query match
-    -- fzf-lua's internal "fzf" UI groups (make sure no debug colors leak).
-    { FzfLuaFzfNormal = { clear = true, link = 'FzfLuaNormal' } },
-    -- { FzfLuaFzfCursorLine = { bg = "#ffff00", fg = "#00ff00"} },
-    -- { FzfLuaFzfPrompt = { bg = "#ff0000", fg = "#00ff00"} },
-    { ['@fzf.normal'] = { clear = true, link = 'FzfLuaNormal' } },
-    -- FzfLuaFzfNormal  FzfLuaNormal    fzf.normal  fzf's fg|bg
-    -- FzfLuaFzfCursorLine  FzfLuaCursorLine    fzf.cursorline  fzf's fg+|bg+
-    -- FzfLuaFzfMatch   Special fzf.match   fzf's hl+
-    -- FzfLuaFzfBorder  FzfLuaBorder    fzf.border  fzf's border
-    -- FzfLuaFzfScrollbar   FzfLuaFzfBorder fzf.scrollbar   fzf's scrollbar
-    -- FzfLuaFzfSeparator   FzfLuaFzfBorder fzf.separator   fzf's separator
-    -- FzfLuaFzfGutter  FzfLuaNormal    fzf.gutter  fzf's gutter (hl bg is used)
-    -- FzfLuaFzfHeader  FzfLuaTitle fzf.header  fzf's header
-    -- FzfLuaFzfInfo    NonText fzf.info    fzf's info
-    -- FzfLuaFzfPointer Special fzf.pointer fzf's pointer
-    -- FzfLuaFzfMarker  FzfLuaFzfPointer    fzf.marker  fzf's marker
-    -- FzfLuaFzfSpinner FzfLuaFzfPointer    fzf.spinner fzf's spinner
-    -- FzfLuaFzfPrompt  Special fzf.prompt  fzf's prompt
-    -- FzfLuaFzfQuery   FzfLuaNormal    fzf.query   fzf's header
-    -- }}}
   })
 end
 
@@ -685,61 +547,6 @@ local function set_sidebar_highlight(dim_factor)
     },
     { PanelStNC = { link = 'PanelWinSeparator' } },
     { PanelSt = { bg = { from = 'Normal', attr = 'bg' } } },
-
-    -- Avanté Panel colors
-    {
-      AvanteSidebarNormal = { link = 'PanelDarkBackground' },
-    },
-    {
-      AvanteTitle = {
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-        -- fg = '#00ff00',
-      },
-    },
-    {
-      AvanteReversedTitle = {
-        fg = { from = 'PanelDarkBackground', attr = 'bg' },
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-      },
-    },
-    {
-      AvanteSubtitle = {
-        -- fg = '#ff0000',
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-      },
-    },
-    {
-      AvanteThirdTitle = {
-        -- fg = '#ff0000',
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-      },
-    },
-    {
-      AvanteReversedSubtitle = { link = 'AvanteReversedTitle' },
-    },
-    {
-      AvanteReversedThirdTitle = { link = 'AvanteReversedTitle' },
-    },
-    {
-      AvanteSidebarWinHorizontalSeparator = {
-        -- bg = '#ff0000',
-        -- fg = '#ff0000',
-        fg = { from = 'PanelDarkBackground', attr = 'bg' },
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-      },
-    },
-    {
-      AvanteSidebarWinSeparator = {
-        -- bg = '#ff0000',
-        -- fg = '#ff0000',
-        -- fg = { from = 'PanelDarkBackground', attr = 'bg' },
-        -- bg = { from = 'PanelDarkBackground', attr = 'bg' },
-        bg = { from = 'PanelDarkBackground', attr = 'bg' },
-        -- fg = { from = 'PanelDarkBackground', attr = 'bg' },
-        -- inherit = 'PanelBackground',
-        fg = { from = 'WinSeparator' },
-      },
-    },
   })
 end
 
@@ -756,19 +563,46 @@ local sidebar_fts = {
   'AvanteSelectedFiles',
 }
 
+local function on_diffview_enter()
+  local stl = vim.api.nvim_get_hl(0, { name = 'StatusLine', link = false })
+  local norm = vim.api.nvim_get_hl(0, { name = 'Normal', link = false })
+  local bg = stl.bg and ('#%06x'):format(stl.bg) or 'NONE'
+  local fg = norm.fg and ('#%06x'):format(norm.fg) or 'NONE'
+  local nbg = norm.bg and ('#%06x'):format(norm.bg) or 'NONE'
+
+  -- Use our own hl groups that diffview doesn't touch
+  vim.api.nvim_set_hl(0, 'DvPanelBg', { bg = bg, fg = fg })
+  vim.api.nvim_set_hl(0, 'DvPanelEob', { bg = bg })
+  vim.api.nvim_set_hl(0, 'DvPanelCursor', { bg = nbg })
+
+  -- Point diffview windows directly at our groups via winhighlight
+  local winhl = table.concat({
+    'Normal:DvPanelBg',
+    'EndOfBuffer:DvPanelEob',
+    'SignColumn:DvPanelBg',
+    'CursorLine:DvPanelCursor',
+    'WinSeparator:DiffviewWinSeparator',
+  }, ',')
+
+  -- Apply to the diffview tab (it opens in a new tabpage)
+  local tabpage = vim.api.nvim_get_current_tabpage()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local ft = vim.bo[buf].filetype
+    if ft == 'DiffviewFiles' or ft == 'DiffviewFileHistory' then
+      vim.api.nvim_set_option_value('winhighlight', winhl, { win = win })
+    end
+  end
+end
+
 local function on_sidebar_enter()
   -- Panels should feel like sidebars: no line numbers.
   vim.opt_local.number = false
   vim.opt_local.relativenumber = false
   vim.opt_local.winhighlight:append({
     Normal = 'PanelDarkBackground',
-    -- AvanteSidebarNormal = { link = 'PanelDarkBackground' },
     EndOfBuffer = 'PanelDarkBackground',
-    -- StatusLine = 'PanelSt',
-    -- StatusLineNC = 'PanelStNC',
     SignColumn = 'PanelDarkBackground',
-    -- VertSplit = 'PanelVertSplit',
-    -- VertSplit = 'PanelWinSeparator',
     WinSeparator = 'PanelWinSeparator',
   })
 end
@@ -784,20 +618,15 @@ local function colorscheme_overrides(dim_factor)
 end
 
 local function user_highlights()
-  local dim_factor = 0.5
-  if vim.g.colors_name == 'gruvbox' then
-    dim_factor = 0.25
-  elseif vim.g.colors_name == 'horizon' then
-    dim_factor = 0.75
-  elseif vim.g.colors_name == 'github_dark_default' then
-    dim_factor = -1
-  end
-
+  local dim_factor = 0.25
   general_overrides(dim_factor)
   set_sidebar_highlight(dim_factor)
   colorscheme_overrides(dim_factor)
 end
 
+-------------------------------------------------------------------------------
+-- Auto-commands to apply highlights at the right time. {{{
+-------------------------------------------------------------------------------
 augroup('UserHighlights', {
   event = 'ColorScheme',
   command = function() user_highlights() end,
@@ -811,6 +640,14 @@ augroup('UserHighlights', {
   event = 'FileType',
   pattern = sidebar_fts,
   command = function() on_sidebar_enter() end,
+}, {
+  -- diffview fires this after its own hl.setup() completes, so our groups win.
+  event = 'User',
+  pattern = 'DiffviewViewPostLayout',
+  command = function() on_diffview_enter() end,
 })
 
--- vim: foldmethod=marker
+-- }}}
+-------------------------------------------------------------------------------
+
+-- vim: fdm=marker

@@ -1,8 +1,8 @@
 -- Neo-tree is a Neovim plugin to browse the file system
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
 local fn, api = vim.fn, vim.api
-local highlight = mrl.highlight
-local icons = mrl.ui.icons
+local highlight = require('highlight')
+local icons = require('tools').ui.icons
 local autocmd = api.nvim_create_autocmd
 
 return {
@@ -52,7 +52,7 @@ return {
     -- end,
     config = function()
       local symbols = require('lspkind').symbol_map
-      local lsp_kinds = mrl.ui.lsp.highlights
+      local lsp_kinds = require('tools').ui.lsp.highlights
 
       require('neo-tree').setup({
         window = {

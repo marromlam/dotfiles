@@ -1,27 +1,9 @@
-local icons = mrl.ui.icons.separators
+local T = require('tools')
+local icons = require('tools').ui.icons.separators
 
-local gitlinker = mrl.require_for_later_index('gitlinker')
+local gitlinker = T.require_for_later_index('gitlinker')
 local function browser_open()
   return { action_callback = require('gitlinker.actions').open_in_browser }
-end
-
-local function check_main_or_develop_branch()
-  local main_exists =
-    vim.fn.system('git show-ref --verify --quiet refs/heads/main')
-  if vim.v.shell_error == 0 then
-    print('Main branch exists.')
-    return 'main'
-  end
-
-  local develop_exists =
-    vim.fn.system('git show-ref --verify --quiet refs/heads/develop')
-  if vim.v.shell_error == 0 then
-    print('Develop branch exists.')
-    return 'develop'
-  end
-
-  print('Neither main nor develop branch exists.')
-  return nil
 end
 
 return {
@@ -304,7 +286,6 @@ return {
   {
     'sindrets/diffview.nvim',
     cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewToggleFiles' },
-    -- diff3_mixed
     opts = {
       enhanced_diff_hl = true,
       signs = {
@@ -313,9 +294,7 @@ return {
         done = '✓',
       },
       view = {
-        merge_tool = {
-          layout = 'diff3_mixed',
-        },
+        merge_tool = { layout = 'diff3_mixed' },
       },
     },
   },
@@ -368,32 +347,6 @@ return {
       },
     },
     config = function() require('litee.gh').setup() end,
-  },
-
-  {
-    'jecaro/fugitive-difftool.nvim',
-    dependencies = { 'tpope/vim-fugitive' },
-    keys = {
-      {
-        '<leader>gPR',
-        function()
-          local current_branch = vim.fn.system('git rev-parse --abbrev-ref HEAD')
-          current_branch = current_branch:gsub('%s+', '')
-          local target_branch = check_main_or_develop_branch()
-
-          -- print('Current branch: ' .. current_branch)
-          -- print('Target branch: ' .. target_branch)
-
-          print(
-            'Git! difftool --name-status '
-              .. target_branch
-              .. '...'
-              .. current_branch
-          )
-        end,
-        desc = 'dddd',
-      },
-    },
   },
 
   -- }}}

@@ -1,5 +1,3 @@
-local icons = require('custom.ui').icons.lsp
-
 return { -- LSP Configuration & Plugins
   {
     'neovim/nvim-lspconfig',
@@ -16,9 +14,7 @@ return { -- LSP Configuration & Plugins
             backdrop = 100, -- 100 = fully transparent (no dimming), 0 = fully opaque
           },
         },
-        config = function(_, opts)
-          require('mason').setup(opts)
-        end,
+        config = function(_, opts) require('mason').setup(opts) end,
       },
       { 'mason-org/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
