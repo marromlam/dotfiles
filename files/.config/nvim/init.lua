@@ -31,18 +31,14 @@ end
 -- Load modules {{{
 --------------------------------------------------------------------------------
 
-require('tools') -- has to be loaded before plugins
+require('tools') -- has to be loaded before plugins (bootstraps ui, strings, colors)
 require('keymaps')
 require('options')
 require('highlight') -- needed by plugins for highlight tables
-require('custom.ui') -- needed by lazyloader for icons
 require('lazyloader')
 
 -- Defer non-critical modules for faster startup
-vim.defer_fn(function()
-  require('custom.strings')
-  require('external_grep')
-end, 0)
+vim.defer_fn(function() require('external_grep') end, 0)
 
 -- }}}
 --------------------------------------------------------------------------------

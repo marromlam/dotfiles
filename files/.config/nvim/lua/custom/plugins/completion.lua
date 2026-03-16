@@ -1,4 +1,5 @@
-local highlight, ui = mrl.highlight, mrl.ui
+local highlight = require('highlight')
+local ui = require('tools').ui
 
 return {
   {

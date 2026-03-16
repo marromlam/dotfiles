@@ -1,3 +1,6 @@
+local T = require('tools')
+local map = vim.keymap.set
+
 return {
   'akinsho/toggleterm.nvim',
   cmd = { 'ToggleTerm', 'ToggleTermOpenAll', 'ToggleTermCloseAll' },
@@ -31,7 +34,7 @@ return {
     require('toggleterm').setup(opts)
 
     local float_handler = function(term)
-      if not mrl.falsy(vim.fn.mapcheck('jk', 't')) then
+      if not T.falsy(vim.fn.mapcheck('jk', 't')) then
         vim.keymap.del('t', 'jk', { buffer = term.bufnr })
         vim.keymap.del('t', '<esc>', { buffer = term.bufnr })
       end
@@ -86,6 +89,6 @@ return {
     map('n', '<leader>ld', function() lazydocker:toggle() end, {
       desc = 'toggleterm: toggle lazydocker',
     })
-    mrl.command('Btop', function() btop:toggle() end)
+    T.command('Btop', function() btop:toggle() end)
   end,
 }

@@ -1,78 +1,7 @@
-if not mrl then return end
+local augroup = require('tools').augroup
 
--- Helper to safely call augroup, deferring if not available yet
-local function augroup(name, ...)
-  local args = { ... }
-  if mrl and mrl.augroup then
-    return mrl.augroup(name, unpack(args))
-  else
-    -- Defer until augroup is available
-    vim.schedule(function()
-      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
-    end)
-  end
-end
-
-local fn, api, v, env, cmd, fmt =
-  vim.fn, vim.api, vim.v, vim.env, vim.cmd, string.format
-
--- -----------------------------------------------------------------------------
--- Performance-sensitive: avoid heavy Vimscript in init.lua
--- -----------------------------------------------------------------------------
-
--- Highlight lines starting with '##' (headings) using a lightweight sign group.
--- This replaces the old Vimscript that unplaced/placed signs across 1000 ids.
--- do
---   local group = api.nvim_create_augroup('HeadingLineSign', { clear = true })
---   local sign_name = 'highlightline'
---   local sign_group = 'headingline'
---   local debounce_ms = 120
---   local pending = {} ---@type table<integer, uv_timer_t?>
---
---   -- Define sign once (safe to call multiple times).
---   pcall(fn.sign_define, sign_name, { linehl = 'Match' })
---
---   local function update(bufnr)
---     if not api.nvim_buf_is_valid(bufnr) then return end
---     if vim.bo[bufnr].buftype ~= '' then return end
---
---     local ft = vim.bo[bufnr].filetype
---     if ft ~= 'markdown' and ft ~= 'org' and ft ~= 'norg' then return end
---
---     pcall(fn.sign_unplace, sign_group, { buffer = bufnr })
---
---     local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
---     for i, line in ipairs(lines) do
---       if line:match('^%s*##') then
---         -- id=0 lets Vim allocate IDs; placing is scoped to sign_group+buffer.
---         pcall(fn.sign_place, 0, sign_group, sign_name, bufnr, {
---           lnum = i,
---           priority = 10,
---         })
---       end
---     end
---   end
---
---   local function schedule(bufnr)
---     if pending[bufnr] then
---       pending[bufnr]:stop()
---       pending[bufnr]:close()
---       pending[bufnr] = nil
---     end
---     pending[bufnr] = vim.defer_fn(function()
---       pending[bufnr] = nil
---       update(bufnr)
---     end, debounce_ms)
---   end
---
---   api.nvim_create_autocmd(
---     { 'BufWinEnter', 'TextChanged', 'TextChangedI', 'TextChangedP' },
---     {
---       group = group,
---       callback = function(args) schedule(args.buf) end,
---     }
---   )
--- end
+local fn, api, v, cmd =
+  vim.fn, vim.api, vim.v, vim.cmd
 
 -- Better terminal UX inside fzf-lua: allow Esc to abort.
 api.nvim_create_autocmd('FileType', {
@@ -94,7 +23,6 @@ do
 
   local function disable(buf)
     if not api.nvim_buf_is_valid(buf) then return end
-    -- Common plugin conventions:
     vim.b[buf].miniindentscope_disable = true
     vim.b[buf].ibl_disable = true
     vim.b[buf].indent_blankline_enabled = false
@@ -105,7 +33,6 @@ do
     callback = function(args) disable(args.buf) end,
   })
 
-  -- Some terminal plugins use a FileType instead of buftype checks.
   api.nvim_create_autocmd('FileType', {
     group = group,
     pattern = { 'toggleterm', 'terminal' },
@@ -130,23 +57,18 @@ do
 
     api.nvim_win_call(win, function()
       vim.opt_local.winhighlight:append({
-        -- Force terminal windows to inherit the main editor background.
         Normal = 'Normal',
         NormalNC = 'NormalNC',
-        -- For floating terminal windows, ensure the float "Normal" maps to Normal too.
         NormalFloat = 'Normal',
       })
     end)
   end
 
-  -- Apply early, but also re-apply on WinEnter since some plugins set winhighlight
-  -- after opening (Sidekick/toggleterm/etc).
   api.nvim_create_autocmd(
     { 'TermOpen', 'BufWinEnter', 'BufEnter', 'WinEnter' },
     {
       group = group,
       callback = function(args)
-        -- Defer one tick so we win over later winhighlight setters.
         vim.schedule(function() apply_terminal_winhighlight(args.buf) end)
       end,
     }
@@ -162,20 +84,15 @@ do
 end
 
 -- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup(
-    'kickstart-highlight-yank',
-    { clear = true }
-  ),
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function() vim.highlight.on_yank() end,
 })
 
 local function stop_hl()
   if v.hlsearch == 0 or api.nvim_get_mode().mode ~= 'n' then return end
-  vim.api.nvim_feedkeys(vim.keycode('<Plug>(StopHL)'), 'm', false)
+  vim.cmd('nohlsearch')
 end
 
 local function hl_search()
@@ -184,7 +101,6 @@ local function hl_search()
   local ok, match = pcall(fn.matchstrpos, curr_line, fn.getreg('/'), 0)
   if not ok then return end
   local _, p_start, p_end = unpack(match)
-  -- if the cursor is in a search result, leave highlighting on
   if col < p_start or col > p_end then stop_hl() end
 end
 
@@ -202,65 +118,19 @@ augroup('VimrcIncSearchHighlight', {
   end,
 }, {
   event = 'RecordingEnter',
-  command = function() vim.o.hlsearch = false end,
-}, {
-  event = 'RecordingLeave',
-  command = function() vim.o.hlsearch = true end,
-})
-
--- Search highlighting {{{
-
-----------------------------------------------------------------------------------------------------
--- HLSEARCH
-----------------------------------------------------------------------------------------------------
---   In order to get hlsearch working the way I like i.e. on when using /,?,N,n,*,#, etc. and off when
--- When I'm not using them, I need to set the following:
--- The mappings below are essentially faked user input this is because in order to automatically turn off
--- the search highlight just changing the value of 'hlsearch' inside a function does not work
--- read `:h nohlsearch`. So to have this workaround I check that the current mouse position is not a search
--- result, if it is we leave highlighting on, otherwise I turn it off on cursor moved by faking my input
--- using the expr mappings below.
---
--- This is based on the implementation discussed here:
--- https://github.com/neovim/neovim/issues/5581
-
-vim.keymap.set(
-  { 'n', 'v', 'o', 'i', 'c' },
-  '<Plug>(StopHL)',
-  'execute("nohlsearch")[-1]',
-  { expr = true }
-)
-
-local function stop_hl()
-  if v.hlsearch == 0 or api.nvim_get_mode().mode ~= 'n' then return end
-  api.nvim_feedkeys(vim.keycode('<Plug>(StopHL)'), 'm', false)
-end
-
--- REMOVED DUPLICATE: This function and autocmd group was already defined above (lines 180-209)
--- Duplicate removed to fix scrolling lag caused by double CursorMoved events
-
--- }}}
-
--- Recording macro {{{
-
-vim.api.nvim_create_autocmd('RecordingEnter', {
-  pattern = '*',
-  callback = function()
+  command = function()
+    vim.o.hlsearch = false
     vim.g.macro_recording = 'macro @' .. vim.fn.reg_recording()
     vim.cmd('redrawstatus')
   end,
-})
-
--- Autocmd to track the end of macro recording
-vim.api.nvim_create_autocmd('RecordingLeave', {
-  pattern = '*',
-  callback = function()
+}, {
+  event = 'RecordingLeave',
+  command = function()
+    vim.o.hlsearch = true
     vim.g.macro_recording = ''
     vim.cmd('redrawstatus')
   end,
 })
-
--- }}}
 
 augroup('UpdateVim', {
   event = { 'FocusLost' },
@@ -269,7 +139,7 @@ augroup('UpdateVim', {
 }, {
   event = { 'VimResized' },
   pattern = { '*' },
-  command = 'wincmd =', -- Make windows equal size when vim resizes
+  command = 'wincmd =',
 })
 
 -- -----------------------------------------------------------------------------
@@ -320,19 +190,16 @@ do
     if fn.winnr('$') ~= 1 then
       api.nvim_win_close(0, true)
     else
-      -- If it's the last window, delete the buffer instead.
       pcall(cmd.bdelete, { 0, bang = true })
     end
   end
 
-  -- Auto open quickfix after grep-like commands.
   api.nvim_create_autocmd('QuickFixCmdPost', {
     group = group,
     pattern = '*grep*',
     command = 'cwindow',
   })
 
-  -- Close certain filetypes by pressing q.
   api.nvim_create_autocmd('FileType', {
     group = group,
     callback = function(args)
@@ -355,7 +222,6 @@ do
     end,
   })
 
-  -- Close quickfix buffer if it's the only remaining window.
   api.nvim_create_autocmd('BufEnter', {
     group = group,
     callback = function()
@@ -365,7 +231,6 @@ do
     end,
   })
 
-  -- Close location list when quitting a window.
   api.nvim_create_autocmd('QuitPre', {
     group = group,
     nested = true,
@@ -400,7 +265,6 @@ do
     local path = api.nvim_buf_get_name(bufnr)
     if path == '' then return false end
 
-    -- Always allow formatting in your own code/config.
     local allow_prefixes = {
       vim.g.personal_directory,
       vim.g.work_directory,
@@ -410,20 +274,16 @@ do
     }
     for _, p in ipairs(allow_prefixes) do
       if p and startswith(path, p) then
-        -- Don't blanket-allow HOME; only use it to prevent disabling on empty vars.
-        -- If you want stricter behavior, remove HOME from this list.
         if p ~= vim.env.HOME then return false end
       end
     end
 
-    -- Disable formatting in runtime/plugin directories.
     if vim.env.VIMRUNTIME and startswith(path, vim.env.VIMRUNTIME) then
       return true
     end
 
     for _, dir in ipairs(vim.split(vim.o.runtimepath, ',', { plain = true })) do
       if dir ~= '' and startswith(path, dir) then
-        -- Never disable in your actual config path.
         if vim.g.vim_dir and startswith(path, vim.g.vim_dir) then
           return false
         end
@@ -493,7 +353,7 @@ do
   })
 end
 
--- Auto create dir when saving a file, in case some intermediate directory does not exist
+-- Auto create dir when saving a file
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   group = vim.api.nvim_create_augroup('AutoCreateDir', { clear = true }),
   callback = function(event)
@@ -511,136 +371,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
   end,
 })
 
--- LSP inline diagnostics {{{
---
--- local function best_diagnostic(diagnostics)
---   if vim.tbl_isempty(diagnostics) then
---     return
---   end
---
---   local best = nil
---   local line_diagnostics = {}
---   local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1
---
---   for k, v in pairs(diagnostics) do
---     if v.lnum == line_nr then
---       line_diagnostics[k] = v
---     end
---   end
---
---   for _, diagnostic in ipairs(line_diagnostics) do
---     if best == nil then
---       best = diagnostic
---     elseif diagnostic.severity < best.severity then
---       best = diagnostic
---     end
---   end
---
---   return best
--- end
---
--- local function current_line_diagnostics()
---   local bufnr = 0
---   local line_nr = vim.api.nvim_win_get_cursor(0)[1] - 1
---   local opts = { ["lnum"] = line_nr }
---
---   return vim.diagnostic.get(bufnr, opts)
--- end
---
--- local signs = {
---   Error = " ",
---   Warn = " ",
---   Hint = " ",
---   Info = " ",
--- }
---
--- local virt_handler = vim.diagnostic.handlers.virtual_text
--- local ns = vim.api.nvim_create_namespace "current_line_virt"
--- local severity = vim.diagnostic.severity
--- local virt_options = {
---   prefix = "",
---   format = function(diagnostic)
---     local message = vim.split(diagnostic.message, "\n")[1]
---
---     if diagnostic.severity == severity.ERROR then
---       return signs.Error .. message
---     elseif diagnostic.severity == severity.INFO then
---       return signs.Info .. message
---     elseif diagnostic.severity == severity.WARN then
---       return signs.Warn .. message
---     elseif diagnostic.severity == severity.HINT then
---       return signs.Hint .. message
---     else
---       return message
---     end
---   end,
--- }
---
--- vim.diagnostic.handlers.current_line_virt = {
---   show = function(_, bufnr, diagnostics, _)
---     local diagnostic = best_diagnostic(diagnostics)
---     if not diagnostic then
---       return
---     end
---
---     local filtered_diagnostics = { diagnostic }
---
---     pcall(
---       virt_handler.show,
---       ns,
---       bufnr,
---       filtered_diagnostics,
---       { virtual_text = virt_options }
---     )
---   end,
---   hide = function(_, bufnr)
---     bufnr = bufnr or vim.api.nvim_get_current_buf()
---     virt_handler.hide(ns, bufnr)
---   end,
--- }
---
--- vim.diagnostic.config {
---   float = { source = "always" },
---   signs = false,
---   virtual_text = false,
---   severity_sort = true,
---   current_line_virt = true,
--- }
---
--- vim.api.nvim_create_augroup("lsp_diagnostic_current_line", {
---   clear = true,
--- })
---
---
--- vim.api.nvim_clear_autocmds {
---   buffer = bufnr,
---   group = "lsp_diagnostic_current_line",
--- }
---
--- vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
---   group = "lsp_diagnostic_current_line",
---   buffer = bufnr,
---   callback = function()
---     vim.diagnostic.handlers.current_line_virt.show(
---       nil,
---       0,
---       current_line_diagnostics(),
---       nil
---     )
---   end,
--- })
---
--- vim.api.nvim_create_autocmd("CursorMoved", {
---   group = "lsp_diagnostic_current_line",
---   buffer = bufnr,
---   callback = function()
---     vim.diagnostic.handlers.current_line_virt.hide(nil, nil)
---   end,
--- })
-
--- }}}
-
--- Cursorline only in active window (Folke's pattern)
+-- Cursorline only in active window
 vim.api.nvim_create_autocmd({ 'InsertLeave', 'WinEnter' }, {
   callback = function()
     if vim.w.auto_cursorline then
@@ -658,34 +389,41 @@ vim.api.nvim_create_autocmd({ 'InsertEnter', 'WinLeave' }, {
   end,
 })
 
--- Disable statuscolumn and other columns in floating windows
+-- Disable statuscolumn/signcolumn/foldcolumn in floating windows and tool panels.
 do
   local group = vim.api.nvim_create_augroup('DisableColumnsInFloats', { clear = true })
 
-  local function disable_columns_in_float()
-    local win = vim.api.nvim_get_current_win()
-    local win_config = vim.api.nvim_win_get_config(win)
-    if win_config.relative ~= '' then
-      -- This is a floating window - disable all column decorations
-      vim.wo[win].statuscolumn = ''
-      vim.wo[win].signcolumn = 'no'
-      vim.wo[win].foldcolumn = '0'
-      vim.wo[win].number = false
-      vim.wo[win].relativenumber = false
-    end
+  local no_number_filetypes = {
+    'lazy', 'mason', 'noice', 'notify', 'trouble', 'aerial',
+    'dap-repl', 'dapui_console', 'dapui_watches', 'dapui_stacks',
+    'dapui_breakpoints', 'dapui_scopes',
+  }
+
+  local function disable_decoration_columns(win)
+    vim.wo[win].statuscolumn = ''
+    vim.wo[win].signcolumn = 'no'
+    vim.wo[win].foldcolumn = '0'
   end
 
-  -- Apply on multiple events to catch Mason, Lazy, and other plugin floats
-  vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter', 'FileType' }, {
-    group = group,
-    callback = disable_columns_in_float,
-  })
-
-  -- Also apply with a slight delay to override plugin settings
   vim.api.nvim_create_autocmd('WinEnter', {
     group = group,
     callback = function()
-      vim.schedule(disable_columns_in_float)
+      local win = vim.api.nvim_get_current_win()
+      if vim.api.nvim_win_get_config(win).relative ~= '' then
+        disable_decoration_columns(win)
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    group = group,
+    pattern = no_number_filetypes,
+    callback = function()
+      vim.opt_local.statuscolumn = ''
+      vim.opt_local.signcolumn = 'no'
+      vim.opt_local.foldcolumn = '0'
+      vim.opt_local.number = false
+      vim.opt_local.relativenumber = false
     end,
   })
 end
@@ -697,7 +435,6 @@ do
   vim.api.nvim_create_autocmd('WinLeave', {
     group = group,
     callback = function()
-      -- Only dim non-floating windows
       local win_config = vim.api.nvim_win_get_config(0)
       if win_config.relative == '' then
         vim.cmd [[setlocal winhl=CursorLine:CursorLineNC]]
@@ -713,4 +450,38 @@ do
   })
 end
 
--- }}
+-- -----------------------------------------------------------------------------
+-- Sidebar panels: strip line numbers and remap highlights to panel groups
+-- -----------------------------------------------------------------------------
+
+do
+  local sidebar_fts = {
+    'undotree',
+    'diff',
+    'Outline',
+    'dbui',
+    'neotest-summary',
+    'fugitive',
+    'AvanteSidebar',
+    'AvanteInput',
+    'Avante',
+    'AvanteSelectedFiles',
+  }
+
+  local function on_sidebar_enter()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.winhighlight:append({
+      Normal = 'PanelDarkBackground',
+      EndOfBuffer = 'PanelDarkBackground',
+      SignColumn = 'PanelDarkBackground',
+      WinSeparator = 'PanelWinSeparator',
+    })
+  end
+
+  vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('SidebarPanelHighlights', { clear = true }),
+    pattern = sidebar_fts,
+    callback = on_sidebar_enter,
+  })
+end

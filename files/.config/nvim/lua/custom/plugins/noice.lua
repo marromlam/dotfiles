@@ -1,5 +1,5 @@
 local fn = vim.fn
-local highlight, L = mrl.highlight, vim.log.levels
+local L = vim.log.levels
 
 return {
   'folke/noice.nvim',
@@ -199,6 +199,13 @@ return {
       filter = {
         event = 'notify',
         find = 'LSP%[ruff%] Ruff failed to handle a request',
+      },
+      opts = { skip = true },
+    })
+    table.insert(opts.routes, {
+      filter = {
+        event = 'msg_show',
+        find = 'client%.notify is deprecated',
       },
       opts = { skip = true },
     })
