@@ -39,9 +39,9 @@ local EXTRA_TOOLS = {
 
 -- mason-lspconfig package names (differ from server names for some servers)
 local SERVER_TO_PACKAGE = {
-  lua_ls       = 'lua-language-server',
+  lua_ls = 'lua-language-server',
   basedpyright = 'basedpyright',
-  ruff         = 'ruff',
+  ruff = 'ruff',
 }
 
 -- ─── Tier 1: mason-registry knows every package ───────────────────────────────
@@ -92,15 +92,13 @@ end
 for _, server in ipairs(LSP_SERVERS) do
   local pkg = SERVER_TO_PACKAGE[server] or server
   local sname = server
-  T['mason registry']['lsp: ' .. sname] = function()
-    eq(registry_has(pkg), true)
-  end
+  T['mason registry']['lsp: ' .. sname] = function() eq(registry_has(pkg), true) end
 end
 
 -- ─── Tier 2: on-disk presence ─────────────────────────────────────────────────
 
 local mason_root = real_data .. '/mason'
-local mason_bin  = mason_root .. '/bin'
+local mason_bin = mason_root .. '/bin'
 local mason_pkgs = mason_root .. '/packages'
 local mason_bin_exists = vim.loop.fs_stat(mason_bin) ~= nil
 

@@ -3,12 +3,10 @@
 -- Author: Marcos Romero Lamas
 -- Version: 1.0.0
 
-vim.cmd("hi clear")
-if vim.fn.exists("syntax_on") then
-  vim.cmd("syntax reset")
-end
+vim.cmd('hi clear')
+if vim.fn.exists('syntax_on') then vim.cmd('syntax reset') end
 
 vim.o.termguicolors = true
-vim.g.colors_name = "carbon-mist"
+vim.g.colors_name = 'carbon-mist'
 
-require("carbon-mist").load()
+require('carbon-mist').load()

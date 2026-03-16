@@ -4,10 +4,8 @@
 
 local T = MiniTest.new_set()
 
-local config_root = vim.fn.fnamemodify(
-  debug.getinfo(1, 'S').source:sub(2),
-  ':h:h:h'
-)
+local config_root =
+  vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h:h')
 
 vim.opt.rtp:prepend(config_root)
 
@@ -19,8 +17,8 @@ local function loads(mod_name)
   end
 end
 
-loads('tools')      -- core utilities + ui + strings + colors
-loads('highlight')  -- highlight helpers (depends on tools)
+loads('tools') -- core utilities + ui + strings + colors
+loads('highlight') -- highlight helpers (depends on tools)
 
 -- options.lua has side effects but returns nothing; just check it doesn't error
 T['options.lua executes without error'] = function()

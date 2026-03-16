@@ -18,48 +18,28 @@ T['options'] = MiniTest.new_set({
       T.child = MiniTest.new_child_neovim()
       T.child.start({ '-u', 'NONE' })
       -- Put the config lua/ directory on rtp so require() works
-      T.child.lua(
-        ('vim.opt.rtp:prepend(%q)'):format(config_root)
-      )
+      T.child.lua(('vim.opt.rtp:prepend(%q)'):format(config_root))
       T.child.lua("require('options')")
     end,
     post_once = function() T.child.stop() end,
   },
 })
 
-local function get_opt(name)
-  return T.child.lua_get(('vim.o[%q]'):format(name))
-end
+local function get_opt(name) return T.child.lua_get(('vim.o[%q]'):format(name)) end
 
-T['options']['number is set'] = function()
-  eq(get_opt('number'), true)
-end
+T['options']['number is set'] = function() eq(get_opt('number'), true) end
 T['options']['relativenumber is set'] = function()
   eq(get_opt('relativenumber'), true)
 end
-T['options']['splitbelow is set'] = function()
-  eq(get_opt('splitbelow'), true)
-end
-T['options']['splitright is set'] = function()
-  eq(get_opt('splitright'), true)
-end
-T['options']['undofile is set'] = function()
-  eq(get_opt('undofile'), true)
-end
+T['options']['splitbelow is set'] = function() eq(get_opt('splitbelow'), true) end
+T['options']['splitright is set'] = function() eq(get_opt('splitright'), true) end
+T['options']['undofile is set'] = function() eq(get_opt('undofile'), true) end
 T['options']['termguicolors is set'] = function()
   eq(get_opt('termguicolors'), true)
 end
-T['options']['ignorecase is set'] = function()
-  eq(get_opt('ignorecase'), true)
-end
-T['options']['smartcase is set'] = function()
-  eq(get_opt('smartcase'), true)
-end
-T['options']['expandtab is set'] = function()
-  eq(get_opt('expandtab'), true)
-end
-T['options']['showtabline is 0'] = function()
-  eq(get_opt('showtabline'), 0)
-end
+T['options']['ignorecase is set'] = function() eq(get_opt('ignorecase'), true) end
+T['options']['smartcase is set'] = function() eq(get_opt('smartcase'), true) end
+T['options']['expandtab is set'] = function() eq(get_opt('expandtab'), true) end
+T['options']['showtabline is 0'] = function() eq(get_opt('showtabline'), 0) end
 
 return T

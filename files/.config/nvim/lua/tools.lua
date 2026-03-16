@@ -612,9 +612,15 @@ function M.ui.refresh_palette()
   derived.light_red = palette_tint(derived.pale_red, -0.15)
   derived.dark_red = palette_tint(derived.pale_red, -0.30)
 
-  for k in pairs(palette) do palette[k] = nil end
-  for k, v in pairs(defaults) do palette[k] = derived[k] or v end
-  for k, v in pairs(derived) do palette[k] = v end
+  for k in pairs(palette) do
+    palette[k] = nil
+  end
+  for k, v in pairs(defaults) do
+    palette[k] = derived[k] or v
+  end
+  for k, v in pairs(derived) do
+    palette[k] = v
+  end
 
   -- Keep LSP colors in sync
   local lsp = M.ui.lsp
