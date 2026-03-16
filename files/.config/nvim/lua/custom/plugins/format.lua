@@ -22,6 +22,7 @@ return {
           -- Disable LSP fallback for languages that don't
           -- have a well standardized coding style. You can add additional
           -- languages here or re-enable it for the disabled ones.
+          if not vim.bo[bufnr].modifiable then return nil end
           if vim.g.disable_autoformat or vim.g.formatting_disabled then
             return nil
           end
