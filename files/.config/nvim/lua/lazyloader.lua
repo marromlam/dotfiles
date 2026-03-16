@@ -15,7 +15,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- Ensure icons are available, use defaults if not
-local icons = require('custom.ui').icons
+local icons = require('tools').ui.icons
 
 require('lazy').setup({
   { import = 'custom.plugins' },

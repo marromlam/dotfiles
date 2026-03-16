@@ -1,3 +1,4 @@
+-- DONE
 return {
   {
     'nvim-treesitter/nvim-treesitter',
@@ -18,8 +19,7 @@ return {
         },
         auto_install = true,
         highlight = {
-          -- enable = true,
-          enable = false,
+          enable = true,
           disable = { 'tex', 'latex', 'applescript' },
           -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
           --  If you are experiencing weird indenting issues, add the language to
@@ -142,7 +142,7 @@ return {
     'nvim-treesitter/nvim-treesitter-context',
     event = { 'BufReadPost', 'BufNewFile' },
     init = function()
-      local highlight = mrl.highlight
+      local highlight = require('highlight')
       highlight.plugin('treesitter-context', {
         { TreesitterContextSeparator = { link = 'Dim' } },
         { TreesitterContext = { inherit = 'Normal' } },
@@ -150,9 +150,17 @@ return {
       })
     end,
     opts = {
-      multiline_threshold = 4,
+      enable = false,
+      multiline_threshold = 10,
       separator = '─',
       mode = 'cursor',
+    },
+    keys = {
+      {
+        '<leader>sc',
+        '<cmd>TSContext toggle<CR>',
+        desc = 'Toggle [s]cope [c]ontext',
+      },
     },
   },
 }
