@@ -1,0 +1,54 @@
+{
+  "mcpServers": {
+    "word-document-server": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Ubuntu-24.04",
+        "/home/linuxbrew/.linuxbrew/bin/python3.14",
+        "-m",
+        "word_document_server.main"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio"
+      }
+    },
+    "github": {
+      "command": "wsl.exe",
+      "args": [
+        "docker",
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN={GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "ghcr.io/github/github-mcp-server"
+      ]
+    },
+    "gitlocal": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Ubuntu-24.04",
+        "bash",
+        "-l",
+        "-c",
+        "npx -y @cyanheads/git-mcp-server"
+      ],
+      "env": {
+        "GIT_ALLOWED_REPOS": "/home/marcos/projects,/home/marcos/work"
+      }
+    },
+    "neovim": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Ubuntu-24.04",
+        "--",
+        "bash",
+        "-lc",
+        "/home/marcos/.dotfiles/scripts/neovim-mcp-wrapper.sh"
+      ]
+    }
+  }
+}

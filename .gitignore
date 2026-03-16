@@ -96,3 +96,17 @@ files/.config/pdftex-figures/roots
 files/.config/browsh/firefox_profile
 files/.config/kitty/kitty.conf.bak
 files/.config/go/telemetry
+
+# additional browsers and tools
+files/.config/BraveSoftware/
+files/.config/configstore/
+files/.config/cursor/
+files/.config/microsoft-edge/
+files/.config/mui-x-nodejs/
+files/.config/opera/
+files/.config/rclone/
+files/.config/systemd/
+files/.config/vivaldi/
+
+# Claude data
+.claude/

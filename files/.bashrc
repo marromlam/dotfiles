@@ -31,6 +31,16 @@ export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 source $HOME/.dotfiles/zsh/ufunctions.sh
 # source $HOME/.dotfiles/zsh/zshenv
 
+# Start MCP server for Neovim (WSL only)
+if grep -qi microsoft /proc/version && [[ -z "$NVIM" ]]; then
+    export NVIM_SOCKET="/tmp/nvim-mcp-server.sock"
+
+    # Ensure systemd user services are running in WSL
+    if ! systemctl --user is-active --quiet neovim-mcp.service; then
+        systemctl --user start neovim-mcp.service
+    fi
+fi
+
 # variable with current host name
 function whoismyhost() {
     echo "$(hostname)"

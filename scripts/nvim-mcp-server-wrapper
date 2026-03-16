@@ -1,0 +1,9 @@
+#!/bin/bash
+# Ensure nvim is running
+if ! pgrep -f 'nvim.*listen /tmp/nvim' >/dev/null; then
+    echo 'Starting Neovim instance...' >&2
+    nvim --headless --listen /tmp/nvim &
+    sleep 1
+fi
+
+exec $HOME/.dotfiles/scripts/nvim-mcp-server

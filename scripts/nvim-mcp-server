@@ -1,0 +1,18 @@
+#!/bin/bash
+export MACHINEOS=$($HOME/.dotfiles/scripts/machine.sh)
+
+# Set OS-dependent stuff
+if [[ "$MACHINEOS" == "Mac" ]]; then
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        export HOMEBREW_PREFIX="/usr/local"
+    else
+        export HOMEBREW_PREFIX="/opt/homebrew"
+    fi
+else
+    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+fi
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
+# export NVIM_SOCKET_PATH=/tmp/nvim-mcp.sock
+export NVIM_SOCKET_PATH=/tmp/nvim-mcp-server.sock
+export ALLOW_SHELL_COMMANDS=true
+exec npx -y mcp-neovim-server
