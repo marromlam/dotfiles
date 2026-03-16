@@ -75,7 +75,6 @@ local function get_hl_as_hex(opts, ns)
   return hl
 end
 
-
 ---Get the value a highlight group whilst handling errors, fallbacks as well as returning a gui value
 ---If no attribute is specified return the entire highlight table
 ---in the right format

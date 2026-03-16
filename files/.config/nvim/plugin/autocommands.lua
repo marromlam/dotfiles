@@ -1,7 +1,6 @@
 local augroup = require('tools').augroup
 
-local fn, api, v, cmd =
-  vim.fn, vim.api, vim.v, vim.cmd
+local fn, api, v, cmd = vim.fn, vim.api, vim.v, vim.cmd
 
 -- Better terminal UX inside fzf-lua: allow Esc to abort.
 api.nvim_create_autocmd('FileType', {
@@ -55,13 +54,16 @@ do
     local win = api.nvim_get_current_win()
     if not api.nvim_win_is_valid(win) then return end
 
-    api.nvim_win_call(win, function()
-      vim.opt_local.winhighlight:append({
-        Normal = 'Normal',
-        NormalNC = 'NormalNC',
-        NormalFloat = 'Normal',
-      })
-    end)
+    api.nvim_win_call(
+      win,
+      function()
+        vim.opt_local.winhighlight:append({
+          Normal = 'Normal',
+          NormalNC = 'NormalNC',
+          NormalFloat = 'Normal',
+        })
+      end
+    )
   end
 
   api.nvim_create_autocmd(
@@ -86,7 +88,10 @@ end
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup(
+    'kickstart-highlight-yank',
+    { clear = true }
+  ),
   callback = function() vim.highlight.on_yank() end,
 })
 
@@ -391,12 +396,22 @@ vim.api.nvim_create_autocmd({ 'InsertEnter', 'WinLeave' }, {
 
 -- Disable statuscolumn/signcolumn/foldcolumn in floating windows and tool panels.
 do
-  local group = vim.api.nvim_create_augroup('DisableColumnsInFloats', { clear = true })
+  local group =
+    vim.api.nvim_create_augroup('DisableColumnsInFloats', { clear = true })
 
   local no_number_filetypes = {
-    'lazy', 'mason', 'noice', 'notify', 'trouble', 'aerial',
-    'dap-repl', 'dapui_console', 'dapui_watches', 'dapui_stacks',
-    'dapui_breakpoints', 'dapui_scopes',
+    'lazy',
+    'mason',
+    'noice',
+    'notify',
+    'trouble',
+    'aerial',
+    'dap-repl',
+    'dapui_console',
+    'dapui_watches',
+    'dapui_stacks',
+    'dapui_breakpoints',
+    'dapui_scopes',
   }
 
   local function disable_decoration_columns(win)
@@ -437,16 +452,14 @@ do
     callback = function()
       local win_config = vim.api.nvim_win_get_config(0)
       if win_config.relative == '' then
-        vim.cmd [[setlocal winhl=CursorLine:CursorLineNC]]
+        vim.cmd([[setlocal winhl=CursorLine:CursorLineNC]])
       end
     end,
   })
 
   vim.api.nvim_create_autocmd('WinEnter', {
     group = group,
-    callback = function()
-      vim.cmd [[setlocal winhl=]]
-    end,
+    callback = function() vim.cmd([[setlocal winhl=]]) end,
   })
 end
 
@@ -480,7 +493,10 @@ do
   end
 
   vim.api.nvim_create_autocmd('FileType', {
-    group = vim.api.nvim_create_augroup('SidebarPanelHighlights', { clear = true }),
+    group = vim.api.nvim_create_augroup(
+      'SidebarPanelHighlights',
+      { clear = true }
+    ),
     pattern = sidebar_fts,
     callback = on_sidebar_enter,
   })

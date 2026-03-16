@@ -6,10 +6,8 @@
 local T = MiniTest.new_set()
 local eq = MiniTest.expect.equality
 
-local config_root = vim.fn.fnamemodify(
-  debug.getinfo(1, 'S').source:sub(2),
-  ':h:h:h'
-)
+local config_root =
+  vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h:h')
 
 T['keymaps'] = MiniTest.new_set({
   hooks = {
@@ -28,10 +26,12 @@ T['keymaps'] = MiniTest.new_set({
 --- Check that a keymap is registered for the given mode and lhs.
 local function has_map(mode, lhs)
   return T.child.lua_get(
-    ('(function() '
+    (
+      '(function() '
       .. 'local maps = vim.fn.maparg(%q, %q, false, true); '
       .. 'return maps ~= nil and maps.lhs ~= nil '
-      .. 'end)()'):format(lhs, mode)
+      .. 'end)()'
+    ):format(lhs, mode)
   )
 end
 
@@ -50,8 +50,6 @@ end
 T['keymaps']['[l moves to prev loclist item'] = function()
   eq(has_map('n', '[l'), true)
 end
-T['keymaps']['g> shows messages'] = function()
-  eq(has_map('n', 'g>'), true)
-end
+T['keymaps']['g> shows messages'] = function() eq(has_map('n', 'g>'), true) end
 
 return T

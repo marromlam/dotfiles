@@ -13,9 +13,7 @@ T['falsy'] = MiniTest.new_set()
 T['falsy']['nil returns true'] = function() eq(tools.falsy(nil), true) end
 T['falsy']['false returns true'] = function() eq(tools.falsy(false), true) end
 T['falsy']['true returns false'] = function() eq(tools.falsy(true), false) end
-T['falsy']['empty string returns true'] = function()
-  eq(tools.falsy(''), true)
-end
+T['falsy']['empty string returns true'] = function() eq(tools.falsy(''), true) end
 T['falsy']['non-empty string returns false'] = function()
   eq(tools.falsy('hello'), false)
 end
@@ -26,9 +24,7 @@ end
 T['falsy']['positive number returns false'] = function()
   eq(tools.falsy(1), false)
 end
-T['falsy']['empty table returns true'] = function()
-  eq(tools.falsy({}), true)
-end
+T['falsy']['empty table returns true'] = function() eq(tools.falsy({}), true) end
 T['falsy']['non-empty table returns false'] = function()
   eq(tools.falsy({ 1 }), false)
 end
@@ -75,13 +71,15 @@ end
 T['fold'] = MiniTest.new_set()
 
 T['fold']['sums a list'] = function()
-  local sum =
-    tools.fold(function(acc, v) return acc + v end, { 1, 2, 3, 4 }, 0)
+  local sum = tools.fold(function(acc, v) return acc + v end, { 1, 2, 3, 4 }, 0)
   eq(sum, 10)
 end
 T['fold']['concatenates strings'] = function()
-  local result =
-    tools.fold(function(acc, v) return acc .. v end, { 'a', 'b', 'c' }, '')
+  local result = tools.fold(
+    function(acc, v) return acc .. v end,
+    { 'a', 'b', 'c' },
+    ''
+  )
   eq(result, 'abc')
 end
 T['fold']['uses empty table as default accumulator'] = function()
@@ -102,8 +100,7 @@ T['map']['doubles each element'] = function()
   eq(result, { 2, 4, 6 })
 end
 T['map']['maps strings to uppercase'] = function()
-  local result =
-    tools.map(function(v) return v:upper() end, { 'a', 'b', 'c' })
+  local result = tools.map(function(v) return v:upper() end, { 'a', 'b', 'c' })
   eq(result, { 'A', 'B', 'C' })
 end
 T['map']['returns empty table for empty input'] = function()

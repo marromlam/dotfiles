@@ -13,9 +13,7 @@ T['spacer']['returns nil for size < 1'] = function()
   eq(S.spacer(0), nil)
   eq(S.spacer(-1), nil)
 end
-T['spacer']['returns nil when size is absent'] = function()
-  eq(S.spacer(), nil)
-end
+T['spacer']['returns nil when size is absent'] = function() eq(S.spacer(), nil) end
 T['spacer']['returns a component with correct padding'] = function()
   local result = S.spacer(3)
   MiniTest.expect.no_equality(result, nil)

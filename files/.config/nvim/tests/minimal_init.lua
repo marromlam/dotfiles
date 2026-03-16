@@ -23,7 +23,8 @@ end
 vim.opt.rtp:prepend(mini_test_path)
 
 -- Add the nvim config root so tests can `require('tools')`, `require('highlight')`, etc.
-local config_root = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h')
+local config_root =
+  vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h')
 vim.opt.rtp:prepend(config_root)
 
 -- Stub out vim.notify to avoid noise during unit tests

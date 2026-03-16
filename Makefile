@@ -110,4 +110,16 @@ zsh-plugins:
 	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
 	
 
-.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
+MASON := $(HOME)/.local/share/nvim/mason/bin
+
+fmt:
+	git diff --name-only --diff-filter=d | grep '\.lua$$' | xargs -r $(MASON)/stylua --
+	git diff --name-only --diff-filter=d | grep '\.sh$$' | xargs -r $(MASON)/shfmt -w
+	git diff --name-only --diff-filter=d | grep '\.py$$' | xargs -r $(MASON)/isort --
+	git diff --name-only --diff-filter=d | grep '\.py$$' | xargs -r $(MASON)/black --
+
+commit: fmt
+	git add -u
+	git commit
+
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test fmt commit
