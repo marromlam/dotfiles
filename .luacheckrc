@@ -2,6 +2,9 @@ globals = {
     "vim",
     "mrl",
     "map",
+    "MiniTest",
+    "Stl",
+    "Stlcol",
 }
 
 -- Ignore: unused variables/arguments, line too long, shadowing, value overwritten
