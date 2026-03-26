@@ -43,11 +43,21 @@ jobs:
           assert_link "$HOME/.zprofile"
           assert_link "$HOME/.gitconfig"
           assert_link "$HOME/.bashrc"
-          assert_link "$HOME/.config/nvim"
-          assert_link "$HOME/.config/zsh"
-          assert_link "$HOME/.config/tmux"
-          assert_link "$HOME/.config/git"
+          assert_link "$HOME/.config"
           assert_link "$HOME/.dotfiles"
+
+          assert_path() {
+            if [[ ! -e "$1" ]]; then
+              echo "FAIL: expected path at $1"
+              ls -la "$(dirname "$1")" || true
+              exit 1
+            fi
+            echo "OK: $1"
+          }
+          assert_path "$HOME/.config/nvim"
+          assert_path "$HOME/.config/zsh"
+          assert_path "$HOME/.config/tmux"
+          assert_path "$HOME/.config/git"
 
       - name: Assert zshenv sets ZDOTDIR
         run: |
