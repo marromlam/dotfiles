@@ -39,27 +39,6 @@ local function general_overrides(dim_factor)
   local popup_thumb =
     highlight.blend(popup_bg, highlight.get('Comment', 'fg', normal_fg), 0.30)
 
-  -- Statuscolumn git bar colors (subtle bg tint from GitSigns fg colors)
-  local git_bar_alpha = 0.28
-  local git_add_bar_bg = highlight.blend(normal_bg, diff_add_fg, git_bar_alpha)
-  local git_change_bar_bg =
-    highlight.blend(normal_bg, diff_change_fg, git_bar_alpha)
-  local git_delete_bar_bg =
-    highlight.blend(normal_bg, diff_delete_fg, git_bar_alpha)
-  local git_untracked_bar_bg =
-    highlight.blend(normal_bg, highlight.get('Comment', 'fg', normal_fg), 0.20)
-
-  -- VSCode-ish: keep original text colors, just tint backgrounds.
-  -- Use HSL darkening to keep hue/saturation consistent across themes.
-  local diff_bg_factor = 0.3
-  local diff_add_bg = highlight.darken_hsl(diff_add_fg, -1 + 0.15)
-  local diff_delete_bg = highlight.darken_hsl(diff_delete_fg, -1 + 0.15)
-  local diff_change_bg = highlight.darken_hsl(diff_change_fg, -1 + 0.20)
-  local diff_text_bg = highlight.darken_hsl(diff_change_fg, -1 + 0.30)
-  -- Diff filler lines use the `fillchars.diff` glyph (you set it to '╱').
-  -- This glyph is highlighted with `DiffDelete` and can look too bright, so
-  -- keep it as a subtle dark grey, just above the background.
-  local diff_delete_filler_fg = highlight.darken_hsl(normal_fg, -0.8)
   -- do
   --   local configured = mrl.ui.current and mrl.ui.current.float_bg
   --   if vim.is_callable(configured) then
@@ -76,7 +55,7 @@ local function general_overrides(dim_factor)
   highlight.all({
     -- Status line
     { PanelSt = { link = 'Normal' } },
-    { TabLineSel = { fg = { from = 'Normal' }, bg = '#ff0000' } },
+    { TabLineSel = { fg = { from = 'Normal' }, bg = stl_bg } },
     -- { StatuslineNC = { fg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
     -- { StatusLine = { fg = { from = 'Normal', attr = 'fg' }, bg = stl_bg } },
     -- { StatusLineNC = { bg = { from = 'Normal', attr = 'fg' }, fg = bg_color } },
@@ -402,6 +381,18 @@ local function general_overrides(dim_factor)
     --     bg = diff_text_bg,
     --   },
     -- },
+    -- Diffview file panel background (winhighlight uses DiffviewNormal for Normal).
+    { DiffviewNormal = { bg = { from = 'Normal', attr = 'bg' }, fg = { from = 'Normal', attr = 'fg' } } },
+    { DiffviewEndOfBuffer = { bg = { from = 'Normal', attr = 'bg' } } },
+    -- Diffview file panel: status letter fg only, no bg bleed from DiffAdd/DiffDelete/etc.
+    { DiffviewStatusAdded = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewStatusUntracked = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewStatusModified = { fg = { from = 'GitSignsChange', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewStatusRenamed = { fg = { from = 'GitSignsChange', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewStatusDeleted = { fg = { from = 'GitSignsDelete', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewStatusUnmerged = { fg = { from = 'DiagnosticWarn', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewFilePanelInsertions = { fg = { from = 'GitSignsAdd', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
+    { DiffviewFilePanelDeletions = { fg = { from = 'GitSignsDelete', attr = 'fg' }, bg = { from = 'Normal', attr = 'bg' } } },
     -- these highlights are syntax groups that are set in diff.vim
     { diffAdded = { inherit = 'DiffAdd' } },
     { diffChanged = { inherit = 'DiffChange' } },
@@ -528,7 +519,7 @@ local function general_overrides(dim_factor)
   })
 end
 
-local function set_sidebar_highlight(dim_factor)
+local function set_sidebar_highlight()
   highlight.all({
     {
       -- Panels should match the main window background.
@@ -563,37 +554,6 @@ local sidebar_fts = {
   'AvanteSelectedFiles',
 }
 
-local function on_diffview_enter()
-  local stl = vim.api.nvim_get_hl(0, { name = 'StatusLine', link = false })
-  local norm = vim.api.nvim_get_hl(0, { name = 'Normal', link = false })
-  local bg = stl.bg and ('#%06x'):format(stl.bg) or 'NONE'
-  local fg = norm.fg and ('#%06x'):format(norm.fg) or 'NONE'
-  local nbg = norm.bg and ('#%06x'):format(norm.bg) or 'NONE'
-
-  -- Use our own hl groups that diffview doesn't touch
-  vim.api.nvim_set_hl(0, 'DvPanelBg', { bg = bg, fg = fg })
-  vim.api.nvim_set_hl(0, 'DvPanelEob', { bg = bg })
-  vim.api.nvim_set_hl(0, 'DvPanelCursor', { bg = nbg })
-
-  -- Point diffview windows directly at our groups via winhighlight
-  local winhl = table.concat({
-    'Normal:DvPanelBg',
-    'EndOfBuffer:DvPanelEob',
-    'SignColumn:DvPanelBg',
-    'CursorLine:DvPanelCursor',
-    'WinSeparator:DiffviewWinSeparator',
-  }, ',')
-
-  -- Apply to the diffview tab (it opens in a new tabpage)
-  local tabpage = vim.api.nvim_get_current_tabpage()
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    local ft = vim.bo[buf].filetype
-    if ft == 'DiffviewFiles' or ft == 'DiffviewFileHistory' then
-      vim.api.nvim_set_option_value('winhighlight', winhl, { win = win })
-    end
-  end
-end
 
 local function on_sidebar_enter()
   -- Panels should feel like sidebars: no line numbers.
@@ -607,7 +567,7 @@ local function on_sidebar_enter()
   })
 end
 
-local function colorscheme_overrides(dim_factor)
+local function colorscheme_overrides()
   local overrides = {
     ['github_dark_default'] = {
       { TabLineSel = { link = 'Todo' } },
@@ -620,8 +580,8 @@ end
 local function user_highlights()
   local dim_factor = 0.25
   general_overrides(dim_factor)
-  set_sidebar_highlight(dim_factor)
-  colorscheme_overrides(dim_factor)
+  set_sidebar_highlight()
+  colorscheme_overrides()
 end
 
 -------------------------------------------------------------------------------
@@ -640,11 +600,6 @@ augroup('UserHighlights', {
   event = 'FileType',
   pattern = sidebar_fts,
   command = function() on_sidebar_enter() end,
-}, {
-  -- diffview fires this after its own hl.setup() completes, so our groups win.
-  event = 'User',
-  pattern = 'DiffviewViewPostLayout',
-  command = function() on_diffview_enter() end,
 })
 
 -- }}}

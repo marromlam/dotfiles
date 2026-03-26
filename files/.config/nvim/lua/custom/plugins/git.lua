@@ -197,15 +197,64 @@ return {
   -- }}}
   -----------------------------------------------------------------------------
   -----------------------------------------------------------------------------
+  -- git-conflict {{{
+  -----------------------------------------------------------------------------
+  {
+    'akinsho/git-conflict.nvim',
+    event = 'BufReadPre',
+    opts = {
+      default_mappings = true,
+      default_commands = true,
+      disable_diagnostics = true,
+      list_opener = 'copen',
+      highlights = {
+        incoming = 'DiffAdd',
+        current = 'DiffText',
+      },
+    },
+  },
+  -- }}}
+  -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
   -- fugitive {{{
   -----------------------------------------------------------------------------
   {
     'tpope/vim-fugitive',
     cmd = { 'Git' },
+    event = 'BufReadPre',
+    init = function()
+      vim.api.nvim_create_autocmd('DirChanged', {
+        group = vim.api.nvim_create_augroup('FugitiveWorktreeDetect', { clear = true }),
+        callback = function()
+          vim.fn.FugitiveDetect(vim.fn.getcwd())
+        end,
+      })
+    end,
     keys = {
       {
         '<leader>gs',
-        '<Cmd>Git<CR>',
+        function()
+          -- FugitiveCommonDir returns the shared .bare dir for all worktrees of the same repo
+          local cur_common = vim.fn.FugitiveCommonDir(vim.api.nvim_get_current_buf())
+          if cur_common == '' then
+            vim.cmd('tab Git')
+            return
+          end
+          for _, tabnr in ipairs(vim.api.nvim_list_tabpages()) do
+            for _, winnr in ipairs(vim.api.nvim_tabpage_list_wins(tabnr)) do
+              local buf = vim.api.nvim_win_get_buf(winnr)
+              local name = vim.api.nvim_buf_get_name(buf)
+              if name:match('^fugitive://') then
+                local tab_common = vim.fn.FugitiveCommonDir(buf)
+                if tab_common ~= '' and tab_common == cur_common then
+                  vim.api.nvim_set_current_tabpage(tabnr)
+                  return
+                end
+              end
+            end
+          end
+          vim.cmd('tab Git')
+        end,
         desc = '[git] Status',
         mode = 'n',
       },
@@ -364,6 +413,122 @@ return {
       'GitWorktreeList',
       'GitWorktreeSwitch',
     },
+    keys = {
+      {
+        '<leader>gwl',
+        function()
+          require('fzf-lua').fzf_exec(function(cb)
+            local lines = vim.fn.systemlist('git worktree list --porcelain')
+            local worktrees = {}
+            local cur = {}
+            for _, line in ipairs(lines) do
+              local path = line:match('^worktree (.+)')
+              local branch = line:match('^branch refs/heads/(.+)')
+              if path then cur = { path = path } end
+              if branch then cur.branch = branch end
+              if line == '' and cur.path then
+                table.insert(worktrees, cur)
+                cur = {}
+              end
+            end
+            if cur.path then table.insert(worktrees, cur) end
+            for _, wt_entry in ipairs(worktrees) do
+              cb(string.format('%s\t%s', wt_entry.branch or '(detached)', wt_entry.path))
+            end
+            cb(nil)
+          end, {
+            prompt = 'Worktrees> ',
+            actions = {
+              ['default'] = function(selected)
+                local path = selected[1]:match('\t(.+)$')
+                if path then
+                  require('git-worktree').switch_worktree(path)
+                end
+              end,
+            },
+          })
+        end,
+        desc = '[git] List/switch worktree',
+      },
+      {
+        '<leader>gwd',
+        function()
+          require('fzf-lua').fzf_exec(function(cb)
+            local lines = vim.fn.systemlist('git worktree list --porcelain')
+            local worktrees = {}
+            local cur = {}
+            for _, line in ipairs(lines) do
+              local path = line:match('^worktree (.+)')
+              local branch = line:match('^branch refs/heads/(.+)')
+              if path then cur = { path = path } end
+              if branch then cur.branch = branch end
+              if line == '' and cur.path then
+                table.insert(worktrees, cur)
+                cur = {}
+              end
+            end
+            if cur.path then table.insert(worktrees, cur) end
+            -- skip the main worktree (first entry)
+            for i, wt_entry in ipairs(worktrees) do
+              if i > 1 then
+                cb(string.format('%s\t%s', wt_entry.branch or '(detached)', wt_entry.path))
+              end
+            end
+            cb(nil)
+          end, {
+            prompt = 'Delete worktree> ',
+            fzf_opts = { ['--header'] = 'CTRL-D: force delete branch | ENTER: remove worktree only' },
+            actions = {
+              ['default'] = function(selected)
+                local path = selected[1]:match('\t(.+)$')
+                if not path then return end
+                vim.ui.input(
+                  { prompt = 'Flags ([-f] [-d|-D], or enter to confirm): ' },
+                  function(flags)
+                    if flags == nil then return end -- cancelled
+                    local cmd = 'gwrm ' .. (flags ~= '' and flags .. ' ' or '') .. vim.fn.shellescape(path)
+                    local out = vim.fn.system(cmd)
+                    if vim.v.shell_error ~= 0 then
+                      vim.notify(out, vim.log.levels.ERROR)
+                    else
+                      vim.notify('Removed worktree: ' .. path)
+                    end
+                  end
+                )
+              end,
+            },
+          })
+        end,
+        desc = '[git] Delete worktree',
+      },
+      {
+        '<leader>gwc',
+        function()
+          vim.ui.input({ prompt = 'New branch name: ' }, function(branch)
+            if not branch or branch == '' then return end
+            vim.ui.input(
+              { prompt = 'Path (default: ' .. branch .. '): ' },
+              function(path)
+                path = (path and path ~= '') and path or branch
+                vim.ui.input({ prompt = 'Base branch (default: HEAD): ' }, function(base)
+                  base = (base and base ~= '') and base or 'HEAD'
+                  require('git-worktree').create_worktree(path, branch, base)
+                end)
+              end
+            )
+          end)
+        end,
+        desc = '[git] Create worktree',
+      },
+    },
+    config = function()
+      require('git-worktree').setup()
+      require('git-worktree').on_tree_change(function(op, metadata)
+        if op == require('git-worktree').Operations.Switch then
+          vim.fn.FugitiveDetect(metadata.path)
+        end
+      end)
+    end,
   },
 }
 

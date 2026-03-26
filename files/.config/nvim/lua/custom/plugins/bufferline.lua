@@ -49,18 +49,14 @@ return {
             -- Visible (non-focused split) buffer
             buffer_visible = { bg = bg, fg = fg_dim },
 
-            -- Separators are invisible (same bg) — no clutter
-            separator = { bg = bg, fg = bg },
-            separator_selected = { bg = bg, fg = bg },
-            separator_visible = { bg = bg, fg = bg },
-            offset_separator = { bg = bg, fg = bg },
+            -- Powerline triangle separators
+            separator = { bg = bg, fg = bg_sel },
+            separator_selected = { bg = bg_sel, fg = bg },
+            separator_visible = { bg = bg, fg = bg_sel },
+            offset_separator = { bg = bg, fg = bg_sel },
 
             -- Indicator line under selected tab uses the accent colour
             indicator_selected = { fg = accent, bg = bg_sel },
-
-            -- Group labels
-            group_separator = { bg = bg, fg = fg_dim },
-            group_label = { bg = bg, fg = accent },
 
             -- Numbers
             numbers = { bg = bg, fg = fg_dim },
@@ -78,6 +74,7 @@ return {
 
           options = {
             style_preset = bufferline.style_preset.minimal,
+            separator_style = { '', '' },
             mode = 'buffers',
             custom_areas = {
               right = function()
@@ -89,7 +86,7 @@ return {
                   local sym = NUMS[i] or tostring(i)
                   local hl = tab == cur and 'BufferLineTabSelected'
                     or 'BufferLineTab'
-                  table.insert(result, { text = ' ' .. sym .. '  ', link = hl })
+                  table.insert(result, { text = ' ' .. sym .. ' ', link = hl })
                 end
                 return result
               end,
@@ -100,9 +97,14 @@ return {
             show_close_icon = false,
             show_buffer_close_icons = false,
             show_tab_indicators = false,
+            indicator = { style = 'none' },
 
-            -- Top-bar indicator for the selected buffer
-            -- indicator = { style = 'icon', icon = '▀' },
+            custom_filter = function(buf_number)
+              local name = vim.api.nvim_buf_get_name(buf_number)
+              if name:match('^fugitive://') then return false end
+              if name == '' then return false end
+              return true
+            end,
 
             hover = { enabled = true, delay = 150, reveal = { 'close' } },
 
@@ -134,69 +136,6 @@ return {
                 highlight = 'PanelHeading',
                 separator = false,
                 text_align = 'left',
-              },
-            },
-
-            groups = {
-              options = { toggle_hidden_on_enter = true },
-              items = {
-                bufferline.groups.builtin.pinned:with({ icon = '' }),
-                bufferline.groups.builtin.ungrouped,
-                {
-                  name = 'Dependencies',
-                  icon = '',
-                  highlight = { fg = '#ECBE7B' },
-                  matcher = function(buf)
-                    return vim.startswith(buf.path, vim.env.VIMRUNTIME)
-                  end,
-                },
-                {
-                  name = 'Terraform',
-                  matcher = function(buf) return buf.name:match('%.tf') ~= nil end,
-                },
-                {
-                  name = 'Kubernetes',
-                  matcher = function(buf)
-                    return buf.name:match('kubernetes')
-                      and buf.name:match('%.yaml')
-                  end,
-                },
-                {
-                  name = 'SQL',
-                  matcher = function(buf) return buf.name:match('%.sql$') end,
-                },
-                {
-                  name = 'Tests',
-                  icon = '',
-                  matcher = function(buf)
-                    local name = buf.name
-                    return name:match('[_%.]spec') or name:match('[_%.]test')
-                  end,
-                },
-                {
-                  name = 'Docs',
-                  icon = '',
-                  matcher = function(buf)
-                    if
-                      vim.bo[buf.id].filetype == 'man'
-                      or buf.path:match('man://')
-                    then
-                      return true
-                    end
-                    for _, ext in ipairs({ 'md', 'txt', 'org', 'norg', 'wiki' }) do
-                      if ext == vim.fn.fnamemodify(buf.path, ':e') then
-                        return true
-                      end
-                    end
-                  end,
-                },
-                {
-                  name = 'Git',
-                  icon = '',
-                  matcher = function(buf)
-                    if buf.path:match('fugitive://') then return true end
-                  end,
-                },
               },
             },
           },
