@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# gwrm — remove a git worktree and optionally delete its branch
+# Usage: gwrm [-f] [-d|-D] <branch-or-path>
+#   -f   force remove even if worktree has uncommitted changes
+#   -d   delete local branch after removing worktree (safe, merged only)
+#   -D   force-delete local branch after removing worktree
+
+set -euo pipefail
+
+force=''
+delete_branch=''
+
+while getopts 'fdD' opt; do
+  case $opt in
+    f) force='--force' ;;
+    d) delete_branch='-d' ;;
+    D) delete_branch='-D' ;;
+    *) echo "Usage: gwrm [-f] [-d|-D] <branch-or-path>" >&2; exit 1 ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -ne 1 ]; then
+  echo "Usage: gwrm [-f] [-d|-D] <branch-or-path>" >&2
+  exit 1
+fi
+
+target=$1
+
+# Resolve worktree path and branch from `git worktree list --porcelain`
+wt_path=''
+wt_branch=''
+cur_path=''
+cur_branch=''
+
+while IFS= read -r line; do
+  case $line in
+    'worktree '*)  cur_path="${line#worktree }" ;;
+    'branch refs/heads/'*) cur_branch="${line#branch refs/heads/}" ;;
+    '')
+      # end of a worktree block — check if it matches the target
+      if [ "$cur_path" = "$target" ] || [ "$cur_branch" = "$target" ]; then
+        wt_path="$cur_path"
+        wt_branch="$cur_branch"
+      fi
+      cur_path=''; cur_branch=''
+      ;;
+  esac
+done < <(git worktree list --porcelain; echo '')
+
+if [ -z "$wt_path" ]; then
+  echo "gwrm: no worktree found matching '$target'" >&2
+  exit 1
+fi
+
+# Safety: refuse to remove the current worktree
+if [ "$wt_path" = "$(git worktree list --porcelain | awk 'NR==2{print $2}')" ] || \
+   [ "$(realpath "$wt_path")" = "$(realpath "$(pwd)")" ]; then
+  echo "gwrm: cannot remove the current worktree" >&2
+  exit 1
+fi
+
+echo "Removing worktree: $wt_path"
+git worktree remove $force "$wt_path"
+git worktree prune
+
+if [ -n "$delete_branch" ] && [ -n "$wt_branch" ]; then
+  echo "Deleting branch: $wt_branch"
+  git branch "$delete_branch" "$wt_branch"
+fi
+
+# vim: ft=bash
