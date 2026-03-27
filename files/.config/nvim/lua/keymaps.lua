@@ -1,37 +1,15 @@
--- TODO: move me to other place
---
---
+local T = require('tools')
 local noremap_silent = { noremap = true, silent = true }
--- Commands {{{
---
----Create an nvim command
-function mrl.command(name, rhs, opts)
-  opts = opts or {}
-  vim.api.nvim_create_user_command(name, rhs, opts)
-end
-
----Determine if a value of any type is empty
-function mrl.falsy(item)
-  if not item then return true end
-  local item_type = type(item)
-  if item_type == 'boolean' then return not item end
-  if item_type == 'string' then return item == '' end
-  if item_type == 'number' then return item <= 0 end
-  if item_type == 'table' then return vim.tbl_isempty(item) end
-  return item ~= nil
-end
-
--- }}}
 
 -- Quickfix and Location List {{{
 
-mrl.list = { qf = {}, loc = {} }
+local list = { qf = {}, loc = {} }
 
 ---@param list_type "loclist" | "quickfix"
 ---@return boolean
 local function is_list_open(list_type)
-  return mrl.find(
-    function(win) return not mrl.falsy(win[list_type]) end,
+  return T.find(
+    function(win) return not T.falsy(win[list_type]) end,
     vim.fn.getwininfo()
   ) ~= nil
 end
@@ -45,7 +23,7 @@ local function preserve_window(callback, ...)
   if win ~= vim.api.nvim_get_current_win() then vim.cmd.wincmd('p') end
 end
 
-function mrl.list.qf.toggle()
+function list.qf.toggle()
   if is_list_open('quickfix') then
     vim.cmd.cclose(silence)
   elseif #vim.fn.getqflist() > 0 then
@@ -53,7 +31,7 @@ function mrl.list.qf.toggle()
   end
 end
 
-function mrl.list.loc.toggle()
+function list.loc.toggle()
   if is_list_open('loclist') then
     vim.cmd.lclose(silence)
   elseif #vim.fn.getloclist(0) > 0 then
@@ -63,34 +41,30 @@ end
 
 -- @see: https://vi.stackexchange.com/a/21255
 -- using range-aware function
-function mrl.list.qf.delete(buf)
+function list.qf.delete(buf)
   buf = buf or vim.api.nvim_get_current_buf()
-  local list = vim.fn.getqflist()
+  local qflist = vim.fn.getqflist()
   local line = vim.api.nvim_win_get_cursor(0)[1]
   local mode = vim.api.nvim_get_mode().mode
   if mode:match('[vV]') then
     local first_line = vim.fn.getpos("'<")[2]
     local last_line = vim.fn.getpos("'>")[2]
-    list = mrl.fold(function(accum, item, i)
+    qflist = T.fold(function(accum, item, i)
       if i < first_line or i > last_line then accum[#accum + 1] = item end
       return accum
-    end, list)
+    end, qflist)
   else
-    table.remove(list, line)
+    table.remove(qflist, line)
   end
   -- replace items in the current list, do not make a new copy of it; this also preserves the list title
-  vim.fn.setqflist({}, 'r', { items = list })
+  vim.fn.setqflist({}, 'r', { items = qflist })
   vim.fn.setpos('.', { buf, line, 1, 0 }) -- restore current line
 end
 
 -- }}}
 
-local fn, api, uv, cmd, command, fmt =
-  vim.fn, vim.api, vim.loop, vim.cmd, mrl.command, string.format
-
-if not mrl or not mrl.mappings.enable then return end
-
 local fn, api, uv, cmd, fmt = vim.fn, vim.api, vim.loop, vim.cmd, string.format
+local command = T.command
 
 -- Credit: Justinmk
 vim.keymap.set('n', 'g>', [[<cmd>set nomore<bar>40messages<bar>set more<CR>]], {
@@ -333,18 +307,8 @@ end)
 vim.keymap.set('n', 'gf', '<Cmd>e <cfile><CR>')
 
 -- quickfix list
-vim.keymap.set(
-  'n',
-  '<C-q>',
-  mrl.list.qf.toggle,
-  { desc = 'toggle quickfix list' }
-)
-vim.keymap.set(
-  'n',
-  '<C-;>',
-  mrl.list.loc.toggle,
-  { desc = 'toggle location list' }
-)
+vim.keymap.set('n', '<C-q>', list.qf.toggle, { desc = 'toggle quickfix list' })
+vim.keymap.set('n', '<C-;>', list.loc.toggle, { desc = 'toggle location list' })
 
 -----------------------------------------------------------------------------//
 -- Completion
@@ -453,7 +417,7 @@ vim.keymap.set(
   '<Cmd>Reverse<CR>',
   { desc = 'reverse buffer' }
 )
-vim.keymap.set('n', '<C-x>', '<Cmd>Todo<CR>', { desc = 'reverse buffer' })
+vim.keymap.set('n', '<C-x>', '<Cmd>Todo<CR>', { desc = 'toggle todo search' })
 
 -----------------------------------------------------------------------------//
 -- References
@@ -840,7 +804,7 @@ vim.keymap.set(
 vim.keymap.set(
   { 'n' },
   '<leader>ls',
-  '<cmd>lua vim.lsp.diagnostic.get_line_diagnostics()<CR>',
+  vim.diagnostic.open_float,
   { noremap = true, silent = true }
 )
 

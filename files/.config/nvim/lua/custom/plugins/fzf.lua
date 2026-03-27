@@ -1,15 +1,10 @@
-local mrl_ref = rawget(_G, 'mrl') or {}
-local ui = mrl_ref.ui or {}
-local icons = ui.icons or {}
-local lsp_hls = (ui.lsp and ui.lsp.highlights) or {}
+local UI = require('tools').ui
+local icons = UI.icons or {}
+local lsp_hls = (UI.lsp and UI.lsp.highlights) or {}
 
-local function has_exec(bin)
-  return vim.fn.executable(bin) == 1
-end
+local function has_exec(bin) return vim.fn.executable(bin) == 1 end
 
-local function trim(s)
-  return (s:gsub('^%s+', ''):gsub('%s+$', ''))
-end
+local function trim(s) return (s:gsub('^%s+', ''):gsub('%s+$', '')) end
 
 local function toggle_cli_flag(args, flag)
   args.cmd = args.cmd or ''
@@ -35,7 +30,10 @@ local function open_files_in_cwd(cwd, label)
   end
 
   local where = label and (' for ' .. label) or ''
-  vim.notify('Invalid directory' .. where .. ': ' .. tostring(dir), vim.log.levels.WARN)
+  vim.notify(
+    'Invalid directory' .. where .. ': ' .. tostring(dir),
+    vim.log.levels.WARN
+  )
   require('fzf-lua').files()
 end
 
@@ -66,6 +64,7 @@ return {
           },
         },
         -- Native integration for vim.ui.select (replaces custom wrapper).
+
         ui_select = {
           winopts = {
             split = 'botright new',
@@ -83,11 +82,13 @@ return {
           hidden = false,
           no_ignore = false,
           follow = false,
-          rg_opts = [[--color=never --files -g "!.git"]],
-          fd_opts = [[--color=never --type f --type l --exclude .git]],
+          -- --hidden lets rg/fd see dotfiles; .gitignore still filters untracked ones,
+          -- so git-tracked hidden files are listed while junk (caches, etc.) stays out.
+          rg_opts = [[--color=never --files --hidden -g "!.git"]],
+          fd_opts = [[--color=never --type f --type l --hidden --exclude .git]],
         },
         grep = {
-          rg_opts = '--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e',
+          rg_opts = '--column --line-number --no-heading --color=always --smart-case --max-columns=4096 --hidden -e',
         },
         keymap = {
           builtin = {
@@ -121,22 +122,46 @@ return {
         },
         git = {
           status = {
-            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS' or nil,
+            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS'
+              or nil,
           },
           bcommits = {
-            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS' or nil,
+            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS'
+              or nil,
           },
           commits = {
-            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS' or nil,
+            preview_pager = has_delta and 'delta --width=$FZF_PREVIEW_COLUMNS'
+              or nil,
           },
           icons = {
-            ['M'] = { icon = (icons.git and icons.git.mod) or 'M', color = 'yellow' },
-            ['D'] = { icon = (icons.git and icons.git.remove) or 'D', color = 'red' },
-            ['A'] = { icon = (icons.git and icons.git.staged) or 'A', color = 'green' },
-            ['R'] = { icon = (icons.git and icons.git.rename) or 'R', color = 'yellow' },
-            ['C'] = { icon = (icons.git and icons.git.conflict) or 'C', color = 'yellow' },
-            ['T'] = { icon = (icons.git and icons.git.mod) or 'T', color = 'magenta' },
-            ['?'] = { icon = (icons.git and icons.git.untracked) or '?', color = 'magenta' },
+            ['M'] = {
+              icon = (icons.git and icons.git.mod) or 'M',
+              color = 'yellow',
+            },
+            ['D'] = {
+              icon = (icons.git and icons.git.remove) or 'D',
+              color = 'red',
+            },
+            ['A'] = {
+              icon = (icons.git and icons.git.staged) or 'A',
+              color = 'green',
+            },
+            ['R'] = {
+              icon = (icons.git and icons.git.rename) or 'R',
+              color = 'yellow',
+            },
+            ['C'] = {
+              icon = (icons.git and icons.git.conflict) or 'C',
+              color = 'yellow',
+            },
+            ['T'] = {
+              icon = (icons.git and icons.git.mod) or 'T',
+              color = 'magenta',
+            },
+            ['?'] = {
+              icon = (icons.git and icons.git.untracked) or '?',
+              color = 'magenta',
+            },
           },
         },
       }
@@ -156,11 +181,10 @@ return {
           -- Use defer_fn to run after fzf-lua sets its statusline
           vim.defer_fn(function()
             if vim.bo.filetype == 'fzf' then
-              local statusline_fn = mrl_ref.ui
-                and mrl_ref.ui.statusline
-                and mrl_ref.ui.statusline.render
-              if type(statusline_fn) == 'function' then
-                vim.opt_local.statusline = '%{%v:lua.mrl.ui.statusline.render()%}'
+              if
+                type(_G.Stl) == 'table' and type(_G.Stl.render) == 'function'
+              then
+                vim.opt_local.statusline = '%{%v:lua.Stl.render()%}'
               end
             end
           end, 0)
@@ -174,7 +198,22 @@ return {
         '<cmd>FzfLua<cr>',
         desc = 'fzf: [f]ind [a]ll builtins',
       },
-      { '<leader>ff', '<cmd>FzfLua files<cr>', desc = 'fzf: [f]ind [f]iles' },
+      {
+        '<leader>ff',
+        function()
+          -- In a git repo: use git ls-files so tracked hidden files appear.
+          -- Outside a git repo: fall back to regular files picker.
+          local ok = vim.fn.systemlist(
+            'git rev-parse --is-inside-work-tree 2>/dev/null'
+          )[1]
+          if ok == 'true' then
+            require('fzf-lua').git_files({ show_untracked = true })
+          else
+            require('fzf-lua').files()
+          end
+        end,
+        desc = 'fzf: [f]ind [f]iles',
+      },
       {
         '<leader>fb',
         '<cmd>FzfLua grep_curbuf<cr>',

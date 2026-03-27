@@ -2,93 +2,85 @@
 
 <div align=center>
   <a href="../../commits/main">
-    <img alt="Last commit" src="https://img.shields.io/github/last-commit/KevinNitroG/dotfiles?style=for-the-badge&color=f2cdcd&labelColor=363a4f"/>
+    <img alt="Last commit" src="https://img.shields.io/github/last-commit/marromlam/dotfiles?style=for-the-badge&color=f2cdcd&labelColor=363a4f"/>
   </a>
-  <img alt="Repo size" src="https://img.shields.io/github/repo-size/KevinNitroG/dotfiles?style=for-the-badge&color=eba0ac&labelColor=363a4f"/>
+  <img alt="Repo size" src="https://img.shields.io/github/repo-size/marromlam/dotfiles?style=for-the-badge&color=eba0ac&labelColor=363a4f"/>
 </div>
 
 <div align=center>
   <img alt="macOS" src="https://img.shields.io/badge/MacOS-f0f0f0?logo=apple&logoColor=black&style=for-the-badge"/>
-  <img alt="Windows" src="https://img.shields.io/badge/Windows-74c7ec?style=for-the-badge&logo=windows&logoColor=white"/>
+  <img alt="Linux" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 </div>
 
 ## Introduction
 
-Most of my machine configuration is handled with my fictional couscous!
+Most of my machine configuration lives here.
 
 <img width="1680" alt="Screenshot 2023-11-07 at 10 55 09" src="https://github.com/marromlam/dotfiles/assets/41004396/7686b940-8004-42b6-bb28-92c5173882b6">
 <img width="1680" alt="Screenshot 2023-11-07 at 11 01 43" src="https://github.com/marromlam/dotfiles/assets/41004396/feb8d9c7-2fbb-4a75-8b5c-a934fbb293ba">
 
-I use different machines for different purposes, and I have set a
-identificator for each of them. This identificator is based on the
-architecture of the machine, and the OS. The following are the
-identificators I use:
+Each machine is identified by a string stored in `~/.machine`:
 
-- `arm64-darwin`: for my M1 mac
-- `arm64-linux`: for my Raspberry Pi 4
-- `x64-darwin`: for my Intel mac
-- `x64-linux`: for my linux machines
-- `x64-nodos`: for IGFAE/CERN machines
-- `x64-codespaces`: used for all my codespaces
-- `x64-wsl`: used for my WSL2 setup
-- `x32-linux`: mainly used for iSH app
+| Identifier       | Machine                    |
+| ---------------- | -------------------------- |
+| `arm64-darwin`   | M-series Mac               |
+| `x64-darwin`     | Intel Mac                  |
+| `x64-linux`      | Linux                      |
+| `x64-wsl`        | WSL2                       |
+| `x64-nodos`      | IGFAE/CERN machines        |
+| `x64-codespaces` | GitHub Codespaces          |
+| `arm64-linux`    | Raspberry Pi 4             |
+| `x32-linux`      | iSH app                    |
 
-This information **must** be set in the `~/.machine` file. This file is
-automatically created by the `install.sh` script, but you can create it
-manually if you want. The file should contain only the identificator of the
-machine, and nothing else.
+The install script creates this file automatically, or you can write it manually.
 
-## Core ideas
+## Core tools
 
-Neovim is my main editor, and everything is circling around it. Here is a list
-of the tools I use:
+Neovim is the primary editor; everything else orbits it.
 
-| Dependency         | Description                                 |
-| ------------------ | ------------------------------------------- |
-| Neovim             | Best editor on Earth                        |
-| Nerd font          | Currently I use Fira Code                   |
-| Fuzzy Finder (fzf) | Search utility                              |
-| ripgrep            | Search                                      |
-| tmux               | Terminal multiplexer                        |
-| wezterm            | The terminal emulator that works everywhere |
+| Tool               | Role                            |
+| ------------------ | ------------------------------- |
+| Neovim             | Editor                          |
+| Nerd Font          | Currently Fira Code             |
+| fzf                | Fuzzy finder                    |
+| ripgrep            | Search                          |
+| tmux               | Terminal multiplexer            |
+| kitty / wezterm    | Terminal emulators              |
 
-I was mostly a Unix user till very recencly where I was forced to use Windows
-and WSL. I used to use kitty as my main terminal, but I swiched to Wezterm
-because it is the only one available on all platforms.
+## Installation
 
-## Makefile
-
-It still exists a Makefile to install this configuration, but I am currently
-using dotbot to manage my dotfiles.
-
-```
+```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/marromlam/dotfiles/main/install.sh)" -f -f
 ```
 
-In WSL you need to run the following commands first:
+On WSL, run these first:
 
 ```bash
 sudo sed -i -E 's/nameserver [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/nameserver 8.8.8.8/' /etc/resolv.conf
 sudo apt update && sudo apt install curl -y
 ```
 
+The installer:
+1. Bootstraps Homebrew (or uses `apk` on iSH)
+2. Installs packages via `install/install_dependencies.sh`
+3. Clones this repo to `~/Projects/personal/dotfiles`
+4. Creates symlinks via GNU Stow (`make install`)
+
+After the initial install, individual steps can be re-run with `make`:
+
+```
+make brew     # reinstall/update Homebrew packages
+make install  # re-apply symlinks
+make setup    # run post-install setup
+```
+
 ## macOS window manager (Amethyst + Hammerspoon)
 
-- Install apps from the Brewfile (`amethyst`, `hammerspoon`).
-- Dotbot links:
-  - `~/.amethyst.yml` -> `files/.amethyst.yml`
-  - `~/.hammerspoon` -> `files/.hammerspoon`
-- Required macOS permissions:
-  - `System Settings > Privacy & Security > Accessibility`
-  - Enable both `Amethyst` and `Hammerspoon`
-- Suggested if you switch from other tilers:
-  - disable `yabai`/`skhd` services to avoid conflicts
-  - keep only one tiler active at a time
+- Installed via Brewfile (`amethyst`, `hammerspoon`)
+- Configs are symlinked: `~/.amethyst.yml` and `~/.hammerspoon/`
+- Required: `System Settings > Privacy & Security > Accessibility` — enable both apps
+- If switching from another tiler (yabai/skhd), disable the old one first
 
-## Contributions
+## Contributing
 
-This files should be used as a template to create your own configuration. I do
-not recommend you to make install all my dotfiles since you will not leverage
-the most part of them. Instead, try to copy what you need and create your own
-repo. But, if you find there is some plugin or configuration that I could take
-advantage of, please do not hesitate to create a pull request!
+Use this as a template — don't install it wholesale. Pick what's useful and build your own config. If you spot something worth sharing back, pull requests are welcome.

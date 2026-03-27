@@ -1,4 +1,5 @@
-local icons = mrl.ui.icons
+local UI = require('tools').ui
+local icons = UI.icons
 return {
   {
     'lukas-reineke/indent-blankline.nvim',
@@ -41,7 +42,7 @@ return {
       local incline = require('incline')
 
       local function set_hls()
-        local pal = mrl.ui.palette or {}
+        local pal = UI.palette or {}
         local bg = '#121212'
         vim.api.nvim_set_hl(0, 'InclineNormal', {
           fg = pal.whitesmoke or 'NONE',
@@ -111,7 +112,7 @@ return {
           local buf = props.buf
           local ft = vim.bo[buf].ft
           local bt = vim.bo[buf].bt
-          local decor = mrl.ui.decorations.get({
+          local decor = UI.decorations.get({
             ft = ft,
             bt = bt,
             setting = 'winbar',
@@ -167,7 +168,7 @@ return {
       local ccc = require('ccc')
       local p = ccc.picker
       ccc.setup({
-        -- win_opts = { border = mrl.ui.border },
+        -- win_opts = { border = UI.border },
         highlighter = {
           auto_enable = false,
           excludes = {
@@ -289,7 +290,7 @@ return {
         api.nvim_create_augroup('MrlRainbowDelimiters', { clear = true })
 
       local function set_hls()
-        local pal = (mrl and mrl.ui and mrl.ui.palette) or {}
+        local pal = UI.palette or {}
         local function as_hex(v, fallback)
           if type(v) == 'string' or type(v) == 'number' then return v end
           if type(v) == 'table' then return v.base or fallback end

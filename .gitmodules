@@ -1,8 +1,3 @@
-[submodule "dotbot"]
-	path = dotbot
-	url = https://github.com/anishathalye/dotbot
-	ignore = dirty
-
 [submodule "files/.config/tmux/plugins/tpm"]
 	path = files/.config/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm

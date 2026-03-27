@@ -3,188 +3,161 @@ return {
   {
     'akinsho/bufferline.nvim',
     event = 'UIEnter',
-    dependencies = {},
-    cond = false,
-    disable = true,
+    dependencies = { 'echasnovski/mini.icons' },
     config = function()
       local bufferline = require('bufferline')
-      bufferline.setup({
-        highlights = {
-          fill = {
-            fg = '#ffffff',
-            bg = '#000000',
-          },
-          background = {
-            -- fg = '#000000',
-            bg = '#000000',
-          },
-          tab = {
-            -- fg = '#000000',
-            bg = '#000000',
-          },
-          tab_selected = {
-            fg = '#000000',
-            bg = '#ffaa00',
-          },
-          tab_separator = {
-            fg = '#00ff00',
-            bg = '#00aa00',
-          },
-          tab_separator_selected = {
-            fg = '#00ff00',
-            bg = '#0000ff',
-            -- sp = '<colour-value-here>',
-            -- underline = '<colour-value-here>',
-          },
-        },
-        options = {
-          debug = { logging = true },
-          style_preset = { bufferline.style_preset.minimal },
-          mode = 'buffers',
-          sort_by = 'insert_after_current',
-          move_wraps_at_ends = true,
-          right_mouse_command = 'vert sbuffer %d',
-          show_close_icon = false,
-          show_buffer_close_icons = false,
-          indicator = {
-            -- style = 'icon',
-            style = 'none',
-            icon = '▎', -- this should be omitted if indicator style is not 'icon'
-          },
-          -- diagnostics = 'nvim_lsp',
-          -- diagnostics_indicator = function(count, level)
-          --   level = level:match('warn') and 'warn' or level
-          --   return (icons[level] or '?') .. ' ' .. count
-          -- end,
-          -- diagnostics_update_in_insert = false,
-          hover = { enabled = true, reveal = { 'close' } },
-          offsets = {
-            {
-              text = 'EXPLORER',
-              filetype = 'neo-tree',
-              highlight = 'PanelHeading',
-              -- text_align = 'left',
-              separator = false,
+      local UI = require('tools').ui
+
+      -- Derive colours from live highlight groups so every theme looks great.
+      local function hl_hex(name, attr, fallback)
+        local ok, h =
+          pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
+        if ok and h and h[attr] then return ('#%06x'):format(h[attr]) end
+        return fallback
+      end
+
+      local NUMS =
+        { '➊', '➋', '➌', '➍', '➎', '➏', '➐', '➑', '➒', '➓' }
+
+      local function setup()
+        local pal = UI.palette or {}
+        local bg = hl_hex('StatusLine', 'bg', 'NONE')
+        local bg_sel = hl_hex('Normal', 'bg', '#1e1e2e')
+        local fg_sel = hl_hex('Normal', 'fg', '#cdd6f4')
+        local fg_dim = pal.comment_grey or hl_hex('Comment', 'fg', '#6c7086')
+        local accent = pal.blue or hl_hex('Function', 'fg', '#82aaff')
+
+        bufferline.setup({
+          highlights = {
+            -- Tabline gutter & inactive tabs share the statusline bg
+            fill = { bg = bg },
+            background = { bg = bg, fg = fg_dim },
+            tab = { bg = bg, fg = fg_dim },
+            tab_close = { bg = bg, fg = fg_dim },
+            close_button = { bg = bg, fg = fg_dim },
+
+            -- Selected buffer pops out with normal bg
+            buffer_selected = {
+              bg = bg_sel,
+              fg = fg_sel,
+              bold = true,
+              italic = false,
             },
-            {
-              text = 'UNDOTREE',
-              filetype = 'undotree',
-              highlight = 'PanelHeading',
-              separator = false,
-            },
-            {
-              text = '󰆼 DATABASE VIEWER',
-              filetype = 'dbui',
-              highlight = 'PanelHeading',
-              separator = false,
-            },
-            {
-              text = ' DIFF VIEW',
-              filetype = 'DiffviewFiles',
-              highlight = 'PanelHeading',
-              separator = false,
+            close_button_selected = { bg = bg_sel, fg = fg_dim },
+            tab_selected = { bg = bg, fg = fg_sel, bold = true },
+
+            -- Visible (non-focused split) buffer
+            buffer_visible = { bg = bg, fg = fg_dim },
+
+            -- Powerline triangle separators
+            separator = { bg = bg, fg = bg_sel },
+            separator_selected = { bg = bg_sel, fg = bg },
+            separator_visible = { bg = bg, fg = bg_sel },
+            offset_separator = { bg = bg, fg = bg_sel },
+
+            -- Indicator line under selected tab uses the accent colour
+            indicator_selected = { fg = accent, bg = bg_sel },
+
+            -- Numbers
+            numbers = { bg = bg, fg = fg_dim },
+            numbers_selected = { bg = bg_sel, fg = fg_sel },
+
+            -- Pick
+            pick = { bg = bg, fg = accent, bold = true, italic = true },
+            pick_selected = {
+              bg = bg_sel,
+              fg = accent,
+              bold = true,
+              italic = true,
             },
           },
-          groups = {
-            options = { toggle_hidden_on_enter = true },
-            items = {
-              bufferline.groups.builtin.pinned:with({ icon = '' }),
-              bufferline.groups.builtin.ungrouped,
+
+          options = {
+            style_preset = bufferline.style_preset.minimal,
+            separator_style = { '', '' },
+            mode = 'buffers',
+            custom_areas = {
+              right = function()
+                local tabs = vim.api.nvim_list_tabpages()
+                if #tabs <= 1 then return {} end
+                local result = {}
+                local cur = vim.api.nvim_get_current_tabpage()
+                for i, tab in ipairs(tabs) do
+                  local sym = NUMS[i] or tostring(i)
+                  local hl = tab == cur and 'BufferLineTabSelected'
+                    or 'BufferLineTab'
+                  table.insert(result, { text = ' ' .. sym .. ' ', link = hl })
+                end
+                return result
+              end,
+            },
+            sort_by = 'insert_after_current',
+            move_wraps_at_ends = true,
+            right_mouse_command = 'vert sbuffer %d',
+            show_close_icon = false,
+            show_buffer_close_icons = false,
+            show_tab_indicators = false,
+            indicator = { style = 'none' },
+
+            custom_filter = function(buf_number)
+              local name = vim.api.nvim_buf_get_name(buf_number)
+              if name:match('^fugitive://') then return false end
+              if name == '' then return false end
+              return true
+            end,
+
+            hover = { enabled = true, delay = 150, reveal = { 'close' } },
+
+            offsets = {
               {
-                name = 'Dependencies',
-                icon = '',
-                highlight = { fg = '#ECBE7B' },
-                matcher = function(buf)
-                  return vim.startswith(buf.path, vim.env.VIMRUNTIME)
-                end,
+                text = '  EXPLORER',
+                filetype = 'neo-tree',
+                highlight = 'PanelHeading',
+                separator = false,
+                text_align = 'left',
               },
               {
-                name = 'Terraform',
-                matcher = function(buf) return buf.name:match('%.tf') ~= nil end,
+                text = '  UNDOTREE',
+                filetype = 'undotree',
+                highlight = 'PanelHeading',
+                separator = false,
+                text_align = 'left',
               },
               {
-                name = 'Kubernetes',
-                matcher = function(buf)
-                  return buf.name:match('kubernetes')
-                    and buf.name:match('%.yaml')
-                end,
+                text = '󰆼  DATABASE',
+                filetype = 'dbui',
+                highlight = 'PanelHeading',
+                separator = false,
+                text_align = 'left',
               },
               {
-                name = 'SQL',
-                matcher = function(buf) return buf.name:match('%.sql$') end,
-              },
-              {
-                name = 'tests',
-                icon = '',
-                matcher = function(buf)
-                  local name = buf.name
-                  return name:match('[_%.]spec') or name:match('[_%.]test')
-                end,
-              },
-              {
-                name = 'docs',
-                icon = '',
-                matcher = function(buf)
-                  if
-                    vim.bo[buf.id].filetype == 'man' or buf.path:match('man://')
-                  then
-                    return true
-                  end
-                  for _, ext in ipairs({ 'md', 'txt', 'org', 'norg', 'wiki' }) do
-                    if ext == vim.fn.fnamemodify(buf.path, ':e') then
-                      return true
-                    end
-                  end
-                end,
-              },
-              {
-                name = 'git',
-                icon = ' fugitive',
-                matcher = function(buf)
-                  if buf.path:match('fugitive://') then return true end
-                end,
+                text = '  DIFF VIEW',
+                filetype = 'DiffviewFiles',
+                highlight = 'PanelHeading',
+                separator = false,
+                text_align = 'left',
               },
             },
           },
-        },
+        })
+      end
+
+      setup()
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        group = vim.api.nvim_create_augroup('MrlBufferline', { clear = true }),
+        callback = setup,
       })
 
-      vim.keymap.set(
-        'n',
-        '[b',
-        '<Cmd>BufferLineMoveNext<CR>',
-        { desc = 'bufferline: move next' }
-      )
-      vim.keymap.set(
-        'n',
-        ']b',
-        '<Cmd>BufferLineMovePrev<CR>',
-        { desc = 'bufferline: move prev' }
-      )
-      vim.keymap.set(
-        'n',
-        'gbb',
-        '<Cmd>BufferLinePick<CR>',
-        { desc = 'bufferline: pick buffer' }
-      )
-      vim.keymap.set(
-        'n',
-        'gbd',
-        '<Cmd>BufferLinePickClose<CR>',
-        { desc = 'bufferline: delete buffer' }
-      )
-      vim.keymap.set(
-        'n',
-        '<S-tab>',
-        '<Cmd>BufferLineCyclePrev<CR>',
-        { desc = 'bufferline: prev' }
-      )
-      vim.keymap.set(
-        'n',
-        '<leader><tab>',
-        '<Cmd>BufferLineCycleNext<CR>',
-        { desc = 'bufferline: next' }
-      )
+      -- Keymaps
+      local map = function(lhs, rhs, desc)
+        vim.keymap.set('n', lhs, rhs, { desc = desc })
+      end
+      map('[b', '<Cmd>BufferLineMoveNext<CR>', 'bufferline: move next')
+      map(']b', '<Cmd>BufferLineMovePrev<CR>', 'bufferline: move prev')
+      map('gbb', '<Cmd>BufferLinePick<CR>', 'bufferline: pick buffer')
+      map('gbd', '<Cmd>BufferLinePickClose<CR>', 'bufferline: delete buffer')
+      map('<S-tab>', '<Cmd>BufferLineCyclePrev<CR>', 'bufferline: prev')
+      map('<leader><tab>', '<Cmd>BufferLineCycleNext<CR>', 'bufferline: next')
     end,
   },
 }

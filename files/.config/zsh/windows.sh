@@ -68,5 +68,4 @@ sync-windows-config() {
 
 }
 
-
 # vim: fdm=marker ft=bash

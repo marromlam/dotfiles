@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main, optim]
+  pull_request:
+    branches: [main]
+
+jobs:
+  install:
+    name: Install (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up machine identifier
+        run: echo "x64-linux" > "$HOME/.machine"
+
+      - name: install_dependencies.sh (Homebrew + packages)
+        run: bash install/install_dependencies.sh
+
+      - name: Persist Homebrew environment
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          {
+            echo "PATH=$PATH"
+            echo "HOMEBREW_PREFIX=$HOMEBREW_PREFIX"
+            echo "HOMEBREW_CELLAR=$HOMEBREW_CELLAR"
+            echo "HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY"
+          } >> "$GITHUB_ENV"
+
+      - name: make install (symlinks)
+        run: |
+          command -v brew
+          command -v stow
+          mkdir -p "$HOME/Projects/personal"
+          ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
+          ln -sfn "$PWD" "$HOME/.dotfiles"
+          make install
+
+      - name: Assert key symlinks exist
+        run: |
+          assert_link() {
+            if [[ ! -L "$1" ]]; then
+              echo "FAIL: expected symlink at $1"
+              ls -la "$(dirname "$1")" || true
+              exit 1
+            fi
+            echo "OK: $1 -> $(readlink "$1")"
+          }
+          assert_link "$HOME/.zshrc"
+          assert_link "$HOME/.zshenv"
+          assert_link "$HOME/.zprofile"
+          assert_link "$HOME/.gitconfig"
+          assert_link "$HOME/.bashrc"
+          assert_link "$HOME/.dotfiles"
+
+          assert_dir_or_link() {
+            if [[ ! -d "$1" && ! -L "$1" ]]; then
+              echo "FAIL: expected directory or symlink at $1"
+              ls -la "$(dirname "$1")" || true
+              exit 1
+            fi
+            if [[ -L "$1" ]]; then
+              echo "OK: $1 -> $(readlink "$1")"
+            else
+              echo "OK: $1 is a directory"
+            fi
+          }
+          assert_dir_or_link "$HOME/.config"
+
+          assert_path() {
+            if [[ ! -e "$1" ]]; then
+              echo "FAIL: expected path at $1"
+              ls -la "$(dirname "$1")" || true
+              exit 1
+            fi
+            echo "OK: $1"
+          }
+          assert_path "$HOME/.config/nvim"
+          assert_path "$HOME/.config/zsh"
+          assert_path "$HOME/.config/tmux"
+          assert_path "$HOME/.config/git"
+
+      - name: Assert zshenv sets ZDOTDIR
+        run: |
+          result=$(bash -c 'source "$HOME/.zshenv" 2>/dev/null; echo "$ZDOTDIR"')
+          [[ "$result" == "$HOME/.config/zsh" ]] \
+            && echo "OK: ZDOTDIR=$result" \
+            || { echo "FAIL: ZDOTDIR='$result'"; exit 1; }
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: ShellCheck
+        run: |
+          # Only lint actively maintained scripts; exclude legacy extra/, zsh configs, and submodules
+          find install/ extra/setup.sh extra/symlinks.sh install.sh \
+            -name '*.sh' \
+            | xargs shellcheck -x
+
+      - name: Bash syntax
+        run: |
+          find install/ extra/setup.sh extra/symlinks.sh install.sh \
+            -name '*.sh' \
+            | xargs -I{} bash -n {}
+
+  lua-lint:
+    name: Lua Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Install luacheck
+        run: sudo apt-get install -y luarocks && sudo luarocks install luacheck
+
+      - name: Install stylua
+        run: |
+          curl -sL "https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip" -o stylua.zip
+          unzip -q stylua.zip -d /usr/local/bin/
+          chmod +x /usr/local/bin/stylua
+
+      - name: luacheck
+        run: luacheck files/.config/nvim --config .luacheckrc
+
+      - name: stylua --check
+        run: stylua --check files/.config/nvim
+        continue-on-error: true

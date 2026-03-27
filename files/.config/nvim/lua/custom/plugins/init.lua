@@ -44,50 +44,10 @@ return {
   },
 
   {
-    'noahfrederick/vim-skeleton',
-    event = 'BufNewFile',
-    config = function()
-      vim.g.skeleton_template_dir = vim.fn.expand('~/.config/nvim')
-        .. '/templates'
-      vim.cmd([[
-        let g:skeleton_replacements = {}
-        function! g:skeleton_replacements.TITLE()
-          return toupper(expand("%:t:r"))
-        endfunction
-      ]])
-    end,
-  },
-
-  {
-    'rlch/github-notifications.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'ibhagwan/fzf-lua' },
-    keys = {
-      {
-        '<leader>gn',
-        function() require('custom.gh_notifications').open() end,
-        desc = 'github notifications (fzf)',
-      },
-    },
-  },
-
-  {
-    'szw/vim-maximizer',
-    keys = {
-      {
-        '<leader>sm',
-        '<cmd>MaximizerToggle<CR>',
-        desc = '[win] Split Maximize/minimize',
-      },
-    },
-  },
-
-  {
     'marromlam/sailor.vim',
     event = 'VimEnter',
     run = './install.sh',
   },
-
-  { 'meznaric/key-analyzer.nvim', opts = {}, cmd = 'KeyAnalyzer' },
 
   {
     'bogado/file-line',
@@ -101,6 +61,14 @@ return {
     cmd = { 'DirDiff' },
   },
 
-  --- }}}
-  ------------------------------------------------------------------------
+  {
+    'tpope/vim-sleuth',
+    event = { 'BufReadPre', 'BufNewFile' },
+  },
+  { 'tpope/vim-surround', event = { 'BufReadPre', 'BufNewFile' } },
+
+  {
+    'tpope/vim-repeat',
+    keys = { '.' },
+  },
 }

@@ -1,5 +1,3 @@
-local icons = mrl.ui.icons.lsp
-
 return { -- LSP Configuration & Plugins
   {
     'neovim/nvim-lspconfig',
@@ -16,23 +14,7 @@ return { -- LSP Configuration & Plugins
             backdrop = 100, -- 100 = fully transparent (no dimming), 0 = fully opaque
           },
         },
-        config = function(_, opts)
-          require('mason').setup(opts)
-          -- Disable columns in Mason windows after setup
-          vim.api.nvim_create_autocmd('FileType', {
-            pattern = 'mason',
-            callback = function()
-              vim.schedule(function()
-                local win = vim.api.nvim_get_current_win()
-                vim.wo[win].statuscolumn = ''
-                vim.wo[win].signcolumn = 'no'
-                vim.wo[win].foldcolumn = '0'
-                vim.wo[win].number = false
-                vim.wo[win].relativenumber = false
-              end)
-            end,
-          })
-        end,
+        config = function(_, opts) require('mason').setup(opts) end,
       },
       { 'mason-org/mason-lspconfig.nvim', opts = {} },
       { 'WhoIsSethDaniel/mason-tool-installer.nvim', opts = {} },
@@ -40,7 +22,20 @@ return { -- LSP Configuration & Plugins
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
-      { 'folke/lazydev.nvim' },
+      {
+        'folke/lazydev.nvim',
+        ft = 'lua',
+        opts = {
+          library = {
+            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+            { path = 'wezterm-types', mods = { 'wezterm' } },
+          },
+          enabled = function(root_dir)
+            return (vim.g.lazydev_enabled == nil or vim.g.lazydev_enabled)
+              and not vim.uv.fs_stat(root_dir .. '/.luarc.json')
+          end,
+        },
+      },
       {
         'stevanmilic/nvim-lspimport',
       },
@@ -187,6 +182,7 @@ return { -- LSP Configuration & Plugins
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
           if
             client
             and client.server_capabilities.inlayHintProvider
@@ -310,10 +306,25 @@ return { -- LSP Configuration & Plugins
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        -- Lua
+        'stylua',
+        -- Python
+        'black',
+        'isort',
         'flake8',
         'mypy',
-        'black',
+        -- Shell
+        'shfmt',
+        -- JS/TS
+        'prettier',
+        'prettierd',
+        'eslint_d',
+        -- Misc linters
+        'hadolint',
+        'jsonlint',
+        'vale',
+        'tflint',
+        -- Other
         'sonarlint-language-server',
       })
       require('mason-tool-installer').setup({

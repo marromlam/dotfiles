@@ -29,7 +29,7 @@ vim.o.background = 'dark' -- or "light"
 -- }}}
 
 -- Timings {{{
-vim.opt.updatetime = 1000  -- Increased from 500 to reduce CursorHold frequency (improves scrolling perf)
+vim.opt.updatetime = 1000 -- Increased from 500 to reduce CursorHold frequency (improves scrolling perf)
 vim.opt.timeout = true
 vim.opt.timeoutlen = 500
 -- }}}
@@ -121,11 +121,7 @@ vim.opt.breakindentopt = 'sbr'
 vim.opt.linebreak = true -- lines wrap at words rather than random characters
 -- If we render signs inside `statuscolumn`, disable the built-in signcolumn to
 -- avoid duplicated icons.
-local statuscolumn_enabled = mrl
-  and mrl.ui
-  and mrl.ui.statuscolumn
-  and mrl.ui.statuscolumn.enable
-vim.opt.signcolumn = statuscolumn_enabled and 'no' or 'yes'
+vim.opt.signcolumn = 'no' -- statuscolumn.lua manages signs
 vim.opt.ruler = false
 vim.opt.cmdheight = 0
 vim.opt.showbreak = [[↪ ]] -- Options include -> '…', '↳ ', '→','↪ '

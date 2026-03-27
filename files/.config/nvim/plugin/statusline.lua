@@ -1,35 +1,19 @@
-if
-  not mrl
-  or not mrl.ui
-  or not mrl.ui.statusline
-  or not mrl.ui.statusline.enable
-then
-  return
-end
+local T = require('tools')
+local UI = require('tools').ui
+local HL = require('highlight')
 
--- Wait for icons to be available
-if not mrl.ui.icons then
-  vim.schedule(function()
-    if mrl and mrl.ui and mrl.ui.icons then
-      dofile(vim.fn.expand('<sfile>:p'))
-    end
-  end)
-  return
-end
-
-mrl.ui.statusline = {}
+_G.Stl = {}
 
 -- LSP clients are collapsed by default: show only 🧩 <count>.
 local state = { lsp_clients_visible = false }
 
-local str = require('custom.strings')
+local str = require('tools').strings
 
 local section, spacer, display = str.section, str.spacer, str.display
-local icons, lsp, highlight, decorations =
-  mrl.ui.icons, mrl.ui.lsp, mrl.highlight, mrl.ui.decorations
+local icons, lsp, highlight, decorations = UI.icons, UI.lsp, HL, UI.decorations
 local api, fn, fs, fmt, strwidth =
   vim.api, vim.fn, vim.fs, string.format, vim.api.nvim_strwidth
-local P, falsy = mrl.ui.palette, mrl.falsy
+local P, falsy = UI.palette, T.falsy
 
 local sep = package.config:sub(1, 1)
 local space = ' '
@@ -54,7 +38,7 @@ local identifiers = {
     terminal = '',
     quickfix = '',
   },
-  filetypes = mrl.p_table({
+  filetypes = T.p_table({
     ['fzf'] = '󱁴', -- '',
     ['fzf-lua'] = '󱁴',
     ['log'] = '',
@@ -79,7 +63,7 @@ local identifiers = {
     ['toggleterm'] = '',
     ['Avante.*'] = icons.misc.chat,
   }),
-  names = mrl.p_table({
+  names = T.p_table({
     ['fzf'] = 'FZF',
     ['fzf-lua'] = 'FZF',
     ['orgagenda'] = 'Org',
@@ -262,7 +246,9 @@ end
 local function special_buffers(ctx)
   if ctx.preview then return 'preview' end
   if ctx.buftype == 'quickfix' then return 'Quickfix List' end
-  if ctx.bufname and ctx.bufname:match('^fzf%-lua') then return 'FZF' end
+  if ctx.filetype == 'fzf' or (ctx.bufname and ctx.bufname:match('^fzf')) then
+    return 'FZF'
+  end
   if ctx.filetype == 'AvanteInput' then return 'Avante' end
   if ctx.filetype == 'AvanteSelectedFiles' then return 'Avante' end
   if ctx.filetype == 'Avante' then return 'Avante' end
@@ -294,19 +280,10 @@ local function dir_env(directory)
   if not directory then return '', '' end
   local paths = {
     [vim.g.dotfiles] = '$DOTFILES',
-    [vim.g.projects_directory .. '/personal/dotfiles'] = '$DOTFILES',
     [vim.g.work_directory] = '$WORK',
-    ['~/Workspaces/work/'] = '$WORK',
-    ['/home/marcos/Workspaces/work/'] = '$WORK',
     [vim.env.VIMRUNTIME] = '$VIMRUNTIME',
     [vim.g.projects_directory] = '$WORKSPACES',
-    ['/home/marcos/Projects/'] = '$WORKSPACES',
-    ['/home/marcos/Workspaces/personal/dotfiles/'] = '$DOTFILES',
-    ['/Users/marcos/Workspaces/personal/dotfiles/'] = '$DOTFILES',
-    ['/home/marcos/Projects/personal/dotfiles/'] = '$DOTFILES',
-    ['~/Projects/personal/dotfiles/'] = '$DOTFILES',
-    ['/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
-    ['~/Library/Mobile Documents/iCloud~md~obsidian'] = '$OBSIDIAN',
+    [vim.g.obsidian] = '$OBSIDIAN',
     [vim.env.HOME] = '~',
   }
   local result, env, prev_match = directory, '', ''
@@ -441,7 +418,7 @@ end
 local function diagnostic_info(context)
   local diagnostics = vim.diagnostic.get(context.bufnum)
   local severities = vim.diagnostic.severity
-  local lsp_icons = mrl.ui.icons.lsp
+  local lsp_icons = UI.icons.lsp
   if vim.tbl_isempty(diagnostics) then
     return {
       error = { count = 0, icon = lsp_icons.error },
@@ -497,7 +474,7 @@ end
 
 local LSP_COMPONENT_ID = 2000
 
-function mrl.ui.statusline.lsp_client_click()
+function Stl.lsp_client_click()
   state.lsp_clients_visible = not state.lsp_clients_visible
   vim.cmd('redrawstatus')
 end
@@ -618,7 +595,7 @@ end
 --  RENDER
 --------------------------------------------------------------------------------
 
-function mrl.ui.statusline.render()
+function Stl.render()
   local curwin = api.nvim_get_current_win()
   local curbuf = api.nvim_win_get_buf(curwin)
 
@@ -652,7 +629,6 @@ function mrl.ui.statusline.render()
 
   local l1 = section:new({
     {
-      -- { '  ' .. vim.g.dev_environ .. '▐', 'StDevEnv' },
       { '' .. vim.g.dev_environ .. '', 'StDevEnv' },
     },
     priority = 1,
@@ -719,7 +695,7 @@ function mrl.ui.statusline.render()
       },
       priority = 2,
       id = LSP_COMPONENT_ID,
-      click = 'v:lua.mrl.ui.statusline.lsp_client_click',
+      click = 'v:lua.Stl.lsp_client_click',
     },
   }
   if state.lsp_clients_visible and lsp_client_count > 0 then
@@ -928,9 +904,6 @@ function mrl.ui.statusline.render()
       priority = 6,
     }
     -- }}}
-    -- Space after {{{
-    -- { { { space, 'StSeparator' } }, priority = 1 }
-    -- }}}
   )
   -- removes 5 columns to add some padding
   return display({ l1 + l2, m1, r1 + r2 }, available_space - 5)
@@ -940,21 +913,9 @@ end
 vim.g.qf_disable_statusline = 1
 
 -- set the statusline
-vim.o.statusline = '%{%v:lua.mrl.ui.statusline.render()%}'
+vim.o.statusline = '%{%v:lua.Stl.render()%}'
 
--- Helper to safely call augroup
-local function augroup(name, ...)
-  local args = { ... }
-  if mrl and mrl.augroup then
-    return mrl.augroup(name, unpack(args))
-  else
-    vim.schedule(function()
-      if mrl and mrl.augroup then mrl.augroup(name, unpack(args)) end
-    end)
-  end
-end
-
-augroup('CustomStatusline', {
+T.augroup('CustomStatusline', {
   event = 'FocusGained',
   command = function() vim.g.vim_in_focus = true end,
 }, {

@@ -5,7 +5,7 @@
 FC=${HOME}/.dotfiles
 TMUX_SHARE=${HOME}/.local/share/tmux
 
-all: brew macos kitty nvim vim tmux fzf-marks private zsh-plugins
+all: brew install setup
 
 test:
 	${HOME}/.dotfiles/tests/zsh/sanity.sh
@@ -16,16 +16,28 @@ macos:
 	# now we change the keymaps
 	bash extra/keyboard.sh
 
+update:
+	brew update && brew upgrade && brew update && brew upgrade && brew cleanup
+
+homebrew:
+	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 install:
-	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}" files
-	rm -rf ~/Downloads; ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads
+	bash ${FC}/extra/symlinks.sh
+	@if [[ "$$(uname)" == "Darwin" ]]; then \
+	  rm -rf ~/Downloads; \
+	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \
+	fi
+
+setup:
+	bash ${FC}/extra/setup.sh
 
 projects:
 	mkdir -p "${HOME}/Projects/icloud"
 	stow --ignore ".DS_Store" --target="${HOME}/Projects/icloud" --dir="${HOME}/Library/Mobile Documents/com~apple~CloudDocs/" Projects
 
 brew:
-	brew bundle --file="${FC}/homebrew/Brewfile"
+	bash ${FC}/install/install_dependencies.sh
 	python3 -m pip install pynvim neovim-remote mcphub[all] --upgrade
 	npm install -g mcp-hub@latest
 
@@ -98,4 +110,16 @@ zsh-plugins:
 	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
 	
 
-.PHONY: all install brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test
+MASON := $(HOME)/.local/share/nvim/mason/bin
+
+fmt:
+	git diff --name-only --diff-filter=d | grep '\.lua$$' | xargs -r $(MASON)/stylua --
+	git diff --name-only --diff-filter=d | grep '\.sh$$' | xargs -r $(MASON)/shfmt -w
+	git diff --name-only --diff-filter=d | grep '\.py$$' | xargs -r $(MASON)/isort --
+	git diff --name-only --diff-filter=d | grep '\.py$$' | xargs -r $(MASON)/black --
+
+commit: fmt
+	git add -u
+	git commit
+
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test fmt commit

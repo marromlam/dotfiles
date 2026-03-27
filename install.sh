@@ -1,79 +1,105 @@
-# Might as well ask for password up-front, right?
-set -e
-echo "Starting install script, please grant me sudo access..."
-sudo -v
+#!/usr/bin/env bash
+# Bootstrap installer — run with:
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/marromlam/dotfiles/main/install.sh)"
 
-# Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
-while true; do
-	sudo -n true
-	sleep 60
-	kill -0 "$$" || exit
-done 2>/dev/null &
+set -euo pipefail
 
-# machine type
-# first check if there is a .machine file in the home directory
-# if not, then check the hostname
-if [ -f ~/.machine ]; then
-	MACHINEOS=$(cat ~/.machine)
-else
-	unameOut="$(uname -s)"
-	case "${unameOut}" in
-	Linux*) MACHINEOS=Linux ;;
-	Darwin*) MACHINEOS=Mac ;;
-	CYGWIN*) MACHINEOS=Cygwin ;;
-	MINGW*) MACHINEOS=MinGw ;;
-	*) MACHINEOS="UNKNOWN:${unameOut}" ;;
+DOTFILES="${DOTFILES:-$HOME/Projects/personal/dotfiles}"
+REPO_URL="https://github.com/marromlam/dotfiles.git"
+
+step() { echo; echo "==> $*"; }
+
+# ------------------------------------------------------------------------------
+# Detect machine type and write ~/.machine
+# ------------------------------------------------------------------------------
+detect_machine() {
+	if [[ -f "$HOME/.machine" ]]; then
+		echo "$HOME/.machine already set: $(cat "$HOME/.machine")"
+		return
+	fi
+
+	local os arch
+	os="$(uname -s)"
+	arch="$(uname -m)"
+
+	local machine
+	case "$os" in
+		Darwin)
+			if [[ "$arch" == "arm64" ]]; then machine="arm64-darwin"
+			else machine="x64-darwin"
+			fi ;;
+		Linux)
+			if grep -qi microsoft /proc/version 2>/dev/null; then machine="x64-wsl"
+			elif [[ "$arch" == "x86_64" ]]; then machine="x64-linux"
+			elif [[ "$arch" == "aarch64" ]]; then machine="arm64-linux"
+			elif [[ "$arch" == "i686" ]]; then machine="x32-linux"
+			else machine="x64-linux"
+			fi ;;
+		*) machine="x64-linux" ;;
 	esac
-	echo $MACHINEOS >~/.machine
-fi
-echo "Machine: $MACHINEOS"
 
-# clone temp dir
-REPO_URL=https://raw.githubusercontent.com/marromlam/dotfiles
-REPO_BRANCH=main
-mkdir -p ${HOME}/tmp
-curl -o ${HOME}/tmp/homebrew_install.sh $REPO_URL/$REPO_BRANCH/homebrew/install.sh
-curl -o ${HOME}/tmp/keys.sh $REPO_URL/$REPO_BRANCH/extra/keys.sh
-curl -o ${HOME}/tmp/dotfiles.sh $REPO_URL/$REPO_BRANCH/extra/dotfiles.sh
-curl -o ${HOME}/tmp/reload_shell $REPO_URL/$REPO_BRANCH/scripts/reload_shell
-curl -o ${HOME}/tmp/preflight_wsl.sh $REPO_URL/$REPO_BRANCH/extra/windows/preflight_wsl.sh
+	echo "$machine" > "$HOME/.machine"
+	echo "Detected machine: $machine"
+}
 
-# if [[ "$MACHINEOS" == "Mac" ]]; then
-# 	echo "Installing homebrew on macOS (forced=$0)"
-# 	bash ${HOME}/tmp/homebrew.sh $0
-# else
-# 	echo "Installing homebrew on Linux (forced=$0)"
-# 	export HOMEBREW_PREFIX="$HOME/.linuxbrew"
-# 	bash ${HOME}/tmp/linuxbrew.sh $0
-# fi
+# ------------------------------------------------------------------------------
+# Install minimal apt packages needed to bootstrap (git, curl)
+# Only runs on Linux where apt is available
+# ------------------------------------------------------------------------------
+apt_bootstrap() {
+	if ! command -v apt-get >/dev/null 2>&1; then
+		return
+	fi
+	if ! command -v curl >/dev/null 2>&1; then
+		step "Installing curl via apt"
+		sudo apt-get update -qq
+		sudo apt-get install -y curl
+	fi
+}
 
-export MACHINE=$(cat $HOME/.machine)
-echo "Machine: $MACHINE"
+# ------------------------------------------------------------------------------
+# Download and run install_dependencies.sh from the repo
+# This installs Homebrew + all packages (including git and stow)
+# before we can clone the full repo.
+# ------------------------------------------------------------------------------
+install_dependencies() {
+	local raw_url="https://raw.githubusercontent.com/marromlam/dotfiles/main/install/install_dependencies.sh"
+	local tmp_script
+	tmp_script="$(mktemp /tmp/install_dependencies.XXXXXX.sh)"
+	step "Downloading install_dependencies.sh"
+	curl -fsSL "$raw_url" -o "$tmp_script"
+	chmod +x "$tmp_script"
+	step "Running install_dependencies.sh"
+	bash "$tmp_script"
+	rm -f "$tmp_script"
+}
 
-# if MACHINE is 'x64-wsl' then install wsl
-if [[ "$MACHINE" == "x64-wsl" ]]; then
-	bash $HOME/tmp/preflight_wsl.sh
-	bash $HOME/.dotfiles/setup/wsl_network_setup.sh
-	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-	sudo mkdir -p /home/linuxbrew/.linuxbrew
-	sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew
-	echo "Installing homebrew on Linux (forced=$0)"
-	bash ${HOME}/tmp/homebrew_install.sh "$1"
-fi
+# ------------------------------------------------------------------------------
+# Clone or update the dotfiles repo
+# git is now available via Homebrew
+# ------------------------------------------------------------------------------
+clone_dotfiles() {
+	if [[ -d "$DOTFILES/.git" ]]; then
+		step "Updating dotfiles repo"
+		git -C "$DOTFILES" pull --ff-only
+	else
+		step "Cloning dotfiles to $DOTFILES"
+		mkdir -p "$(dirname "$DOTFILES")"
+		git clone "$REPO_URL" "$DOTFILES"
+	fi
 
-mkdir -p ~/Projects/{work,personal}
+	step "Updating submodules"
+	git -C "$DOTFILES" submodule update --init --recursive
+}
 
-# install private dotfiles
-printf " \n\n"
-bash ${HOME}/tmp/keys.sh $1
+# ------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------
+detect_machine
+apt_bootstrap
+install_dependencies
+clone_dotfiles
 
-# create projects folder
-
-# clone dotfiles
-printf " \n\n"
-bash ${HOME}/tmp/dotfiles.sh -dotfiles
-sudo chsh -s $(which zsh)
-
-# clone dotfiles
-printf " \n\n"
-~/Projects/personal/dotfiles/install
+step "Running make install setup"
+cd "$DOTFILES"
+make install setup

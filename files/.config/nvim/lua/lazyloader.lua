@@ -15,7 +15,7 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- Ensure icons are available, use defaults if not
-local icons = mrl.ui and mrl.ui.icons or nil
+local icons = require('tools').ui.icons
 
 require('lazy').setup({
   { import = 'custom.plugins' },
@@ -89,19 +89,4 @@ require('lazy').setup({
       lazy = icons.sleep,
     },
   },
-})
-
--- Disable columns in Lazy.nvim windows
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'lazy',
-  callback = function()
-    vim.schedule(function()
-      local win = vim.api.nvim_get_current_win()
-      vim.wo[win].statuscolumn = ''
-      vim.wo[win].signcolumn = 'no'
-      vim.wo[win].foldcolumn = '0'
-      vim.wo[win].number = false
-      vim.wo[win].relativenumber = false
-    end)
-  end,
 })

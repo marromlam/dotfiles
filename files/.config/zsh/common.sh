@@ -31,7 +31,6 @@ USER_PATHS=(
   "$HOME/.cargo/bin"
 )
 
-
 # Filter paths that exist
 SYS_PATHS=($(for p in "${SYS_PATHS[@]}"; do path_exists "$p" && echo "$p"; done))
 USER_PATHS=($(for p in "${USER_PATHS[@]}"; do path_exists "$p" && echo "$p"; done))

@@ -1,0 +1,4 @@
+- [ ] Consolidate helpers
+- [ ] Icons should stay in statusbar
+- [ ] Add pomodoro popup and calendar integration
+- [ ] Themse should live in ~/.local/share
