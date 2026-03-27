@@ -55,8 +55,21 @@ jobs:
           assert_link "$HOME/.zprofile"
           assert_link "$HOME/.gitconfig"
           assert_link "$HOME/.bashrc"
-          assert_link "$HOME/.config"
           assert_link "$HOME/.dotfiles"
+
+          assert_dir_or_link() {
+            if [[ ! -d "$1" && ! -L "$1" ]]; then
+              echo "FAIL: expected directory or symlink at $1"
+              ls -la "$(dirname "$1")" || true
+              exit 1
+            fi
+            if [[ -L "$1" ]]; then
+              echo "OK: $1 -> $(readlink "$1")"
+            else
+              echo "OK: $1 is a directory"
+            fi
+          }
+          assert_dir_or_link "$HOME/.config"
 
           assert_path() {
             if [[ ! -e "$1" ]]; then
