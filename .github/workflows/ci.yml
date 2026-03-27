@@ -21,8 +21,20 @@ jobs:
       - name: install_dependencies.sh (Homebrew + packages)
         run: bash install/install_dependencies.sh
 
+      - name: Persist Homebrew environment
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          {
+            echo "PATH=$PATH"
+            echo "HOMEBREW_PREFIX=$HOMEBREW_PREFIX"
+            echo "HOMEBREW_CELLAR=$HOMEBREW_CELLAR"
+            echo "HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY"
+          } >> "$GITHUB_ENV"
+
       - name: make install (symlinks)
         run: |
+          command -v brew
+          command -v stow
           mkdir -p "$HOME/Projects/personal"
           ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
           ln -sfn "$PWD" "$HOME/.dotfiles"
