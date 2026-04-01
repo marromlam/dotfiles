@@ -34,8 +34,7 @@ end
 require('tools') -- has to be loaded before plugins (bootstraps ui, strings, colors)
 require('keymaps')
 require('options')
-require('highlight') -- needed by plugins for highlight tables
-require('lazyloader')
+require('packloader')
 
 -- Defer non-critical modules for faster startup
 vim.defer_fn(function() require('external_grep') end, 0)

@@ -1,52 +1,36 @@
+-- packs/completion.lua
+
 local highlight = require('highlight')
-local ui = require('tools').ui
 
-return {
-  {
-    'saghen/blink.cmp',
-    event = 'InsertEnter',
-    cond = not vim.g.use_cmp,
-    disable = vim.g.use_cmp,
-    dependencies = {
-      'rafamadriz/friendly-snippets',
-      'onsails/lspkind.nvim', -- vs-code like pictograms
-      'Kaiser-Yang/blink-cmp-avante',
-      {
-        'MeanderingProgrammer/render-markdown.nvim',
-        dependencies = {
-          'nvim-treesitter/nvim-treesitter',
-        },
-        opts = {
-          file_types = { 'markdown', 'Avante' },
-          completions = {
-            blink = { enabled = true },
-          },
-        },
-      },
-    },
-    version = '*',
-    init = function()
-      highlight.plugin('blink', {
-        -- Keep completion popups consistent with float styling
-        { BlinkCmpMenuBorder = { link = 'FloatBorder' } },
-        { BlinkCmpDocBorder = { link = 'FloatBorder' } },
-        { BlinkCmpMenu = { link = 'NormalFloat' } },
-        { BlinkCmpDoc = { link = 'NormalFloat' } },
-        { BlinkCmpDocCursorLine = { link = 'CursorLine' } },
-      })
+if vim.g.use_cmp then return end
 
-      -- User command to toggle ghost text
-      vim.api.nvim_create_user_command('BlinkToggleGhostText', function()
-        local blink = require('blink.cmp')
-        local enabled = blink.config.completion.ghost_text.enabled
-        blink.config.completion.ghost_text.enabled = not enabled
-        vim.notify(
-          'Ghost text ' .. (enabled and 'disabled' or 'enabled'),
-          vim.log.levels.INFO
-        )
-      end, { desc = 'Toggle blink.cmp ghost text' })
-    end,
-    opts = {
+-- Run init-equivalent code immediately (highlight setup + user command)
+highlight.plugin('blink', {
+  -- Keep completion popups consistent with float styling
+  { BlinkCmpMenuBorder = { link = 'FloatBorder' } },
+  { BlinkCmpDocBorder = { link = 'FloatBorder' } },
+  { BlinkCmpMenu = { link = 'NormalFloat' } },
+  { BlinkCmpDoc = { link = 'NormalFloat' } },
+  { BlinkCmpDocCursorLine = { link = 'CursorLine' } },
+})
+
+-- User command to toggle ghost text
+vim.api.nvim_create_user_command('BlinkToggleGhostText', function()
+  local blink = require('blink.cmp')
+  local enabled = blink.config.completion.ghost_text.enabled
+  blink.config.completion.ghost_text.enabled = not enabled
+  vim.notify(
+    'Ghost text ' .. (enabled and 'disabled' or 'enabled'),
+    vim.log.levels.INFO
+  )
+end, { desc = 'Toggle blink.cmp ghost text' })
+
+-- Setup blink.cmp on InsertEnter
+vim.api.nvim_create_autocmd('InsertEnter', {
+  once = true,
+  group = vim.api.nvim_create_augroup('MrlCompletion', { clear = true }),
+  callback = function()
+    require('blink.cmp').setup({
       -- Custom keymap
       keymap = {
         preset = 'none',
@@ -256,7 +240,14 @@ return {
           auto_brackets = { enabled = true },
         },
       },
-    },
-    opts_extend = { 'sources.default' },
-  },
-}
+    })
+
+    -- Also setup render-markdown for markdown/Avante filetypes
+    require('render-markdown').setup({
+      file_types = { 'markdown', 'Avante' },
+      completions = {
+        blink = { enabled = true },
+      },
+    })
+  end,
+})

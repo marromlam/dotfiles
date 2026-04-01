@@ -1,14 +1,9 @@
-return {
-  'mfussenegger/nvim-lint',
-  event = { 'BufWritePost', 'BufReadPost', 'InsertLeave', 'LspAttach' },
-  keys = {
-    {
-      '<leader>ll',
-      function() require('lint').try_lint() end,
-      desc = 'Try linting for current file',
-    },
-  },
-  config = function()
+-- packs/linting.lua
+
+vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
+  once = true,
+  group = vim.api.nvim_create_augroup('MrlLinting', { clear = true }),
+  callback = function()
     local lint = require('lint')
     local fn = vim.fn
 
@@ -57,11 +52,8 @@ return {
     lint.linters_by_ft['clojure'] = nil -- example on how to disable
 
     lint.linters.flake8 = lint.linters.flake8 or {}
-
     lint.linters.mypy = lint.linters.mypy or {}
-
     lint.linters.eslint_d = lint.linters.eslint_d or {}
-
     lint.linters.luacheck = lint.linters.luacheck or {}
 
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
@@ -74,4 +66,9 @@ return {
       end,
     })
   end,
-}
+})
+
+-- Keymap registered immediately
+vim.keymap.set('n', '<leader>ll', function() require('lint').try_lint() end, {
+  desc = 'Try linting for current file',
+})

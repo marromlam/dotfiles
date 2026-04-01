@@ -384,6 +384,184 @@ end
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
+-- Highlight utilities {{{
+--------------------------------------------------------------------------------
+
+---@alias HLAttrs {from: string, attr: "fg" | "bg", alter: integer}
+
+---@class HLData
+---@field fg string
+---@field bg string
+---@field bold boolean
+---@field italic boolean
+---@field undercurl boolean
+---@field underline boolean
+---@field underdotted boolean
+---@field underdashed boolean
+---@field underdouble boolean
+---@field strikethrough boolean
+---@field reverse boolean
+---@field nocombine boolean
+---@field link string
+---@field default boolean
+
+---@class HLArgs
+---@field blend integer?
+---@field fg (string | HLAttrs)?
+---@field bg (string | HLAttrs)?
+---@field sp (string | HLAttrs)?
+---@field bold boolean?
+---@field italic boolean?
+---@field undercurl boolean?
+---@field underline boolean?
+---@field underdotted boolean?
+---@field underdashed boolean?
+---@field underdouble boolean?
+---@field strikethrough boolean?
+---@field reverse boolean?
+---@field nocombine boolean?
+---@field link string?
+---@field default boolean?
+---@field clear boolean?
+---@field inherit string?
+
+local hl_enable_italics = true
+local hl_attrs = {
+  fg = true,
+  bg = true,
+  sp = true,
+  blend = true,
+  bold = true,
+  italic = hl_enable_italics,
+  standout = true,
+  underline = true,
+  undercurl = true,
+  underdouble = true,
+  underdotted = true,
+  underdashed = true,
+  strikethrough = true,
+  reverse = true,
+  nocombine = true,
+  link = true,
+  default = true,
+}
+
+---@private
+---@param opts {name: string?, link: boolean?}?
+---@param ns integer?
+---@return HLData
+local function hl_get_as_hex(opts, ns)
+  ns, opts = ns or 0, opts or {}
+  opts.link = opts.link ~= nil and opts.link or false
+  local hl = api.nvim_get_hl(ns, opts)
+  hl.fg = hl.fg and ('#%06x'):format(hl.fg)
+  hl.bg = hl.bg and ('#%06x'):format(hl.bg)
+  return hl
+end
+
+---Get the value of a highlight group, handling errors and fallbacks.
+---If no attribute is specified return the entire highlight table.
+---@param group string
+---@param attribute string?
+---@param fallback string?
+---@return string
+---@overload fun(group: string): HLData
+local function hl_get(group, attribute, fallback)
+  assert(group, 'cannot get a highlight without specifying a group name')
+  local data = hl_get_as_hex({ name = group })
+  if not attribute then return data end
+  assert(hl_attrs[attribute], ('the attribute passed in is invalid: %s'):format(attribute))
+  local color = data[attribute] or fallback
+  if not color then return 'NONE' end
+  return color
+end
+
+---@param hl string | HLAttrs
+---@param attr string
+---@return HLData
+local function hl_resolve_from_attribute(hl, attr)
+  if type(hl) ~= 'table' or not hl.from then return hl end
+  local colour = hl_get(hl.from, hl.attr or attr)
+  if hl.alter then colour = M.tint(colour, hl.alter) end
+  return colour
+end
+
+---Set a neovim highlight with syntactic sugar for deriving colors from other groups.
+---@param name string
+---@param opts HLArgs
+---@overload fun(ns: integer, name: string, opts: HLArgs)
+local function hl_set(ns, name, opts)
+  if type(ns) == 'string' and type(name) == 'table' then
+    opts, name, ns = name, ns, 0
+  end
+  vim.validate('opts', opts, 'table')
+  vim.validate('name', name, 'string')
+  vim.validate('ns', ns, 'number')
+  local hl = opts.clear and {} or hl_get_as_hex({ name = opts.inherit or name })
+  for attribute, hl_data in pairs(opts) do
+    local new_data = hl_resolve_from_attribute(hl_data, attribute)
+    if hl_attrs[attribute] then hl[attribute] = new_data end
+  end
+  M.pcall(fmt('setting highlight "%s"', name), api.nvim_set_hl, ns, name, hl)
+end
+
+---Apply a list of highlights.
+---@param hls {[string]: HLArgs}[]
+---@param namespace integer?
+local function hl_all(hls, namespace)
+  vim.iter(hls):each(function(hl) hl_set(namespace or 0, next(hl)) end)
+end
+
+---Set window local highlights.
+---@param name string
+---@param win_id number
+---@param hls HLArgs[]
+local function hl_set_winhl(name, win_id, hls)
+  local namespace = api.nvim_create_namespace(name)
+  hl_all(hls, namespace)
+  api.nvim_win_set_hl_ns(win_id, namespace)
+end
+
+---@param theme {[string]: HLArgs[]}
+---@return HLArgs[]
+local function hl_add_theme_overrides(theme)
+  local res, seen = {}, {}
+  local list = vim.list_extend(theme[vim.g.colors_name] or {}, theme['*'] or {})
+  for _, hl in ipairs(list) do
+    local n = next(hl)
+    if not seen[n] then res[#res + 1] = hl end
+    seen[n] = true
+  end
+  return res
+end
+
+---Apply highlights for a plugin and refresh on colorscheme change.
+---@param name string plugin name
+---@param opts HLArgs[] | { theme: table<string, HLArgs[]> }
+local function hl_plugin(name, opts)
+  if opts.theme then
+    opts = hl_add_theme_overrides(opts.theme)
+    if not next(opts) then return end
+  end
+  vim.schedule(function() hl_all(opts) end)
+  M.augroup(fmt('%sHighlightOverrides', name:gsub('^%l', string.upper)), {
+    event = 'ColorScheme',
+    command = function() vim.schedule(function() hl_all(opts) end) end,
+  })
+end
+
+M.hl = {
+  get = hl_get,
+  set = hl_set,
+  all = hl_all,
+  plugin = hl_plugin,
+  set_winhl = hl_set_winhl,
+}
+
+-- }}}
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
 -- UI {{{
 --------------------------------------------------------------------------------
 
@@ -693,14 +871,7 @@ M.ui.border = 'rounded'
 
 M.ui.current = {
   border = 'rounded',
-  float_bg = function()
-    local ok, HL = pcall(require, 'highlight')
-    if ok and HL and HL.get then return HL.get('Normal', 'bg') end
-    local ok2, hl =
-      pcall(vim.api.nvim_get_hl, 0, { name = 'Normal', link = false })
-    if ok2 and hl and hl.bg then return ('#%06x'):format(hl.bg) end
-    return 'NONE'
-  end,
+  float_bg = function() return hl_get('Normal', 'bg') end,
 }
 
 -- }}}
