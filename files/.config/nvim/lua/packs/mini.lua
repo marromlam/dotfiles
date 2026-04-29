@@ -8,17 +8,11 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
   group = vim.api.nvim_create_augroup('MrlMiniTextObjects', { clear = true }),
   callback = function()
-    require('mini.ai').setup({ n_lines = 500 })
-
-    require('mini.align').setup({
-      mappings = {
-        start = 'ga', -- Start align mode
-        start_with_preview = 'gA', -- Start align mode with preview
-      },
-      options = {
-        split_pattern = '',
-        justify_side = 'left',
-        merge_delimiter = '',
+    require('mini.ai').setup({
+      n_lines = 500,
+      custom_textobjects = {
+        -- Handle namespaced XML/HTML tags like <w:pPr> in addition to plain tags
+        t = { '<(%a[%w:.-]*)%f[^%w:.-][^>]->.-</%1>', '^<.->().-()</[^>]+>$' },
       },
     })
 
@@ -35,6 +29,19 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
         update_n_lines = 'sn', -- Update `n_lines`
       },
     })
+
+    require('mini.align').setup({
+      mappings = {
+        start = 'ga', -- Start align mode
+        start_with_preview = 'gA', -- Start align mode with preview
+      },
+      options = {
+        split_pattern = '',
+        justify_side = 'left',
+        merge_delimiter = '',
+      },
+    })
+
 
     require('mini.splitjoin').setup({
       mappings = {
@@ -59,24 +66,6 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
       },
       options = {
         reindent_linewise = true,
-      },
-    })
-
-    require('mini.diff').setup({
-      view = {
-        style = 'sign',
-        signs = {
-          add = '┃',
-          change = '┃',
-          delete = '┃',
-        },
-      },
-      algorithm = 'histogram',
-      highlight = {
-        additions = 'MiniDiffSignAdd',
-        deletions = 'MiniDiffSignDelete',
-        changes = 'MiniDiffSignChange',
-        text = 'MiniDiffText',
       },
     })
 

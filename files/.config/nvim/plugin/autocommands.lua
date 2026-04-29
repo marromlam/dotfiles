@@ -1,6 +1,45 @@
 local augroup = require('tools').augroup
 
 local fn, api, v, cmd = vim.fn, vim.api, vim.v, vim.cmd
+local startup_archive = require('startup_archive')
+
+do
+  local group =
+    api.nvim_create_augroup('ArchiveStartupRetry', { clear = true })
+
+  api.nvim_create_autocmd('VimEnter', {
+    group = group,
+    once = true,
+    callback = function()
+      local arg0 = fn.argv(0)
+      if arg0 == '' then return end
+
+      local lines = api.nvim_buf_get_lines(0, 0, -1, false)
+      local ctx = startup_archive.build_ctx({
+        argc = fn.argc(),
+        arg0 = arg0,
+        zip_exts = vim.g.zipPlugin_ext,
+        retry_done = vim.g._mrl_archive_startup_retry_done == true,
+        buftype = vim.bo.buftype,
+        filetype = vim.bo.filetype,
+        line_count = api.nvim_buf_line_count(0),
+        lines = lines,
+      })
+
+      if not ctx.is_single_arg or ctx.retry_done or not ctx.is_archive_arg then
+        return
+      end
+
+      vim.g._mrl_archive_startup_retry_done = true
+      local should_retry = startup_archive.should_retry_startup_edit(ctx)
+      -- Even when the initial buffer looks sane in headless mode, interactive
+      -- startup can still render it blank. Re-open once, deferred, to mimic
+      -- the known-working manual `:e test.docx` path.
+      local delay = should_retry and 0 or 30
+      vim.defer_fn(function() cmd.edit(vim.fn.fnameescape(arg0)) end, delay)
+    end,
+  })
+end
 
 -- Better terminal UX inside fzf-lua: allow Esc to abort.
 api.nvim_create_autocmd('FileType', {

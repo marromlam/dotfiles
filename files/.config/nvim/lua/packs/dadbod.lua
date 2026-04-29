@@ -1,4 +1,3 @@
 -- packs/dadbod.lua
 
--- Your DBUI configuration (init equivalent - runs immediately)
-vim.g.db_ui_use_nerd_fonts = 1
+-- vim-dadbod / vim-dadbod-ui: no setup needed, configured via vim.g in packloader.lua

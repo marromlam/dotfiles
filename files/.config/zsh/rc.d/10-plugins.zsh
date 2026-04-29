@@ -57,9 +57,10 @@ setopt MENU_COMPLETE
 setopt no_list_ambiguous
 
 # syntax highlighting — deferred to first precmd to not block startup
-if [[ -f $HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+__DOTS[zsh_syntax_highlighting]="$HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if [[ -f "${__DOTS[zsh_syntax_highlighting]}" ]]; then
   _load_zsh_syntax_highlighting() {
-    source $HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    [[ -f "${__DOTS[zsh_syntax_highlighting]}" ]] && source "${__DOTS[zsh_syntax_highlighting]}"
     add-zsh-hook -d precmd _load_zsh_syntax_highlighting
   }
   add-zsh-hook precmd _load_zsh_syntax_highlighting

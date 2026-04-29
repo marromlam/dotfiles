@@ -1,3 +1,6 @@
+-- Suppress deprecation warnings from plugins (e.g. client.notify)
+vim.deprecate = function() end
+
 -- Make all keymaps silent by default (Folke's pattern)
 local keymap_set = vim.keymap.set
 vim.keymap.set = function(mode, lhs, rhs, opts)

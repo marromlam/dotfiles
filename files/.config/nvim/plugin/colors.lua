@@ -592,8 +592,7 @@ augroup('UserHighlights', {
   command = function() user_highlights() end,
 }, {
   -- Run once after plugins load, so plugin highlight overrides don't win.
-  event = 'User',
-  pattern = 'LazyDone',
+  event = 'VimEnter',
   once = true,
   command = function() user_highlights() end,
 }, {

@@ -22,10 +22,6 @@ vim.g.obsidian = vim.g.icloud .. '/iCloud~md~obsidian/Documents/Marcos'
 vim.g.mapleader = ' ' -- Remap leader key
 vim.g.maplocalleader = '\\' -- Local leader is <Space>
 
--- If opening from inside neovim terminal buffer, skip full config
-if vim.env.NVIM and vim.env.TERM_PROGRAM == 'nvim' then
-  return require('lazy').setup({ { 'willothy/flatten.nvim', config = true } })
-end
 
 --------------------------------------------------------------------------------
 -- Load modules {{{
@@ -42,4 +38,4 @@ vim.defer_fn(function() require('external_grep') end, 0)
 -- }}}
 --------------------------------------------------------------------------------
 
--- vim: ts=2 sts=2 sw=2 et fdm=marker
+-- vim: ts=2 sts=2 sw=2 et fdm=marker fol

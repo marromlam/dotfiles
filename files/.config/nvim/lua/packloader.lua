@@ -1,8 +1,5 @@
 -- lua/packloader.lua
 
--- Firenvim: skip the full plugin stack
-if vim.g.started_by_firenvim then return end
-
 vim.g.db_ui_use_nerd_fonts = 1
 
 -- ---------------------------------------------------------------------------
@@ -77,7 +74,6 @@ vim.pack.add({
   'https://github.com/echasnovski/mini.splitjoin',
   'https://github.com/echasnovski/mini.move',
   'https://github.com/echasnovski/mini.icons',
-  'https://github.com/echasnovski/mini.diff',
   'https://github.com/echasnovski/mini.trailspace',
   'https://github.com/echasnovski/mini.misc',
   'https://github.com/echasnovski/mini.bufremove',
@@ -129,8 +125,7 @@ vim.pack.add({
   -- Obsidian
   'https://github.com/epwalsh/obsidian.nvim',
 
-  -- REPL
-  'https://github.com/marromlam/kitty-repl.nvim',
+  -- REPL (loaded conditionally below)
 
   -- Remote / containers
   'https://codeberg.org/esensar/nvim-dev-container',
@@ -156,20 +151,24 @@ vim.pack.add({
   'https://github.com/nvim-lua/plenary.nvim',
   'https://github.com/jghauser/fold-cycle.nvim',
   'https://github.com/andrewferrier/debugprint.nvim',
-  'https://github.com/marromlam/sailor.vim',
+  -- 'https://github.com/marromlam/sailor.vim',
+  'https://github.com/marromlam/tex-kitty',
   'https://github.com/bogado/file-line',
   'https://github.com/will133/vim-dirdiff',
   'https://github.com/tpope/vim-sleuth',
-  'https://github.com/tpope/vim-surround',
   'https://github.com/tpope/vim-repeat',
-
-  -- Bufferline dep
-  'https://github.com/nvim-lua/plenary.nvim',
 })
 
 -- ---------------------------------------------------------------------------
 -- Load configuration for each pack (imperative setup)
 -- ---------------------------------------------------------------------------
+
+-- Theme {{{
+local themes_dev = '/Users/marcos/Workspaces/personal/themes/themes/vim'
+if vim.uv.fs_stat(themes_dev) then
+  vim.opt.runtimepath:prepend(themes_dev)
+end
+-- }}}
 
 -- Always-on / UI (load immediately)
 require('packs.colorscheme')
@@ -188,7 +187,23 @@ require('packs.navigation')
 require('packs.terminal')
 
 -- REPL
+local _kitty_dev = '/Users/marcos/Workspaces/personal/kitty-repl.nvim'
+if vim.uv.fs_stat(_kitty_dev) then
+  vim.opt.runtimepath:prepend(_kitty_dev)
+else
+  vim.pack.add({ 'https://github.com/marromlam/kitty-repl.nvim' })
+end
 require('packs.repl')
+
+local _sailor_dev = '/Users/marcos/Workspaces/personal/sailor.vim'
+if vim.uv.fs_stat(_sailor_dev) then
+  vim.opt.runtimepath:prepend(_sailor_dev)
+  -- plugin/sailor.lua auto-calls setup() on load; source it explicitly
+  -- since prepend() doesn't trigger plugin/ sourcing the way pack.add() does
+  vim.cmd('source ' .. _sailor_dev .. '/plugin/sailor.lua')
+else
+  vim.pack.add({ 'https://github.com/marromlam/sailor.vim' })
+end
 
 -- Copilot / AI (deferred setup via autocmd in each file)
 require('packs.copilot')
@@ -217,13 +232,15 @@ require('packs.filetype')
 -- Treesitter (on BufReadPost)
 require('packs.treesitter')
 
+-- Git (load immediately so <leader>gs works before any buffer is opened)
+require('packs.git')
+
 -- Heavy plugins: load on BufReadPre/BufNewFile
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
   group = vim.api.nvim_create_augroup('MrlPackloaderHeavy', { clear = true }),
   callback = function()
     require('packs.lsp')
-    require('packs.git')
     require('packs.ui')
     require('packs.format')
     require('packs.linting')

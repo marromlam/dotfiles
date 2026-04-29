@@ -20,7 +20,7 @@ vim.keymap.set('n', '<leader>dC', '<Cmd>DeleteDebugPrints<CR>', {
   desc = 'debugprint: clear all',
 })
 
--- sailor.vim: loaded on VimEnter, no explicit setup needed
+-- sailor.vim: plugin/sailor.lua auto-calls setup() on load (no explicit call needed)
 
 -- file-line: activated by the gF key, no setup needed
 

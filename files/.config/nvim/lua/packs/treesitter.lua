@@ -31,7 +31,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
         'c', 'vim', 'vimdoc', 'query', 'lua', 'luadoc', 'luap',
         'diff', 'regex', 'gitcommit', 'git_config', 'git_rebase', 'markdown', 'markdown_inline',
         'bash', 'html', 'json', 'javascript', 'typescript', 'tsx', 'yaml', 'css', 'prisma',
-        'svelte', 'graphql', 'dockerfile', 'gitignore', 'python', 'go', 'rust',
+        'svelte', 'graphql', 'dockerfile', 'gitignore', 'python', 'go', 'rust', 'xml',
       },
     })
 

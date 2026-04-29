@@ -1,7 +1,8 @@
 -- packs/colorscheme.lua
+local home_dir = os.getenv('HOME')
 
 local is_dev = vim.fn.isdirectory(
-  '/Users/marcos/Workspaces/personal/theme-builder'
+  home_dir .. '/Workspaces/personal/themes'
 ) == 1
 
 if not is_dev then
@@ -25,6 +26,6 @@ if not is_dev then
   vim.cmd('colorscheme vague')
 else
   -- BEGIN_NEOVIM_THEME
-  vim.cmd.colorscheme('amberglow')
+  vim.cmd.colorscheme('dracula_pro')
   -- END_NEOVIM_THEME
 end

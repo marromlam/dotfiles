@@ -470,7 +470,10 @@ local function hl_get(group, attribute, fallback)
   assert(group, 'cannot get a highlight without specifying a group name')
   local data = hl_get_as_hex({ name = group })
   if not attribute then return data end
-  assert(hl_attrs[attribute], ('the attribute passed in is invalid: %s'):format(attribute))
+  assert(
+    hl_attrs[attribute],
+    ('the attribute passed in is invalid: %s'):format(attribute)
+  )
   local color = data[attribute] or fallback
   if not color then return 'NONE' end
   return color
@@ -546,7 +549,9 @@ local function hl_plugin(name, opts)
   vim.schedule(function() hl_all(opts) end)
   M.augroup(fmt('%sHighlightOverrides', name:gsub('^%l', string.upper)), {
     event = 'ColorScheme',
-    command = function() vim.schedule(function() hl_all(opts) end) end,
+    command = function()
+      vim.schedule(function() hl_all(opts) end)
+    end,
   })
 end
 
@@ -556,6 +561,9 @@ M.hl = {
   all = hl_all,
   plugin = hl_plugin,
   set_winhl = hl_set_winhl,
+  tint = M.tint,
+  blend = M.blend,
+  darken_hsl = M.darken_hsl,
 }
 
 -- }}}
@@ -588,14 +596,14 @@ M.ui.icons = {
     hint = '󰌶', --  ⚑
   },
   git = {
-    add = '󰐗',
-    mod = '󰻂',
-    remove = '󰍶',
-    ignore = '',
-    rename = '',
+    add = '',
+    mod = '',
+    remove = '',
+    ignore = '',
+    rename = '',
     untracked = '',
-    ignored = '󰙦',
-    unstaged = '󰻂',
+    ignored = '',
+    unstaged = '',
     staged = '',
     conflict = '',
     diff = '',
@@ -619,6 +627,7 @@ M.ui.icons = {
     tab = '⇥',
     bug = '',
     question = '',
+    bell = '',
     clock = '',
     cmd = '⌘',
     lock = '',
@@ -629,7 +638,7 @@ M.ui.icons = {
     history = '󰄉',
     comment = '󰅺',
     robot = '󰚩',
-    copilot = '',
+    copilot = '',
     lightbulb = '󰌵',
     search = '󰍉',
     code = '',
@@ -653,7 +662,7 @@ M.ui.icons = {
     calendar = '',
     block = '▏',
     clippy = '',
-    puzzle = '',
+    puzzle = '',
     settings = '⚙',
     key = '',
     config = '',
@@ -1115,7 +1124,8 @@ local function sl_component(opts)
   if not opts.priority then opts.priority = 10 end
 
   local item_str = sl_chunks_to_string(item)
-  if vim.api.nvim_strwidth(item_str) == 0 then return end
+  -- Use byte length: nvim_strwidth returns 0 for Nerd Font private-use glyphs
+  if #item_str == 0 then return end
 
   local click_start = opts.click
       and sl_get_click_start(opts.click, tostring(opts.id))

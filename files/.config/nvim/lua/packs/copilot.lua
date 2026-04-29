@@ -1,7 +1,7 @@
 -- packs/copilot.lua
 
--- copilot.lua: setup on InsertEnter
-vim.api.nvim_create_autocmd('InsertEnter', {
+-- copilot.lua: setup on BufReadPre so the LSP client appears in the statusline
+vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
   group = vim.api.nvim_create_augroup('MrlCopilot', { clear = true }),
   callback = function()
