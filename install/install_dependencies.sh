@@ -308,6 +308,7 @@ BREW_LINUX=(
 	"pandoc"
 	"pkg-config"
 	"python"
+	"uv"
 	"readline"
 	"ripgrep"
 	"rlue/utils/timer"

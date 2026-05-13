@@ -1,324 +1,765 @@
-#!/bin/bash
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "rich>=13",
+#   "zeroconf>=0.131",
+#   "requests>=2.31",
+# ]
+# ///
+"""LAN device scanner inspired by the iOS Net Analyzer app.
 
-SUBNET="192.168.1.0/24"
-OUTPUT="text"
-VENDOR_LOOKUP=1
-IDENTIFY=1
-DEEP=0
-REPORT_RE='for[[:space:]]+([^[:space:]]+)[[:space:]]+\(([^)]+)\)'
-IS_ROOT=0
-if [[ $(id -u) -eq 0 ]]; then
-    IS_ROOT=1
-fi
+Lists hosts on the current network with hostname, MAC, vendor, advertised
+Bonjour services, SSDP/UPnP identity, and (optionally) OS fingerprint.
+"""
 
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-    --json)
-        OUTPUT="json"
-        shift
-        ;;
-    --no-vendor)
-        VENDOR_LOOKUP=0
-        shift
-        ;;
-    --identify)
-        IDENTIFY=1
-        shift
-        ;;
-    --no-identify)
-        IDENTIFY=0
-        shift
-        ;;
-    --deep)
-        DEEP=1
-        shift
-        ;;
-    *)
-        SUBNET="$1"
-        shift
-        ;;
-    esac
-done
+from __future__ import annotations
 
-needs() {
-    local cmd="$1"
-    local pkg="$2"
-    if command -v "$cmd" >/dev/null 2>&1; then
-        return 0
-    fi
-    if command -v brew >/dev/null 2>&1; then
-        brew install "$pkg"
-    else
-        echo "Missing $cmd and Homebrew is not installed."
-        return 1
-    fi
+import argparse
+import ipaddress
+import json
+import os
+import re
+import socket
+import subprocess
+import sys
+import time
+import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+
+import requests
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+from rich import box
+from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
+
+# ---------- constants ---------------------------------------------------------
+
+MACVENDORS_URL = "https://api.macvendors.com/{}"
+CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "net-analyzer"
+CACHE_PATH = CACHE_DIR / "vendors.json"
+CACHE_TTL_SECONDS = 30 * 24 * 3600
+
+BROADCAST_MACS = {"ff:ff:ff:ff:ff:ff"}
+MULTICAST_MAC_PREFIXES = ("01:00:5e:", "33:33:", "01:80:c2:")
+
+# Curated mDNS service types — matches the badge set the iOS app shows.
+MDNS_SERVICE_TYPES = [
+    "_airplay._tcp.local.",
+    "_raop._tcp.local.",
+    "_companion-link._tcp.local.",
+    "_homekit._tcp.local.",
+    "_hap._tcp.local.",
+    "_googlecast._tcp.local.",
+    "_spotify-connect._tcp.local.",
+    "_printer._tcp.local.",
+    "_ipp._tcp.local.",
+    "_ipps._tcp.local.",
+    "_smb._tcp.local.",
+    "_afpovertcp._tcp.local.",
+    "_ssh._tcp.local.",
+    "_http._tcp.local.",
+    "_device-info._tcp.local.",
+    "_workstation._tcp.local.",
+    "_matter._tcp.local.",
+    "_sonos._tcp.local.",
+    "_amzn-wplay._tcp.local.",
+    "_nvstream._tcp.local.",
+]
+
+SERVICE_LABELS = {
+    "_airplay._tcp.local.": "AirPlay",
+    "_raop._tcp.local.": "AirTunes",
+    "_companion-link._tcp.local.": "Companion",
+    "_homekit._tcp.local.": "HomeKit",
+    "_hap._tcp.local.": "HomeKit",
+    "_googlecast._tcp.local.": "Cast",
+    "_spotify-connect._tcp.local.": "Spotify",
+    "_printer._tcp.local.": "Printer",
+    "_ipp._tcp.local.": "IPP",
+    "_ipps._tcp.local.": "IPPS",
+    "_smb._tcp.local.": "SMB",
+    "_afpovertcp._tcp.local.": "AFP",
+    "_ssh._tcp.local.": "SSH",
+    "_http._tcp.local.": "HTTP",
+    "_device-info._tcp.local.": "Info",
+    "_workstation._tcp.local.": "Workstation",
+    "_matter._tcp.local.": "Matter",
+    "_sonos._tcp.local.": "Sonos",
+    "_amzn-wplay._tcp.local.": "Amazon",
+    "_nvstream._tcp.local.": "NVIDIA",
 }
 
-DEVICE_LIST="$(mktemp)"
-ARP_TABLE="$(mktemp)"
-VENDOR_CACHE="$(mktemp)"
-IDENTIFY_OUT="$(mktemp)"
-MDNS_INFO="$(mktemp)"
-SSDP_SERVER="$(mktemp)"
-SSDP_LOCATION="$(mktemp)"
-UPNP_INFO="$(mktemp)"
-trap 'rm -f "$DEVICE_LIST" "$ARP_TABLE" "$VENDOR_CACHE" "$IDENTIFY_OUT" "$MDNS_INFO" "$SSDP_SERVER" "$SSDP_LOCATION" "$UPNP_INFO"' EXIT
-
-refresh_arp() {
-    if ! command -v arp >/dev/null 2>&1; then
-        : >"$ARP_TABLE"
-        return
-    fi
-    arp -a 2>/dev/null | awk '{
-        host=$1;
-        ip=$2;
-        gsub(/[()]/,"",ip);
-        mac=$4;
-        if (mac ~ /incomplete/ || mac == "<incomplete>") mac="";
-        print ip "\t" host "\t" mac;
-    }' >"$ARP_TABLE"
+# OUI fallback so cold-start (no network for macvendors) still gives useful output.
+OUI_FALLBACK = {
+    "00:03:93": "Apple, Inc.",
+    "00:05:02": "Apple, Inc.",
+    "00:0a:27": "Apple, Inc.",
+    "00:0a:95": "Apple, Inc.",
+    "00:50:e4": "Apple, Inc.",
+    "00:1b:63": "Apple, Inc.",
+    "00:1f:f3": "Apple, Inc.",
+    "00:25:00": "Apple, Inc.",
+    "3c:22:fb": "Apple, Inc.",
+    "a4:83:e7": "Apple, Inc.",
+    "f0:18:98": "Apple, Inc.",
+    "f4:0f:24": "Apple, Inc.",
+    "f8:1e:df": "Apple, Inc.",
+    "b8:27:eb": "Raspberry Pi Foundation",
+    "dc:a6:32": "Raspberry Pi Trading Ltd",
+    "e4:5f:01": "Raspberry Pi Trading Ltd",
+    "d8:3a:dd": "Raspberry Pi Trading Ltd",
+    "f0:ef:86": "Google, Inc.",
+    "1c:f2:9a": "Google, Inc.",
+    "44:07:0b": "Google, Inc.",
+    "f4:f5:d8": "Google, Inc.",
+    "ac:63:be": "Amazon Technologies Inc.",
+    "fc:65:de": "Amazon Technologies Inc.",
+    "00:1a:11": "Google, Inc.",
 }
 
-normalize_field() {
-    local value="$1"
-    value="$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-    if [[ -z $value || $value == "?" ]]; then
-        echo "unknown"
-    else
-        echo "$value"
-    fi
-}
+SSDP_MX = 2
+SSDP_GROUP = ("239.255.255.250", 1900)
+SSDP_M_SEARCH = (
+    "M-SEARCH * HTTP/1.1\r\n"
+    "HOST: 239.255.255.250:1900\r\n"
+    'MAN: "ssdp:discover"\r\n'
+    f"MX: {SSDP_MX}\r\n"
+    "ST: ssdp:all\r\n\r\n"
+).encode("ascii")
 
-normalize_mac() {
-    local mac="$1"
-    if [[ -z $mac || $mac == "?" || $mac == "unknown" || $mac == *"incomplete"* ]]; then
-        echo "unknown"
-        return
-    fi
-    echo "$mac" | awk -F: '{
-        if (NF==6) {
-            for (i=1;i<=6;i++) {
-                if (length($i)==1) $i="0"$i;
-            }
-            printf "%s:%s:%s:%s:%s:%s\n", $1,$2,$3,$4,$5,$6;
-        } else {
-            print $0;
-        }
-    }'
-}
+console = Console(stderr=True)
 
-lookup_field() {
-    local ip="$1"
-    local file="$2"
-    awk -v ip="$ip" '$1==ip { $1=""; sub(/^\t/,""); print; exit }' "$file"
-}
+# ---------- model -------------------------------------------------------------
 
-lookup_arp_host() {
-    local ip="$1"
-    awk -v ip="$ip" '$1==ip {print $2; exit}' "$ARP_TABLE"
-}
 
-lookup_arp_mac() {
-    local ip="$1"
-    awk -v ip="$ip" '$1==ip {print $3; exit}' "$ARP_TABLE"
-}
+@dataclass
+class Host:
+    ip: str
+    hostname: Optional[str] = None
+    mac: Optional[str] = None
+    vendor: Optional[str] = None
+    os_: Optional[str] = None
+    mdns_services: set[str] = field(default_factory=set)
+    ssdp: bool = False
+    friendly_name: Optional[str] = None
+    manufacturer: Optional[str] = None
+    model: Optional[str] = None
+    ssdp_location: Optional[str] = None
 
-lookup_vendor() {
-    local mac="$1"
-    if [[ -z $mac || $VENDOR_LOOKUP -ne 1 ]] || ! command -v curl >/dev/null 2>&1; then
-        echo "unknown"
-        return
-    fi
 
-    local cached
-    cached=$(awk -v mac="$mac" '$1==mac { $1=""; sub(/^\t/,""); print; exit }' "$VENDOR_CACHE")
-    if [[ -n $cached ]]; then
-        echo "$cached"
-        return
-    fi
+# ---------- default route / CIDR ---------------------------------------------
 
-    local vendor
-    vendor=$(curl -fsS "https://api.macvendors.com/$mac" 2>/dev/null | tr -d '\r' || true)
-    vendor=$(normalize_field "$vendor")
-    printf "%s\t%s\n" "$mac" "$vendor" >>"$VENDOR_CACHE"
-    echo "$vendor"
-}
 
-lookup_os() {
-    local ip="$1"
-    if [[ $DEEP -ne 1 ]] || ! command -v nmap >/dev/null 2>&1; then
-        echo "unknown"
-        return
-    fi
+def detect_default_cidr() -> tuple[str, Optional[str]]:
+    """Return (cidr, local_ip). Falls back to 192.168.1.0/24 with a warning."""
+    try:
+        if sys.platform == "darwin":
+            out = subprocess.check_output(["route", "-n", "get", "default"], text=True, timeout=3)
+            iface_m = re.search(r"interface:\s*(\S+)", out)
+            if not iface_m:
+                raise RuntimeError("no default interface")
+            iface = iface_m.group(1)
+            ifc = subprocess.check_output(["ifconfig", iface], text=True, timeout=3)
+            m = re.search(r"inet (\S+) netmask (0x[0-9a-f]+)", ifc)
+            if not m:
+                raise RuntimeError("no inet on iface")
+            ip = m.group(1)
+            mask = bin(int(m.group(2), 16)).count("1")
+            net = ipaddress.IPv4Network(f"{ip}/{mask}", strict=False)
+            return str(net), ip
+        # linux / wsl
+        out = subprocess.check_output(
+            ["ip", "-o", "-4", "route", "show", "default"], text=True, timeout=3
+        )
+        parts = out.split()
+        iface = parts[parts.index("dev") + 1]
+        addr = subprocess.check_output(
+            ["ip", "-o", "-4", "addr", "show", "dev", iface], text=True, timeout=3
+        )
+        m = re.search(r"inet (\S+)/(\d+)", addr)
+        if not m:
+            raise RuntimeError("no inet/prefix")
+        ip, prefix = m.group(1), m.group(2)
+        net = ipaddress.IPv4Network(f"{ip}/{prefix}", strict=False)
+        return str(net), ip
+    except Exception as exc:
+        console.print(
+            f"[yellow][warn][/] could not auto-detect CIDR ({exc}); falling back to 192.168.1.0/24"
+        )
+        return "192.168.1.0/24", None
 
-    local os
-    os=$(nmap -O -sV --osscan-guess --host-timeout 30s "$ip" 2>/dev/null | awk -F': ' \
-        '/OS details:|Running:|Service Info: OS:/{print $2; exit}')
-    echo "$(normalize_field "$os")"
-}
 
-parse_mdns() {
-    awk '
-        /^\| mdns-discovery:/ {in_block=1; next}
-        in_block && $1 == "|" && $2 ~ /^[0-9]+\./ {ip=$2; next}
-        in_block && $1 == "|" && $2 == "Hostname:" && ip != "" {
-            $1=""; $2="";
-            sub(/^[[:space:]]+/, "", $0);
-            print ip "\t" $0;
-            next
-        }
-    ' "$IDENTIFY_OUT" >"$MDNS_INFO"
-}
+# ---------- nmap host discovery ----------------------------------------------
 
-parse_ssdp() {
-    awk '
-        /^\| broadcast-upnp-discovery:/ {in_block=1; next}
-        in_block && $1 == "|" && $2 == "Server:" {
-            $1=""; $2="";
-            sub(/^[[:space:]]+/, "", $0);
-            server=$0;
-            next
-        }
-        in_block && $1 == "|" && $2 == "Location:" {
-            loc=$3;
-            ip=loc;
-            sub(/^https?:\/\//, "", ip);
-            sub(/[:\/].*$/, "", ip);
-            if (ip != "") {
-                print ip "\t" server > "'"$SSDP_SERVER"'";
-                print ip "\t" loc > "'"$SSDP_LOCATION"'";
-            }
-            server="";
-            next
-        }
-    ' "$IDENTIFY_OUT"
-}
 
-fetch_upnp_details() {
-    local location="$1"
-    if [[ -z $location ]] || ! command -v curl >/dev/null 2>&1; then
-        printf "%s\t%s\t%s\n" "unknown" "unknown" "unknown"
-        return
-    fi
-    local xml
-    xml=$(curl -fsS --max-time 2 "$location" 2>/dev/null | tr -d '\r' || true)
-    local friendly manufacturer model
-    friendly=$(echo "$xml" | sed -n 's:.*<friendlyName>\(.*\)</friendlyName>.*:\1:p' | head -n 1)
-    manufacturer=$(echo "$xml" | sed -n 's:.*<manufacturer>\(.*\)</manufacturer>.*:\1:p' | head -n 1)
-    model=$(echo "$xml" | sed -n 's:.*<modelName>\(.*\)</modelName>.*:\1:p' | head -n 1)
-    printf "%s\t%s\t%s\n" "$(normalize_field "$friendly")" "$(normalize_field "$manufacturer")" "$(normalize_field "$model")"
-}
+def nmap_ping_scan(cidr: str, *, unprivileged: bool) -> list[Host]:
+    if not _have("nmap"):
+        console.print("[yellow][warn][/] nmap not found; skipping active host discovery")
+        return []
+    args = ["nmap", "-sn", "-oX", "-"]
+    if unprivileged:
+        args.append("--unprivileged")
+    args.append(cidr)
+    try:
+        out = subprocess.check_output(args, text=True, timeout=120)
+    except subprocess.CalledProcessError as exc:
+        console.print(f"[yellow][warn][/] nmap failed: {exc}")
+        return []
+    return _parse_nmap_xml(out)
 
-if [[ $DEEP -eq 1 && $IS_ROOT -ne 1 ]]; then
-    echo "Deep scans require sudo on macOS. Disabling --deep." >&2
-    DEEP=0
-fi
 
-echo "Scanning network $SUBNET..."
-
-needs nmap nmap || true
-
-if command -v nmap >/dev/null 2>&1; then
-    nmap_args=("-sn")
-    if [[ $IS_ROOT -ne 1 ]]; then
-        nmap_args+=("--unprivileged")
-    fi
-    nmap "${nmap_args[@]}" "$SUBNET" 2>/dev/null | while read -r line; do
-        if [[ $line == *"Nmap scan report for"* ]]; then
-            if [[ $line =~ $REPORT_RE ]]; then
-                host="${BASH_REMATCH[1]}"
-                ip="${BASH_REMATCH[2]}"
-            else
-                ip="${line##*for }"
-                host="unknown"
-            fi
-            printf "%s\t%s\n" "$ip" "$host"
-        fi
-    done >"$DEVICE_LIST"
-    refresh_arp
-    if [[ ! -s $DEVICE_LIST ]]; then
-        awk '$3 != "" {print $1 "\t" $2}' "$ARP_TABLE" >"$DEVICE_LIST"
-    fi
-else
-    refresh_arp
-    awk '$3 != "" {print $1 "\t" $2}' "$ARP_TABLE" >"$DEVICE_LIST"
-fi
-
-if [[ $IDENTIFY -eq 1 ]] && command -v nmap >/dev/null 2>&1; then
-    if [[ $IS_ROOT -eq 1 ]]; then
-        nmap -sU -p 1900,5353 --script broadcast-upnp-discovery,mdns-discovery --script-timeout 10s \
-            2>/dev/null >"$IDENTIFY_OUT" || true
-        parse_mdns
-        parse_ssdp
-    else
-        echo "Skipping UDP discovery (requires sudo for nmap -sU on macOS)." >&2
-    fi
-fi
-
-if [[ $DEEP -eq 1 && -s "$SSDP_LOCATION" ]]; then
-    while IFS=$'\t' read -r ip location; do
-        if grep -q "^$ip\t" "$UPNP_INFO" 2>/dev/null; then
+def _parse_nmap_xml(xml_text: str) -> list[Host]:
+    hosts: list[Host] = []
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return hosts
+    for host_el in root.findall("host"):
+        status = host_el.find("status")
+        if status is not None and status.get("state") != "up":
             continue
-        fi
-        IFS=$'\t' read -r friendly manufacturer model < <(fetch_upnp_details "$location")
-        printf "%s\t%s\t%s\t%s\n" "$ip" "$friendly" "$manufacturer" "$model" >>"$UPNP_INFO"
-    done <"$SSDP_LOCATION"
-fi
+        ip: Optional[str] = None
+        mac: Optional[str] = None
+        for addr in host_el.findall("address"):
+            kind = addr.get("addrtype")
+            if kind == "ipv4":
+                ip = addr.get("addr")
+            elif kind == "mac":
+                mac = (addr.get("addr") or "").lower() or None
+        if not ip:
+            continue
+        hostname = None
+        hn_el = host_el.find("hostnames/hostname")
+        if hn_el is not None:
+            hostname = hn_el.get("name") or None
+        hosts.append(Host(ip=ip, hostname=hostname, mac=mac))
+    return hosts
 
-if [[ $OUTPUT == "text" ]]; then
-    echo -e "IP Address\tHostname\tMAC Address\tVendor\tOS\tmDNS\tSSDP\tFriendly\tManufacturer\tModel"
-else
-    echo "["
-fi
 
-is_ignored_mac() {
-    local mac="$1"
-    case "$mac" in
-    ff:ff:ff:ff:ff:ff | 01:00:5e:* | 33:33:*)
+# ---------- ARP table ---------------------------------------------------------
+
+_ARP_RE = re.compile(r"\(([\d.]+)\) at ([0-9a-fA-F:]{11,17})")
+
+
+def read_arp_table() -> dict[str, str]:
+    if not _have("arp"):
+        return {}
+    try:
+        out = subprocess.check_output(["arp", "-an"], text=True, timeout=5)
+    except subprocess.CalledProcessError:
+        return {}
+    result: dict[str, str] = {}
+    for ip, mac in _ARP_RE.findall(out):
+        mac = _normalize_mac(mac)
+        if not mac:
+            continue
+        if mac in BROADCAST_MACS or mac.startswith(MULTICAST_MAC_PREFIXES):
+            continue
+        result[ip] = mac
+    return result
+
+
+def _normalize_mac(mac: str) -> str:
+    mac = mac.lower().strip()
+    if "incomplete" in mac or not mac:
+        return ""
+    parts = mac.split(":")
+    if len(parts) != 6:
+        return ""
+    return ":".join(p.zfill(2) for p in parts)
+
+
+# ---------- vendor cache ------------------------------------------------------
+
+
+def _load_vendor_cache() -> dict:
+    if not CACHE_PATH.exists():
+        return {}
+    try:
+        data = json.loads(CACHE_PATH.read_text())
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _save_vendor_cache(cache: dict) -> None:
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        CACHE_PATH.write_text(json.dumps(cache, separators=(",", ":")))
+    except OSError as exc:
+        console.print(f"[yellow][warn][/] could not save vendor cache: {exc}")
+
+
+def _is_locally_administered(mac: str) -> bool:
+    """Random/privacy MAC — never in the OUI registry. The U/L bit is bit 1 of byte 0."""
+    try:
+        first_byte = int(mac.split(":")[0], 16)
+    except (ValueError, IndexError):
+        return False
+    return bool(first_byte & 0b10)
+
+
+def lookup_vendor(mac: str, cache: dict, *, use_cache: bool = True) -> Optional[str]:
+    if not mac:
+        return None
+    oui = ":".join(mac.split(":")[:3])
+    if use_cache:
+        entry = cache.get(oui)
+        if entry and isinstance(entry, dict):
+            if time.time() - entry.get("ts", 0) < CACHE_TTL_SECONDS:
+                return entry.get("vendor") or None
+    if oui in OUI_FALLBACK:
+        vendor = OUI_FALLBACK[oui]
+        cache[oui] = {"vendor": vendor, "ts": int(time.time())}
+        return vendor
+    if _is_locally_administered(mac):
+        cache[oui] = {"vendor": None, "ts": int(time.time())}
+        return None
+    backoffs = (0.0, 0.8, 2.0, 4.0)
+    vendor: Optional[str] = None
+    for delay in backoffs:
+        if delay:
+            time.sleep(delay)
+        try:
+            r = requests.get(MACVENDORS_URL.format(mac), timeout=4)
+        except requests.RequestException:
+            continue
+        if r.status_code == 429:
+            continue
+        if r.status_code == 404:
+            cache[oui] = {"vendor": None, "ts": int(time.time())}
+            return None
+        if r.ok:
+            vendor = r.text.strip() or None
+            cache[oui] = {"vendor": vendor, "ts": int(time.time())}
+            return vendor
+        break
+    return None
+
+
+# ---------- mDNS (zeroconf) ---------------------------------------------------
+
+
+class _MDNSCollector(ServiceListener):
+    def __init__(self, zc: Zeroconf, sink: dict[str, set[str]]) -> None:
+        self.zc = zc
+        self.sink = sink
+
+    def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:  # noqa: D401
+        try:
+            info = zc.get_service_info(type_, name, timeout=2000)
+        except Exception:
+            return
+        if not info:
+            return
+        try:
+            addrs = info.parsed_addresses()
+        except Exception:
+            addrs = []
+        for addr in addrs:
+            if ":" in addr:  # skip IPv6 for now
+                continue
+            self.sink.setdefault(addr, set()).add(type_)
+
+    def update_service(self, *args, **kwargs) -> None:
+        return
+
+    def remove_service(self, *args, **kwargs) -> None:
+        return
+
+
+def discover_mdns(timeout: float) -> dict[str, set[str]]:
+    sink: dict[str, set[str]] = {}
+    try:
+        zc = Zeroconf()
+    except OSError as exc:
+        console.print(f"[yellow][warn][/] zeroconf init failed ({exc}); skipping mDNS")
+        return sink
+    try:
+        listener = _MDNSCollector(zc, sink)
+        browsers = [ServiceBrowser(zc, t, listener) for t in MDNS_SERVICE_TYPES]
+        time.sleep(timeout)
+        for b in browsers:
+            try:
+                b.cancel()
+            except Exception:
+                pass
+    finally:
+        try:
+            zc.close()
+        except Exception:
+            pass
+    return sink
+
+
+# ---------- SSDP --------------------------------------------------------------
+
+
+def discover_ssdp(timeout: float, local_ip: Optional[str]) -> dict[str, dict]:
+    """Returns ip -> {server, location}."""
+    results: dict[str, dict] = {}
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+    try:
+        if local_ip:
+            try:
+                sock.bind((local_ip, 0))
+            except OSError:
+                sock.bind(("", 0))
+        else:
+            sock.bind(("", 0))
+        sock.settimeout(timeout)
+        try:
+            sock.sendto(SSDP_M_SEARCH, SSDP_GROUP)
+        except OSError as exc:
+            console.print(f"[yellow][warn][/] SSDP send failed ({exc}); skipping")
+            return results
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            sock.settimeout(max(0.1, deadline - time.time()))
+            try:
+                data, (peer_ip, _port) = sock.recvfrom(4096)
+            except socket.timeout:
+                break
+            except OSError:
+                break
+            text = data.decode("utf-8", errors="replace")
+            server = _http_header(text, "Server")
+            location = _http_header(text, "Location")
+            entry = results.setdefault(peer_ip, {})
+            if server:
+                entry.setdefault("server", server)
+            if location:
+                entry.setdefault("location", location)
+    finally:
+        sock.close()
+    return results
+
+
+def _http_header(text: str, name: str) -> Optional[str]:
+    pat = re.compile(rf"^{re.escape(name)}\s*:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE)
+    m = pat.search(text)
+    return m.group(1) if m else None
+
+
+def fetch_upnp_descriptor(location: str) -> dict[str, Optional[str]]:
+    try:
+        r = requests.get(location, timeout=3)
+        if not r.ok:
+            return {}
+        xml = r.text
+    except requests.RequestException:
+        return {}
+
+    def grab(tag: str) -> Optional[str]:
+        m = re.search(rf"<{tag}>([^<]+)</{tag}>", xml)
+        return m.group(1).strip() if m else None
+
+    return {
+        "friendly_name": grab("friendlyName"),
+        "manufacturer": grab("manufacturer"),
+        "model": grab("modelName"),
+    }
+
+
+# ---------- deep scan ---------------------------------------------------------
+
+
+def nmap_deep_scan(hosts: list[Host]) -> None:
+    if not _have("nmap"):
+        return
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("deep scan", total=len(hosts))
+        for h in hosts:
+            progress.update(task, description=f"deep scan {h.ip}")
+            try:
+                out = subprocess.check_output(
+                    [
+                        "nmap",
+                        "-O",
+                        "-sV",
+                        "--osscan-guess",
+                        "--host-timeout",
+                        "30s",
+                        "-oX",
+                        "-",
+                        h.ip,
+                    ],
+                    text=True,
+                    timeout=45,
+                    stderr=subprocess.DEVNULL,
+                )
+                h.os_ = _parse_os_from_xml(out)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                pass
+            progress.advance(task)
+
+
+def _parse_os_from_xml(xml_text: str) -> Optional[str]:
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return None
+    for host_el in root.findall("host"):
+        for match in host_el.findall("os/osmatch"):
+            name = match.get("name")
+            if name:
+                return name
+        info = host_el.find(".//service")
+        if info is not None and info.get("ostype"):
+            return info.get("ostype")
+    return None
+
+
+# ---------- output ------------------------------------------------------------
+
+
+def build_table(hosts: list[Host], *, wide: bool) -> Table:
+    if wide:
+        table = Table(box=box.SIMPLE_HEAVY, show_lines=False, expand=False)
+        for col in (
+            "IP",
+            "Hostname",
+            "MAC",
+            "Vendor",
+            "OS",
+            "mDNS",
+            "SSDP",
+            "Friendly",
+            "Manufacturer",
+            "Model",
+        ):
+            table.add_column(col, overflow="fold")
+        for h in hosts:
+            mdns = ", ".join(sorted(_label(s) for s in h.mdns_services)) or "-"
+            table.add_row(
+                h.ip,
+                h.hostname or "-",
+                h.mac or "-",
+                h.vendor or "-",
+                h.os_ or "-",
+                mdns,
+                "yes" if h.ssdp else "-",
+                h.friendly_name or "-",
+                h.manufacturer or "-",
+                h.model or "-",
+            )
+        return table
+
+    table = Table(box=box.SIMPLE_HEAVY, show_lines=False, expand=False)
+    for col in ("IP", "Hostname", "MAC", "Vendor", "OS", "Services", "Friendly Name"):
+        table.add_column(col, overflow="fold")
+    for h in hosts:
+        labels = sorted({_label(s) for s in h.mdns_services})
+        if h.ssdp:
+            labels.append("+UPnP")
+        services = ", ".join(labels) or "-"
+        table.add_row(
+            h.ip,
+            h.hostname or "-",
+            h.mac or "-",
+            h.vendor or "-",
+            h.os_ or "-",
+            services,
+            h.friendly_name or "-",
+        )
+    return table
+
+
+def _label(service_type: str) -> str:
+    return SERVICE_LABELS.get(service_type, service_type.rstrip(".").split(".")[0].lstrip("_"))
+
+
+def to_json(hosts: list[Host], cidr: str) -> str:
+    payload = {
+        "cidr": cidr,
+        "scanned_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "hosts": [
+            {
+                "ip": h.ip,
+                "hostname": h.hostname,
+                "mac": h.mac,
+                "vendor": h.vendor,
+                "os": h.os_,
+                "mdns_services": sorted(h.mdns_services),
+                "ssdp": h.ssdp,
+                "friendly_name": h.friendly_name,
+                "manufacturer": h.manufacturer,
+                "model": h.model,
+            }
+            for h in hosts
+        ],
+    }
+    return json.dumps(payload, indent=2)
+
+
+# ---------- helpers -----------------------------------------------------------
+
+
+def _have(cmd: str) -> bool:
+    from shutil import which
+
+    return which(cmd) is not None
+
+
+def _sort_key(h: Host) -> tuple:
+    try:
+        return tuple(int(p) for p in h.ip.split("."))
+    except ValueError:
+        return (0,)
+
+
+# ---------- main --------------------------------------------------------------
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Scan the local network and list devices, services, and identity (iOS Net Analyzer-style)."
+    )
+    parser.add_argument("cidr", nargs="?", help="CIDR to scan (default: auto-detect)")
+    parser.add_argument("--json", action="store_true", help="emit JSON instead of a table")
+    parser.add_argument("--wide", action="store_true", help="show all 10 columns (parity with old bash version)")
+    parser.add_argument("--no-vendor", action="store_true", help="skip MAC vendor lookup")
+    parser.add_argument("--identify", dest="identify", action="store_true", default=True, help="run mDNS + SSDP discovery (default)")
+    parser.add_argument("--no-identify", dest="identify", action="store_false", help="skip mDNS + SSDP discovery")
+    parser.add_argument("--deep", action="store_true", help="run nmap OS fingerprint (requires sudo)")
+    parser.add_argument("--timeout-mdns", type=float, default=8.0, help="mDNS browse duration in seconds (default: 8)")
+    parser.add_argument("--timeout-ssdp", type=float, default=5.0, help="SSDP listen duration in seconds (default: 5)")
+    parser.add_argument("--no-cache", action="store_true", help="ignore the on-disk vendor cache for this run")
+    parser.add_argument("--clear-cache", action="store_true", help="wipe the vendor cache and exit")
+    parser.add_argument("--quiet", action="store_true", help="suppress progress messages on stderr")
+    args = parser.parse_args()
+
+    if args.quiet:
+        console.quiet = True
+
+    if args.clear_cache:
+        try:
+            CACHE_PATH.unlink()
+            console.print(f"[green]cleared[/] {CACHE_PATH}")
+        except FileNotFoundError:
+            console.print(f"[dim]no cache at {CACHE_PATH}[/]")
         return 0
-        ;;
-    esac
-    return 1
-}
 
-first=1
-while IFS=$'\t' read -r ip host; do
-    [[ -z $ip ]] && continue
-    arp_host=$(lookup_arp_host "$ip")
-    if [[ $host == "unknown" || $host == "?" || -z $host ]]; then
-        host="$arp_host"
-    fi
-    host=$(normalize_field "$host")
-    mac=$(normalize_mac "$(lookup_arp_mac "$ip")")
-    if is_ignored_mac "$mac"; then
-        continue
-    fi
-    vendor=$(lookup_vendor "$mac")
-    os=$(lookup_os "$ip")
-    mdns=$(normalize_field "$(lookup_field "$ip" "$MDNS_INFO")")
-    ssdp=$(normalize_field "$(lookup_field "$ip" "$SSDP_SERVER")")
-    upnp_line=$(lookup_field "$ip" "$UPNP_INFO")
-    IFS=$'\t' read -r friendly manufacturer model <<<"$upnp_line"
-    friendly=$(normalize_field "$friendly")
-    manufacturer=$(normalize_field "$manufacturer")
-    model=$(normalize_field "$model")
+    is_root = hasattr(os, "geteuid") and os.geteuid() == 0
+    if args.deep and not is_root:
+        console.print("[yellow][warn][/] --deep requires root; ignoring. Re-run with sudo.")
+        args.deep = False
 
-    if [[ $OUTPUT == "json" ]]; then
-        if [[ $first -eq 0 ]]; then
-            echo ","
-        fi
-        first=0
-        printf '  {"ip":"%s","hostname":"%s","mac":"%s","vendor":"%s","os":"%s","mdns":"%s","ssdp":"%s","friendly":"%s","manufacturer":"%s","model":"%s"}' \
-            "$ip" "$host" "$mac" "$vendor" "$os" "$mdns" "$ssdp" "$friendly" "$manufacturer" "$model"
-    else
-        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
-            "$ip" "$host" "$mac" "$vendor" "$os" "$mdns" "$ssdp" "$friendly" "$manufacturer" "$model"
-    fi
-done <"$DEVICE_LIST"
+    cidr = args.cidr
+    local_ip: Optional[str] = None
+    if not cidr:
+        cidr, local_ip = detect_default_cidr()
+    console.print(f"[bold]Scanning[/] {cidr} …")
 
-if [[ $OUTPUT == "json" ]]; then
-    echo
-    echo "]"
-fi
+    hosts = nmap_ping_scan(cidr, unprivileged=not is_root)
 
-# vim: ft=bash
+    arp = read_arp_table()
+    by_ip: dict[str, Host] = {h.ip: h for h in hosts}
+    for ip, mac in arp.items():
+        if ip in by_ip:
+            if not by_ip[ip].mac:
+                by_ip[ip].mac = mac
+        else:
+            try:
+                if ipaddress.ip_address(ip) in ipaddress.ip_network(cidr):
+                    by_ip[ip] = Host(ip=ip, mac=mac)
+            except ValueError:
+                continue
+
+    # parallel: vendor + SSDP
+    cache = {} if args.no_cache else _load_vendor_cache()
+
+    ssdp_results: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        vendor_futures = {}
+        if not args.no_vendor:
+            for h in by_ip.values():
+                if h.mac:
+                    vendor_futures[pool.submit(lookup_vendor, h.mac, cache, use_cache=not args.no_cache)] = h
+        ssdp_future = None
+        if args.identify:
+            ssdp_future = pool.submit(discover_ssdp, args.timeout_ssdp, local_ip)
+        for fut in as_completed(vendor_futures):
+            host = vendor_futures[fut]
+            try:
+                host.vendor = fut.result()
+            except Exception:
+                pass
+        if ssdp_future:
+            ssdp_results = ssdp_future.result()
+
+    # merge SSDP into hosts, then fetch descriptors in parallel
+    if ssdp_results:
+        for ip, entry in ssdp_results.items():
+            host = by_ip.get(ip)
+            if host is None:
+                try:
+                    if ipaddress.ip_address(ip) not in ipaddress.ip_network(cidr):
+                        continue
+                except ValueError:
+                    continue
+                host = Host(ip=ip)
+                by_ip[ip] = host
+            host.ssdp = True
+            host.ssdp_location = entry.get("location")
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            futs = {}
+            for host in by_ip.values():
+                if host.ssdp_location:
+                    futs[pool.submit(fetch_upnp_descriptor, host.ssdp_location)] = host
+            for fut in as_completed(futs):
+                host = futs[fut]
+                try:
+                    desc = fut.result()
+                except Exception:
+                    desc = {}
+                host.friendly_name = desc.get("friendly_name")
+                host.manufacturer = desc.get("manufacturer")
+                host.model = desc.get("model")
+
+    # mDNS pass (zeroconf runs its own threads)
+    if args.identify:
+        mdns_results = discover_mdns(args.timeout_mdns)
+        for ip, types in mdns_results.items():
+            host = by_ip.get(ip)
+            if host is None:
+                try:
+                    if ipaddress.ip_address(ip) not in ipaddress.ip_network(cidr):
+                        continue
+                except ValueError:
+                    continue
+                host = Host(ip=ip)
+                by_ip[ip] = host
+            host.mdns_services |= types
+
+    if args.deep and is_root:
+        nmap_deep_scan(list(by_ip.values()))
+
+    hosts_sorted = sorted(by_ip.values(), key=_sort_key)
+
+    if args.json:
+        sys.stdout.write(to_json(hosts_sorted, cidr) + "\n")
+    else:
+        out_console = Console()
+        out_console.print(build_table(hosts_sorted, wide=args.wide))
+
+    if not args.no_cache:
+        _save_vendor_cache(cache)
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
