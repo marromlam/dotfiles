@@ -1,3 +1,4 @@
+-- DONE
 local fn, api, fmt = vim.fn, vim.api, string.format
 
 local M = {}

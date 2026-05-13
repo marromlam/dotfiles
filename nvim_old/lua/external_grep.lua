@@ -1,3 +1,4 @@
+-- DONE
 vim.cmd([[
 set grepprg=rg\ --vimgrep
 

@@ -1,3 +1,4 @@
+-- DONE
 -- Suppress deprecation warnings from plugins (e.g. client.notify)
 vim.deprecate = function() end
 
