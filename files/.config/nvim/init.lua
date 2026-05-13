@@ -452,12 +452,12 @@ do
     return ('%%#%s#%s%%*'):format(group, text)
   end
 
-  local function fold_mark(lnum)
-    local fcs = vim.opt.fillchars:get()
-    if fn.foldlevel(lnum) <= fn.foldlevel(lnum - 1) then return '' end
-    return fn.foldclosed(lnum) == -1 and (fcs.foldopen or '▾')
-      or (fcs.foldclose or '▸')
-  end
+  local _fcs = vim.opt.fillchars:get()
+  T.augroup('StatusColFillchars', {
+    event = 'OptionSet',
+    pattern = 'fillchars',
+    command = function() _fcs = vim.opt.fillchars:get() end,
+  })
 
   local function get_signs(buf, lnum0)
     return api.nvim_buf_get_extmarks(
@@ -481,8 +481,8 @@ do
   local _git_bar_thick = _icons.separators.right_block .. ' '
   local _git_bar_thin = _icons.separators.right_thin_block .. ' '
 
-  local function git_col(buf, lnum0)
-    for _, m in ipairs(get_signs(buf, lnum0)) do
+  local function git_col(signs)
+    for _, m in ipairs(signs) do
       local hlg = (m[4] or {}).sign_hl_group or ''
       if hlg:match('^GitSigns') then
         for key, grp in pairs(_git_hl) do
@@ -494,10 +494,15 @@ do
     return _hl('StatusColGitNone', _git_bar_thin)
   end
 
-  local function diag_col(buf, lnum0, cursor_lnum, lnum)
+  local function diag_col(signs, cursor_lnum, lnum)
     if lnum == cursor_lnum then return ' ' end
+    -- Fold header: show fold icon in this cell instead of diagnostic sign.
+    if fn.foldlevel(lnum) > fn.foldlevel(lnum - 1) then
+      local icon = fn.foldclosed(lnum) == -1 and (_fcs.foldopen or '▾') or (_fcs.foldclose or '▸')
+      return _hl('FoldColumn', icon)
+    end
     local best_text, best_hl, best_sev = '', nil, 99
-    for _, m in ipairs(get_signs(buf, lnum0)) do
+    for _, m in ipairs(signs) do
       local hlg = (m[4] or {}).sign_hl_group or ''
       if hlg:match('^DiagnosticSign') then
         local sev = hlg:match('Error') and 1 or hlg:match('Warn') and 2 or nil
@@ -531,13 +536,13 @@ do
     end
 
     local lnum0 = lnum - 1
+    local signs = get_signs(buf, lnum0)
     local is_cursor = (lnum == cursor_lnum and virtnum == 0)
     local num_hl = is_cursor and 'CursorLineNr' or 'LineNr'
     local parts = table.concat({
-      diag_col(buf, lnum0, cursor_lnum, lnum),
+      diag_col(signs, cursor_lnum, lnum),
       _hl(num_hl, num_str),
-      git_col(buf, lnum0),
-      fold_mark(lnum),
+      git_col(signs),
     })
     return is_cursor and ('%%#CursorLine#%s%%*'):format(parts) or parts
   end
@@ -3930,20 +3935,31 @@ do
 
   -- ── Diagnostics ───────────────────────────────────────────────────────
 
-  local function _diagnostics(buf)
+  local _diag_cache = {}
+
+  local function _refresh_diag(buf)
     local sev = vim.diagnostic.severity
     local icons = _icons.lsp
     local result = {
       error = { count = 0, icon = icons.error },
-      warn = { count = 0, icon = icons.warn },
-      info = { count = 0, icon = icons.info },
-      hint = { count = 0, icon = icons.hint },
+      warn  = { count = 0, icon = icons.warn  },
+      info  = { count = 0, icon = icons.info  },
+      hint  = { count = 0, icon = icons.hint  },
     }
     for _, item in ipairs(vim.diagnostic.get(buf)) do
       local s = sev[item.severity]:lower()
       result[s].count = result[s].count + 1
     end
-    return result
+    _diag_cache[buf] = result
+  end
+
+  local _diag_zero = {
+    error = { count = 0 }, warn = { count = 0 },
+    info  = { count = 0 }, hint = { count = 0 },
+  }
+
+  local function _diagnostics(buf)
+    return _diag_cache[buf] or _diag_zero
   end
 
   -- ── Search count ──────────────────────────────────────────────────────
@@ -3969,13 +3985,14 @@ do
     vim.cmd('redrawstatus')
   end
 
-  local function _lsp_clients(ctx)
-    local clients = vim.lsp.get_clients({ bufnr = ctx.bufnum }) or {}
-    if #clients == 0 then return false, {} end
-    local has_copilot = false
-    local names = {}
-    for _, client in ipairs(clients) do
-      local name = client.name or ''
+  local _lsp_cache = {}
+
+  local function _refresh_lsp(buf)
+    local clients = vim.lsp.get_clients({ bufnr = buf }) or {}
+    if #clients == 0 then _lsp_cache[buf] = { false, {} }; return end
+    local has_copilot, names = false, {}
+    for _, c in ipairs(clients) do
+      local name = c.name or ''
       if name == 'copilot' or name:match('copilot') then
         has_copilot = true
       else
@@ -3983,7 +4000,13 @@ do
       end
     end
     table.sort(names)
-    return has_copilot, names
+    _lsp_cache[buf] = { has_copilot, names }
+  end
+
+  local function _lsp_clients(ctx)
+    local cached = _lsp_cache[ctx.bufnum]
+    if cached then return cached[1], cached[2] end
+    return false, {}
   end
 
   -- ── Git update timer ──────────────────────────────────────────────────
@@ -4281,7 +4304,13 @@ do
     command = _git_updates,
   }, {
     event = 'DiagnosticChanged',
-    command = function() vim.cmd('redrawstatus') end,
+    command = function(ev) _refresh_diag(ev.buf); vim.cmd('redrawstatus') end,
+  }, {
+    event = { 'LspAttach', 'LspDetach' },
+    command = function(ev) _refresh_lsp(ev.buf); vim.cmd('redrawstatus') end,
+  }, {
+    event = 'BufDelete',
+    command = function(ev) _diag_cache[ev.buf] = nil; _lsp_cache[ev.buf] = nil end,
   }, {
     event = { 'WinEnter', 'WinLeave', 'BufWinEnter' },
     command = function() vim.cmd('redrawstatus') end,
