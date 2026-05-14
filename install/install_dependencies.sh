@@ -166,22 +166,22 @@ install_kitty_linux() {
 }
 
 install_pdfcat() {
-	local dest="$HOMEBREW_PREFIX/Cellar/pdfcat"
+	# The pdfcat formula lives in the source repo itself
+	# (marromlam/pdfcat, not marromlam/homebrew-pdfcat), so tap with an
+	# explicit URL.
+	local tap="marromlam/pdfcat"
+	local pkg="marromlam/pdfcat/pdfcat"
 
-	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
-		rm -rf "$dest" "$HOMEBREW_PREFIX/bin/pdfcat"
+	if [[ "$FORCE_INSTALL" -eq 1 ]] && brew list --formula "$pkg" >/dev/null 2>&1; then
+		brew uninstall "$pkg" || true
 	fi
 
-	if [[ -d "$dest" ]]; then
-		echo "pdfcat is already installed"
-		return
+	if ! brew tap | grep -qx "$tap"; then
+		GIT_TERMINAL_PROMPT=0 brew tap "$tap" "https://github.com/marromlam/pdfcat" \
+			|| { echo "Warning: failed to tap $tap; skipping pdfcat."; return; }
 	fi
 
-	git clone https://github.com/marromlam/pdfcat.git "$dest"
-	pushd "$dest" >/dev/null
-	"$HOMEBREW_PREFIX/bin/python3" -m pip install -e .
-	ln -sf "$dest/pdfcat" "$HOMEBREW_PREFIX/bin/pdfcat"
-	popd >/dev/null
+	brew_install_once "$pkg"
 }
 
 install_rust() {
