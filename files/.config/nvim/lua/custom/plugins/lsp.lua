@@ -202,6 +202,10 @@ return { -- LSP Configuration & Plugins
           end
 
           -- Enable inlay hints by default if supported
+          -- The following autocommand is used to enable inlay hints in your
+          -- code, if the language server you are using supports them
+          --
+          -- This may be unwanted, since they displace some of your code
           if
             client
             and client.server_capabilities.inlayHintProvider

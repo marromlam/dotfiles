@@ -377,9 +377,9 @@ return {
       {
         '<leader>gPR',
         function()
-          current_branch = vim.fn.system('git rev-parse --abbrev-ref HEAD')
+          local current_branch = vim.fn.system('git rev-parse --abbrev-ref HEAD')
           current_branch = current_branch:gsub('%s+', '')
-          target_branch = check_main_or_develop_branch()
+          local target_branch = check_main_or_develop_branch()
 
           -- print('Current branch: ' .. current_branch)
           -- print('Target branch: ' .. target_branch)

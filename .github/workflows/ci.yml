@@ -25,6 +25,7 @@ jobs:
         run: |
           mkdir -p "$HOME/Projects/personal"
           ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
+          ln -sfn "$PWD" "$HOME/.dotfiles"
           make install
 
       - name: Assert key symlinks exist
