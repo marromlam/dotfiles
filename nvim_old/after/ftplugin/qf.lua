@@ -1,6 +1,6 @@
 -- CUSTOM QUICKFIX WINDOW
 
-local T = _G.T
+local T = require('tools')
 
 vim.opt_local.wrap = false
 vim.opt_local.number = false
@@ -38,7 +38,7 @@ vim.keymap.set(
   'v',
   'd',
   qf_delete,
-  { buffer = 0, desc = '[qf] delete selected quickfix entries' }
+  { buffer = 0, desc = '[qf] delete selected quickfix entry' }
 )
 vim.keymap.set(
   'n',
