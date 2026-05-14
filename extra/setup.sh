@@ -53,10 +53,17 @@ fi
 # ------------------------------------------------------------------------------
 # tmux plugins via TPM
 # ------------------------------------------------------------------------------
+TPM_DIR="$HOME/.local/share/tmux/plugins/tpm"
+if [[ ! -d "$TPM_DIR" ]]; then
+  step "Installing TPM (tmux plugin manager)"
+  mkdir -p "$(dirname "$TPM_DIR")"
+  git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+fi
+
 step "Installing tmux plugins"
 tmux start-server
 tmux new-session -d -s __setup__ 2>/dev/null || true
-~/.local/share/tmux/plugins/tpm/scripts/install_plugins.sh
+"$TPM_DIR/scripts/install_plugins.sh"
 tmux kill-session -t __setup__ 2>/dev/null || true
 
 echo
