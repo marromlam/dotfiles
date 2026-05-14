@@ -1,112 +1,128 @@
-# bashrc
-
-# skip loading
-[[ -f "$HOME/.skip" ]] && source $HOME/.skip
-
-# Eval homebrew {{{
-# Get machine operative system
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+#
+#
+#
+#
+#
 
 export MACHINEOS=$($HOME/.dotfiles/scripts/machine.sh)
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
-echo $MACHINEOS
 
 # Set OS-dependent stuff
 if [[ "$MACHINEOS" == "Mac" ]]; then
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        export HOMEBREW_PREFIX="/usr/local"
-    else
-        export HOMEBREW_PREFIX="/opt/homebrew"
-    fi
+	if [[ "$(uname -m)" == "x86_64" ]]; then
+		export HOMEBREW_PREFIX="/usr/local"
+	else
+		export HOMEBREW_PREFIX="/opt/homebrew"
+	fi
 else
-    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
 fi
 
-export HOMEBREW_PREFIX="/opt/homebrew"
 eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
+export PATH="$HOME/.local/bin:$PATH"
 
-# }}}
+# If not running interactively, don't do anything
+case $- in
+*i*) ;;
+*) return ;;
+esac
 
-# source basuc functions
-source $HOME/.dotfiles/zsh/ufunctions.sh
-# source $HOME/.dotfiles/zsh/zshenv
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
 
-# Start MCP server for Neovim (WSL only)
-if grep -qi microsoft /proc/version && [[ -z "$NVIM" ]]; then
-    export NVIM_SOCKET="/tmp/nvim-mcp-server.sock"
+# # Start MCP server for Neovim (WSL only)
+# if grep -qi microsoft /proc/version && [[ -z "$NVIM" ]]; then
+#     export NVIM_SOCKET="/tmp/nvim-mcp-server.sock"
+#
+#     # Ensure systemd user services are running in WSL
+#     if ! systemctl --user is-active --quiet neovim-mcp.service; then
+#         systemctl --user start neovim-mcp.service
+#     fi
+# fi
 
-    # Ensure systemd user services are running in WSL
-    if ! systemctl --user is-active --quiet neovim-mcp.service; then
-        systemctl --user start neovim-mcp.service
-    fi
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+	debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# variable with current host name
-function whoismyhost() {
-    echo "$(hostname)"
-}
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+xterm-color | *-256color) color_prompt=yes ;;
+esac
 
-echo "Connected to $(whoismyhost) with bash"
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
 
-# . ~/.sh_profile
-
-# bind 'set show-all-if-ambiguous on'
-# bind 'set completion-ignore-case on'
-# bind 'TAB: menu-complete'
-
-if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-    alias nvim=nvr -cc split --remote-wait +'set bufhidden=wipe'
+if [ -n "$force_color_prompt" ]; then
+	if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+		# We have color support; assume it's compliant with Ecma-48
+		# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+		# a case would tend to support setf rather than setaf.)
+		color_prompt=yes
+	else
+		color_prompt=
+	fi
 fi
-if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
-    export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
-    export EDITOR="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+
+if [ "$color_prompt" = yes ]; then
+	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
-    export VISUAL="nvim"
-    export EDITOR="nvim"
+	PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm* | rxvt*)
+	PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	;;
+*)
+	;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+	test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+	alias ls='ls --color=auto'
 fi
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-# source $(brew --prefix)/etc/bash_completion
-# source "$HOME/.dotfiles/zsh/prompt-basic.sh"
-
-# finishing {{{
-
-# source my aliases
-source $HOME/.dotfiles/zsh/aliases.sh
-
-# common settings for bash and zsh
-source $HOME/.dotfiles/zsh/common.sh
-
-# source local config file, if exists
-# [[ -f "$HOME/.zshrc_local" ]] && source $HOME/.zshrc_local
-
-# USGC BASH PROMPT
-if [[ $- == *i* ]]; then
-    export CLICOLOR=1
-    export LSCOLORS=GxFxCxDxBxegedabagaced
-    export PS1="\[$(tput setaf 7)\]❬\h❭ \[$(tput setaf 2)\]\W\[$(tput setaf 1)\] ●\[$(tput sgr0)\] "
+if [ -f ~/.bash_aliases ]; then
+	. ~/.bash_aliases
 fi
 
-# check whether tmux is running or not, and export variable
-if [ -n "$TMUX" ]; then
-    export IS_TMUX=1
-else
-    if [ -z ${IS_TMUX+x} ]; then
-        export IS_TMUX=0
-    fi
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+	if [ -f /usr/share/bash-completion/bash_completion ]; then
+		. /usr/share/bash-completion/bash_completion
+	elif [ -f /etc/bash_completion ]; then
+		. /etc/bash_completion
+	fi
 fi
-
-# Set KITTY_PORT env variable
-if [ $SSH_TTY ] && ! [ -n "$TMUX" ]; then
-    # if [ $SSH_TTY ]; then
-    export KITTY_PORT=$(kitty @ ls 2>/dev/null | grep "[0-9]:/tmp/mykitty" | head -n 1 | cut -d : -f 1 | cut -d \" -f 2)
-fi
-
-# }}}
-
-# vim: ft=bash fdm=marker
-
-
-# BEGIN_FZF_THEME: carbon-mist
-source ~/.config/fzf/themes/carbon-mist.sh
-# END_FZF_THEME: carbon-mist
+. "$HOME/.cargo/env"

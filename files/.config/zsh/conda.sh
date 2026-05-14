@@ -1,53 +1,69 @@
-#!/bin/bash
-# create a boostrap installer for conda
-#
+#!/usr/bin/env zsh
 
-CONDA_PREFIX=/opt/conda
-export CONDA_ORIGIN=/opt/conda
+CONDA_PREFIX="/opt/conda"
+export CONDA_ORIGIN="/opt/conda"
 
-function __boostrap_conda() {
-    # create a boostrap installer for conda taking into account
-    # the operating system
-    if [[ "$OSTYPE" == "linux-gnu" ]]; then
-        CONDA_OS="Linux"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        CONDA_OS="MacOSX"
-    elif [[ "$OSTYPE" == "cygwin" ]]; then
-        CONDA_OS="Windows"
-    elif [[ "$OSTYPE" == "msys" ]]; then
-        CONDA_OS="Windows"
-    elif [[ "$OSTYPE" == "win32" ]]; then
-        CONDA_OS="Windows"
-    elif [[ "$OSTYPE" == "freebsd"* ]]; then
-        CONDA_OS="Linux"
-    else
-        echo "Unknown OS: $OSTYPE"
-        exit 1
-    fi
+__bootstrap_conda() {
+	local conda_os=""
+	local conda_arch=""
+	local conda_url=""
+	local conda_installer="${HOME}/miniconda.sh"
 
-    # download the boostrap installer
-    CONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-$CONDA_OS-x86_64.sh"
-    CONDA_INSTALLER="$HOME/miniconda.sh"
-    wget $CONDA_URL -O $CONDA_INSTALLER
+	case "${OSTYPE}" in
+	linux-gnu* | freebsd*)
+		conda_os="Linux"
+		;;
+	darwin*)
+		conda_os="MacOSX"
+		;;
+	*)
+		echo "Unsupported OS for conda bootstrap: ${OSTYPE}" >&2
+		return 1
+		;;
+	esac
 
-    # install conda, withoud prompting the user
-    # and without adding the conda path to the .bashrc
-    sudo mkdir -p /opt
-    sudo chown -R $(whoami) /opt
-    bash $CONDA_INSTALLER -b -p $CONDA_ORIGIN
-    conda config --append channels conda-forge
+	case "$(uname -m)" in
+	x86_64 | amd64)
+		conda_arch="x86_64"
+		;;
+	arm64 | aarch64)
+		conda_arch="arm64"
+		;;
+	*)
+		echo "Unsupported architecture for conda bootstrap: $(uname -m)" >&2
+		return 1
+		;;
+	esac
+
+	conda_url="https://repo.anaconda.com/miniconda/Miniconda3-latest-${conda_os}-${conda_arch}.sh"
+
+	if command -v wget >/dev/null 2>&1; then
+		wget "${conda_url}" -O "${conda_installer}"
+	elif command -v curl >/dev/null 2>&1; then
+		curl -fsSL "${conda_url}" -o "${conda_installer}"
+	else
+		echo "Neither wget nor curl is available to download Miniconda." >&2
+		return 1
+	fi
+
+	sudo mkdir -p /opt
+	sudo chown -R "$(whoami)" /opt
+
+	bash "${conda_installer}" -b -p "${CONDA_ORIGIN}"
+	rm -f "${conda_installer}"
+
+	eval "$(${CONDA_PREFIX}/bin/conda shell.zsh hook)"
+	conda config --append channels conda-forge
 }
 
-function conda() {
-    # check if the conda prefix exists
-    # if it does not exist, then install conda
-    if [[ ! -d "$CONDA_PREFIX" ]]; then
-        __boostrap_conda
-    fi
-    source $CONDA_PREFIX/bin/activate
-    unset -f __boostrap_conda
-    # unset -f conda
-    conda $@
+conda() {
+	if [[ ! -x "${CONDA_PREFIX}/bin/conda" ]]; then
+		__bootstrap_conda || return 1
+	fi
+
+	eval "$(${CONDA_PREFIX}/bin/conda shell.zsh hook)"
+	unset -f __bootstrap_conda
+	conda "$@"
 }
 
-# vim: ft=bash
+# vim: ft=zsh
