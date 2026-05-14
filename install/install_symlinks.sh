@@ -14,6 +14,13 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Ensure stow is available (installed by Homebrew, which may not have run yet)
 # ------------------------------------------------------------------------------
 if ! command -v stow >/dev/null 2>&1; then
+  # Brew may be installed but not on PATH (e.g. invoked from a child shell
+  # right after install_dependencies.sh). Probe standard prefixes.
+  if ! command -v brew >/dev/null 2>&1; then
+    for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+      [[ -x "$brew_bin" ]] && { eval "$("$brew_bin" shellenv)"; break; }
+    done
+  fi
   if command -v brew >/dev/null 2>&1; then
     echo "==> Installing stow via Homebrew"
     brew install stow
