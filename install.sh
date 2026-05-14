@@ -130,6 +130,7 @@ clone_dotfiles() {
 
 	step "Updating submodules"
 	git -C "$DOTFILES" submodule update --init --recursive
+    ln -sf "$DOTFILES" "$HOME/.dotfiles"
 }
 
 # }}}

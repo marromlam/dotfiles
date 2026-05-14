@@ -2,14 +2,17 @@
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
 
 
-FC=${HOME}/.dotfiles
+# Resolve FC from the Makefile's own location, not from the ~/.dotfiles symlink
+# (which is created BY this Makefile via install/install_symlinks.sh —
+# chicken-and-egg on a fresh machine).
+FC := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 TMUX_SHARE=${HOME}/.local/share/tmux
 
 all: brew install setup
 
 test:
-	${HOME}/.dotfiles/tests/zsh/sanity.sh
-	${HOME}/.dotfiles/tests/tmux/sanity.sh
+	${FC}/tests/zsh/sanity.sh
+	${FC}/tests/tmux/sanity.sh
 
 macos:
 	${FC}/extra/macos/macos_settings.sh
@@ -23,7 +26,7 @@ homebrew:
 	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 install:
-	bash ${FC}/extra/symlinks.sh
+	bash ${FC}/install/install_symlinks.sh
 	@if [[ "$$(uname)" == "Darwin" ]]; then \
 	  rm -rf ~/Downloads; \
 	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Post-symlink setup steps.
-# Run after extra/symlinks.sh to install packages and configure the system.
+# Run after install/install_symlinks.sh to install packages and configure the system.
 #
 # Usage: bash extra/setup.sh
 

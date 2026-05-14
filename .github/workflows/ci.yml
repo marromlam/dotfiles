@@ -105,13 +105,13 @@ jobs:
       - name: ShellCheck
         run: |
           # Only lint actively maintained scripts; exclude legacy extra/, zsh configs, and submodules
-          find install/ extra/setup.sh extra/symlinks.sh install.sh \
+          find install/ extra/setup.sh install.sh \
             -name '*.sh' \
             | xargs shellcheck -x
 
       - name: Bash syntax
         run: |
-          find install/ extra/setup.sh extra/symlinks.sh install.sh \
+          find install/ extra/setup.sh install.sh \
             -name '*.sh' \
             | xargs -I{} bash -n {}
 

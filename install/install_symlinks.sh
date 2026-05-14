@@ -2,7 +2,7 @@
 # Create symlinks from the dotfiles repo into $HOME via GNU Stow.
 # Idempotent: safe to run multiple times.
 #
-# Usage: bash extra/symlinks.sh [--force]
+# Usage: bash install/install_symlinks.sh [--force]
 #   --force  Remove pre-existing symlinks not owned by stow before stowing.
 #            Required on first migration from another symlink manager.
 
