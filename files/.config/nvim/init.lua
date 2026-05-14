@@ -933,7 +933,7 @@ vim.pack.add({
   -- 'https://github.com/ruifm/gitlinker.nvim',
   -- 'https://github.com/akinsho/git-conflict.nvim',
   'https://github.com/tpope/vim-fugitive',
-  -- 'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/sindrets/diffview.nvim',
   -- 'https://github.com/isakbm/gitgraph.nvim',
   -- 'https://github.com/ThePrimeagen/git-worktree.nvim',
 

@@ -1,4 +1,5 @@
 # Ignore config files -- downloaded automatically with make
+files/.config/aws/config.yml
 files/.config/kitty/appdirs/
 files/.config/kitty/keyring.patch
 files/.config/kitty/keyring/

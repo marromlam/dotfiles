@@ -1,0 +1,113 @@
+{
+  "mcpServers": {
+    "word-document-server": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "/home/linuxbrew/.linuxbrew/bin/python3.14",
+        "-m",
+        "word_document_server.main"
+      ],
+      "env": {
+        "MCP_TRANSPORT": "stdio"
+      }
+    },
+    "github": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/.dotfiles/scripts/mcp-github-wrapper.sh"
+      ]
+    },
+    "gitlocal": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "bash",
+        "-l",
+        "-c",
+        "npx -y @cyanheads/git-mcp-server"
+      ],
+      "env": {
+        "GIT_ALLOWED_REPOS": "/home/mromerol/projects,/home/marcos/work"
+      }
+    },
+    "neovim": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/.dotfiles/scripts/neovim-mcp-wrapper.sh"
+      ]
+    },
+    "mcp-atlassian": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/.dotfiles/scripts/mcp-atlassian-wrapper.sh"
+      ]
+    },
+    "filesystem": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/.dotfiles/scripts/mcp-filesystem-wrapper.sh"
+      ]
+    },
+    "shell": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/.dotfiles/scripts/shell-mcp-wrapper.sh"
+      ]
+    },
+    "document-compare": {
+      "command": "wsl.exe",
+      "args": [
+        "-d",
+        "Debian",
+        "--",
+        "bash",
+        "-lc",
+        "/home/mromerol/Workspaces/work/document-compare-mcp/entrypoint.sh"
+      ]
+    }
+  },
+  "preferences": {
+    "coworkScheduledTasksEnabled": false,
+    "ccdScheduledTasksEnabled": false,
+    "sidebarMode": "chat",
+    "coworkWebSearchEnabled": true,
+    "epitaxyPrefs": {
+      "starred-local-code-sessions": [],
+      "starred-cowork-spaces": [],
+      "starred-session-groups": [],
+      "dframe-local-slice": {
+        "pinnedOrder": [],
+        "customGroupAssignments": {},
+        "customGroupOrder": {}
+      }
+    }
+  }
+}
