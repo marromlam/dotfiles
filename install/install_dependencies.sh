@@ -407,13 +407,6 @@ install_rust
 install_sonarqube
 brew_install_once "pixi"
 
-DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-if [[ -x "$DOTFILES_ROOT/install/install_zsh.sh" ]]; then
-	bash "$DOTFILES_ROOT/install/install_zsh.sh"
-elif [[ -x "${HOME}/tmp/install_zsh.sh" ]]; then
-	bash "${HOME}/tmp/install_zsh.sh"
-fi
-
 brew update
 brew upgrade
 brew cleanup

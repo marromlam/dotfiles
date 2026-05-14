@@ -93,16 +93,17 @@ fzf-marks:
 	fi
 
 private:
-	# this uses a private repository where I store some other snippets
+	# private-dotfiles holds ssh keys + other secrets (separate repo)
 	if [ ! -d "${FC}/private" ]; then \
-	    git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
+	    git clone https://github.com/marromlam/private-dotfiles.git "${FC}/private"; \
 	else \
-	    cd  "${FC}/private"; \
-	    git pull; \
-	    cd "${FC}"; \
+	    cd "${FC}/private" && git pull --ff-only; \
 	fi
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
 	chmod 600 ${HOME}/.ssh/*
+
+keys:
+	bash ${FC}/install/install_keys.sh
 
 zsh-plugins:
 	git clone https://github.com/djui/alias-tips.git ${HOMEBREW_PREFIX}/Cellar/alias-tips; \
@@ -122,4 +123,4 @@ commit: fmt
 	git add -u
 	git commit
 
-.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test fmt commit
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private keys zsh-plugins test fmt commit

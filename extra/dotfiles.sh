@@ -4,7 +4,7 @@ echo "--------------------------------------------------------------------------
 
 set -e
 
-DOTFILES=${HOME}/Projects/personal/dotfiles
+DOTFILES=${HOME}/Workspaces/personal/dotfiles
 
 if test "$1" = "-dotfiles"; then
 	rm -rf $DOTFILES

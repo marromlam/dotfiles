@@ -63,7 +63,7 @@ sudo apt update && sudo apt install curl -y
 The installer:
 1. Bootstraps Homebrew (or uses `apk` on iSH)
 2. Installs packages via `install/install_dependencies.sh`
-3. Clones this repo to `~/Projects/personal/dotfiles`
+3. Clones this repo to `~/Workspaces/personal/dotfiles`
 4. Creates symlinks via GNU Stow (`make install`)
 
 After the initial install, individual steps can be re-run with `make`:

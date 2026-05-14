@@ -35,8 +35,8 @@ jobs:
         run: |
           command -v brew
           command -v stow
-          mkdir -p "$HOME/Projects/personal"
-          ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
+          mkdir -p "$HOME/Workspaces/personal"
+          ln -sfn "$PWD" "$HOME/Workspaces/personal/dotfiles"
           ln -sfn "$PWD" "$HOME/.dotfiles"
           make install
 

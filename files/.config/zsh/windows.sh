@@ -47,7 +47,7 @@ sync-windows-config() {
     # directory.
     #
     #
-    LINUX_CONFIG=~/Projects/personal/dotfiles/files/.config
+    LINUX_CONFIG=~/Workspaces/personal/dotfiles/files/.config
     WINDOWS_CONFIG=/mnt/c/Users/marcos.romero/.config
     mkdir -p $WINDOWS_CONFIG
     chmod -R 777 $WINDOWS_CONFIG

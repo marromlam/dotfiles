@@ -66,7 +66,7 @@ if [[ ! -e ~/.dotfiles || $FORCE -eq 1 ]]; then
 fi
 
 # SSH keys from private-dotfiles (separate repo, separate location)
-PRIVATE_SSH=~/Projects/personal/private-dotfiles/files/.ssh
+PRIVATE_SSH=~/Workspaces/personal/private-dotfiles/files/.ssh
 if [[ -d "$PRIVATE_SSH" && ( ! -e ~/.ssh || $FORCE -eq 1 ) ]]; then
   ln -sfn "$PRIVATE_SSH" ~/.ssh
   echo "  link  ~/.ssh -> $PRIVATE_SSH"
