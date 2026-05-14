@@ -15,6 +15,6 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --info="inline"'
 
 # Colors sourced separately by the active theme
-[ -f ~/.config/fzf/themes/amberglow.sh ] && source ~/.config/fzf/themes/amberglow.sh
+[ -f ~/.config/fzf/themes/amberglow.sh ] && source ~/.config/fzf/themes/dracula-pro.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

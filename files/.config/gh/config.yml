@@ -1,5 +1,5 @@
 git_protocol: ssh
 prompt: enabled
 aliases:
-  co: pr checkout
+    co: pr checkout
 version: "1"

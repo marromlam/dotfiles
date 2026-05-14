@@ -1,5 +1,6 @@
 # This file install all shit
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
+SHELL:=/bin/bash
 
 
 FC=${HOME}/.dotfiles

@@ -7,7 +7,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     alias ls='eza --icons'
     alias ll="eza -lr --icons" # show list of directory
 else
-    alias clc="/bin/clear && printf '\e[3J'" # clear terminal window and clean history
+    alias clc="LD_LIBRARY_PATH='' /bin/clear && printf '\e[3J'" # clear terminal window and clean history
     alias ls='eza --icons'
     alias ll="eza -lr --icons" # show list of directory
 fi

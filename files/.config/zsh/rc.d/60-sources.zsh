@@ -9,6 +9,7 @@ source $HOME/.config/zsh/scripts/fzf.sh
 source $HOME/.config/zsh/scripts/docker.sh
 
 reload_zsh() {
+  [[ -f "$HOME/.config/zsh/zshenv" ]] && source "$HOME/.config/zsh/zshenv"
   for f in $HOME/.config/zsh/rc.d/*.zsh; do
     [[ -f "$f" ]] && source "$f"
   done

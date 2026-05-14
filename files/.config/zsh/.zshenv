@@ -2,3 +2,4 @@
 if [ -f "$HOME/.config/zsh/zshenv" ]; then
   source "$HOME/.config/zsh/zshenv"
 fi
+. "$HOME/.cargo/env"

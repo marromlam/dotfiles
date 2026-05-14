@@ -1,0 +1,23 @@
+{
+    "name": "dracula-pro",
+    "background": "#22212C",
+    "foreground": "#F8F8F2",
+    "cursorColor": "#7970A9",
+    "selectionBackground": "#454158",
+    "black": "#22212C",
+    "red": "#FF9580",
+    "green": "#8AFF80",
+    "yellow": "#FFFF80",
+    "blue": "#9580FF",
+    "purple": "#FF80BF",
+    "cyan": "#80FFEA",
+    "white": "#F8F8F2",
+    "brightBlack": "#504C67",
+    "brightRed": "#FFAA99",
+    "brightGreen": "#A2FF99",
+    "brightYellow": "#FFFF99",
+    "brightBlue": "#AA99FF",
+    "brightPurple": "#FF99CC",
+    "brightCyan": "#99FFEE",
+    "brightWhite": "#FFFFFF"
+}
