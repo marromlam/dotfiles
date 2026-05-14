@@ -1,4 +1,3 @@
--- DONE
 local T = require('tools')
 local noremap_silent = { noremap = true, silent = true }
 
@@ -677,8 +676,6 @@ nnoremap S :keeppatterns substitute/\s*\%#\s*/\r/e <bar> normal! ==<CR>
 ]])
 
 -- move arround
-vim.keymap.set({ 'n', 'v' }, 'j', 'gj', { desc = 'move down by display line' })
-vim.keymap.set({ 'n', 'v' }, 'k', 'gk', { desc = 'move up by display line' })
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', 'n', 'nzzzv')

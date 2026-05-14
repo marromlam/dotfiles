@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SOCKET_PATH=/tmp/nvim-mcp.sock
+
+# Kill any existing instance on this socket
+if [ -S "$SOCKET_PATH" ]; then
+    rm -f "$SOCKET_PATH"
+fi
+
+# Kill any zombie nvim processes
+pkill -9 -f "nvim.*$SOCKET_PATH"
+
+# Start Neovim headless server
+/home/linuxbrew/.linuxbrew/bin/nvim --headless --listen "$SOCKET_PATH" &
+
+echo "Neovim MCP server started on $SOCKET_PATH"

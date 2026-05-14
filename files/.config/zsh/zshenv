@@ -69,8 +69,7 @@ export PYTHONSTARTUP=$HOME/.config/python/pythonrc.py
 # ==============================================================================
 
 load_conda() {
-  source $HOME/.config/zsh/conda.sh
-  unset -f conda
+  source "$HOME/.config/zsh/conda.sh"
   unset -f load_conda
 }
 conda() {

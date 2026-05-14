@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import subprocess
+import re
+
+result = subprocess.run(
+    ["/home/mromerol/.local/bin/cursor-agent", "about"],
+    capture_output=True, text=True
+)
+
+data = {}
+for line in result.stdout.splitlines():
+    # Lines like: "Subscription Tier   Team"
+    match = re.match(r'^(.+?)\s{2,}(.+)$', line.strip())
+    if match:
+        data[match.group(1).strip()] = match.group(2).strip()
+
+print(f"Plan:  {data.get('Subscription Tier', 'unknown')}")
+print(f"Model: {data.get('Model', 'unknown')}")
+print(f"User:  {data.get('User Email', 'unknown')}")
+print(f"Note:  Cursor usage quota is not available via CLI")

@@ -31,7 +31,7 @@ Plugins are installed to:
 
 The installer is:
 
-- `~/Workspaces/personal/dotfiles/install/install_zsh.sh`
+- `~/Projects/personal/dotfiles/install/install_zsh.sh`
 
 It deletes existing plugin directories and clones fresh copies for idempotent installs.
 

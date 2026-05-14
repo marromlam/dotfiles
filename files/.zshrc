@@ -4,6 +4,10 @@
 [[ -o login ]] || { [[ -f "$HOME/.zprofile" ]] && source "$HOME/.zprofile"; }
 source $HOME/.config/zsh/conda.sh
 
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
 # Use a minimal prompt in Cursor to avoid command detection issues
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
   PROMPT='%n@%m:%~%# '
@@ -31,4 +35,10 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 source ~/.config/fzf/themes/carbon-mist.sh
 # END_FZF_THEME: carbon-mist
 
+alias curl='noglob curl'
+
 # vim: fdm=marker ft=zsh
+
+# BEGIN_EZA_THEME
+export EZA_COLORS=$(tr '\n' ':' < ~/.config/eza/themes/dracula-pro.yaml)
+# END_EZA_THEME

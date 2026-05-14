@@ -3,6 +3,10 @@
     "codex": {
       "command": "codex",
       "args": ["mcp-server"]
+    },
+    "atlassian": {
+      "command": "/home/mromerol/.dotfiles/scripts/mcp-atlassian-wrapper.sh",
+      "args": []
     }
   }
 }
