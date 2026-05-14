@@ -123,5 +123,7 @@ files/.config/rclone/
 files/.config/systemd/
 files/.config/vivaldi/
 
+files/.config/litellm/github_copilot/access-token
+files/.config/litellm/github_copilot/api-key.json
 
 
