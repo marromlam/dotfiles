@@ -9,7 +9,7 @@
       "src": "https://github.com/saghen/blink.lib"
     },
     "conform.nvim": {
-      "rev": "dca1a190aa85f9065979ef35802fb77131911106",
+      "rev": "0451b96660e8ca7dd8897718bad63932cf59255a",
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "copilot.lua": {
@@ -37,7 +37,7 @@
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
     "fzf-lua": {
-      "rev": "97376e364f51f1b5ae3efaa3eb2e929430ca8419",
+      "rev": "23f71140754b9162551dc8ccc1d6346e4275ecc2",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
@@ -61,7 +61,7 @@
       "src": "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim"
     },
     "mason.nvim": {
-      "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
+      "rev": "8e921c2b68571e978db5d4d3fef9c9a7f8755473",
       "src": "https://github.com/mason-org/mason.nvim"
     },
     "neotest": {

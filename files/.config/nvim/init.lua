@@ -1209,6 +1209,7 @@ require('blink.cmp').setup({
   },
 
   fuzzy = {
+    implementation = 'lua',
     frecency = { enabled = true },
     use_proximity = true,
     sorts = { 'score', 'sort_text' },
@@ -1930,7 +1931,7 @@ require('mason-tool-installer').setup({
     'eslint_d',
     'flake8',
     'mypy',
-    'luacheck',
+
     'hadolint',
     'jsonlint',
     'vale',
