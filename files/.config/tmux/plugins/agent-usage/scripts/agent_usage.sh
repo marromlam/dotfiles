@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# Renders both Copilot and Cursor quota bars for tmux statusline.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON="${PYTHON:-python3}"
+
+get_percentage() {
+    local agent="$1"
+    local cmd
+    cmd="$(tmux show-option -gqv "@agent_usage_cmd_${agent}" 2>/dev/null)"
+    if [[ -z "$cmd" ]]; then
+        case "$agent" in
+        copilot) cmd="$PYTHON $SCRIPT_DIR/fetch_copilot_usage.py" ;;
+        cursor) cmd="$PYTHON $SCRIPT_DIR/fetch_cursor_usage.py" ;;
+        esac
+    fi
+    eval "$cmd" 2>/dev/null || echo "0"
+}
+
+get_reset_in() {
+    local agent="$1"
+    local cmd
+    cmd="$(tmux show-option -gqv "@agent_usage_reset_cmd_${agent}" 2>/dev/null)"
+    if [[ -z "$cmd" ]]; then
+        case "$agent" in
+        copilot) cmd="$PYTHON $SCRIPT_DIR/fetch_copilot_usage.py --field reset_in" ;;
+        cursor) cmd="echo 0" ;;
+        esac
+    fi
+    eval "$cmd" 2>/dev/null || echo "0"
+}
+
+format_reset() {
+    local reset_in="$1"
+    [[ "$reset_in" =~ ^[0-9]+$ ]] || reset_in=0
+    local hours=$((reset_in / 3600))
+    local minutes=$(((reset_in % 3600) / 60))
+    printf "%02d:%02d" "$hours" "$minutes"
+}
+
+render_bar() {
+    local agent="$1" icon="$2" pct="$3" reset_label="$4"
+    local width=6
+    local empty_bg="colour236"
+    local sub_chars=('▏' '▎' '▍' '▌' '▋' '▊' '▉')
+
+    ((pct < 0)) && pct=0
+    ((pct > 100)) && pct=100
+
+    if ((pct >= 60)); then
+        color="colour71"
+    elif ((pct >= 30)); then
+        color="colour214"
+    else
+        color="colour160"
+    fi
+
+    read -r full partial_idx <<<"$(awk -v p="$pct" -v w="$width" 'BEGIN {
+        filled = p * w / 100
+        full   = int(filled)
+        idx    = int((filled - full) * 8)
+        print full, idx
+    }')"
+
+    local bar_on=""
+    for ((i = 0; i < full; i++)); do bar_on+="█"; done
+
+    local partial="" empty
+    if ((partial_idx > 0)); then
+        partial="${sub_chars[$((partial_idx - 1))]}"
+        empty=$((width - full - 1))
+    else
+        empty=$((width - full))
+    fi
+
+    local bar_off=""
+    for ((i = 0; i < empty; i++)); do bar_off+=" "; done
+
+    local show_icon
+    show_icon="$(tmux show-option -gqv "@agent_usage_show_icons" 2>/dev/null)"
+    local icon_prefix=""
+    [[ "$show_icon" != "off" ]] && icon_prefix="$icon "
+
+    printf "#[fg=%s,bold]%s%d%%#[default] #[fg=%s,bg=%s]%s%s#[fg=%s,bg=%s]%s#[default] #[fg=%s,bold]%s#[default]" \
+        "$color" "$icon_prefix" "$pct" \
+        "$color" "$empty_bg" "$bar_on" "$partial" \
+        "$empty_bg" "$empty_bg" "$bar_off" \
+        "$color" "$reset_label"
+}
+
+render_agent() {
+    local agent="$1" icon="$2"
+    local pct reset_in reset_label
+    pct=$(get_percentage "$agent")
+    reset_in=$(get_reset_in "$agent")
+    reset_label=$(format_reset "$reset_in")
+    render_bar "$agent" "$icon" "$pct" "$reset_label"
+}
+
+# Render both bars separated by a divider
+render_agent "copilot" "⊙"
+# printf " #[fg=colour240]│#[default] "
+# render_agent "cursor" "⌘"
