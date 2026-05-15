@@ -35,8 +35,8 @@ jobs:
         run: |
           command -v brew
           command -v stow
-          mkdir -p "$HOME/Workspaces/personal"
-          ln -sfn "$PWD" "$HOME/Workspaces/personal/dotfiles"
+          mkdir -p "$HOME/Projects/personal"
+          ln -sfn "$PWD" "$HOME/Projects/personal/dotfiles"
           ln -sfn "$PWD" "$HOME/.dotfiles"
           make install
 
@@ -105,13 +105,13 @@ jobs:
       - name: ShellCheck
         run: |
           # Only lint actively maintained scripts; exclude legacy extra/, zsh configs, and submodules
-          find install/ extra/setup.sh install.sh \
+          find install/ extra/setup.sh extra/symlinks.sh install.sh \
             -name '*.sh' \
             | xargs shellcheck -x
 
       - name: Bash syntax
         run: |
-          find install/ extra/setup.sh install.sh \
+          find install/ extra/setup.sh extra/symlinks.sh install.sh \
             -name '*.sh' \
             | xargs -I{} bash -n {}
 

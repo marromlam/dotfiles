@@ -166,22 +166,22 @@ install_kitty_linux() {
 }
 
 install_pdfcat() {
-	# The pdfcat formula lives in the source repo itself
-	# (marromlam/pdfcat, not marromlam/homebrew-pdfcat), so tap with an
-	# explicit URL.
-	local tap="marromlam/pdfcat"
-	local pkg="marromlam/pdfcat/pdfcat"
+	local dest="$HOMEBREW_PREFIX/Cellar/pdfcat"
 
-	if [[ "$FORCE_INSTALL" -eq 1 ]] && brew list --formula "$pkg" >/dev/null 2>&1; then
-		brew uninstall "$pkg" || true
+	if [[ "$FORCE_INSTALL" -eq 1 ]]; then
+		rm -rf "$dest" "$HOMEBREW_PREFIX/bin/pdfcat"
 	fi
 
-	if ! brew tap | grep -qx "$tap"; then
-		GIT_TERMINAL_PROMPT=0 brew tap "$tap" "https://github.com/marromlam/pdfcat" \
-			|| { echo "Warning: failed to tap $tap; skipping pdfcat."; return; }
+	if [[ -d "$dest" ]]; then
+		echo "pdfcat is already installed"
+		return
 	fi
 
-	brew_install_once "$pkg"
+	git clone https://github.com/marromlam/pdfcat.git "$dest"
+	pushd "$dest" >/dev/null
+	"$HOMEBREW_PREFIX/bin/python3" -m pip install -e .
+	ln -sf "$dest/pdfcat" "$HOMEBREW_PREFIX/bin/pdfcat"
+	popd >/dev/null
 }
 
 install_rust() {
@@ -308,7 +308,6 @@ BREW_LINUX=(
 	"pandoc"
 	"pkg-config"
 	"python"
-	"uv"
 	"readline"
 	"ripgrep"
 	"rlue/utils/timer"
@@ -406,6 +405,13 @@ install_pdfcat
 install_rust
 install_sonarqube
 brew_install_once "pixi"
+
+DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -x "$DOTFILES_ROOT/install/install_zsh.sh" ]]; then
+	bash "$DOTFILES_ROOT/install/install_zsh.sh"
+elif [[ -x "${HOME}/tmp/install_zsh.sh" ]]; then
+	bash "${HOME}/tmp/install_zsh.sh"
+fi
 
 brew update
 brew upgrade

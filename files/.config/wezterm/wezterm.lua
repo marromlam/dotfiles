@@ -586,4 +586,9 @@ return {
   -- END_WEZTERM_THEME
 }
 
+
+-- BEGIN_WEZTERM_THEME
+config.color_scheme = 'dracula-pro'
+-- END_WEZTERM_THEME
+
 -- vim: fdm=marker ts=2 sw=2 sts=2 et

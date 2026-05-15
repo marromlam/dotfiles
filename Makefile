@@ -1,18 +1,16 @@
 # This file install all shit
 #${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
+SHELL:=/bin/bash
 
 
-# Resolve FC from the Makefile's own location, not from the ~/.dotfiles symlink
-# (which is created BY this Makefile via install/install_symlinks.sh —
-# chicken-and-egg on a fresh machine).
-FC := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+FC=${HOME}/.dotfiles
 TMUX_SHARE=${HOME}/.local/share/tmux
 
 all: brew install setup
 
 test:
-	${FC}/tests/zsh/sanity.sh
-	${FC}/tests/tmux/sanity.sh
+	${HOME}/.dotfiles/tests/zsh/sanity.sh
+	${HOME}/.dotfiles/tests/tmux/sanity.sh
 
 macos:
 	${FC}/extra/macos/macos_settings.sh
@@ -26,7 +24,7 @@ homebrew:
 	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 install:
-	bash ${FC}/install/install_symlinks.sh
+	bash ${FC}/extra/symlinks.sh
 	@if [[ "$$(uname)" == "Darwin" ]]; then \
 	  rm -rf ~/Downloads; \
 	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \
@@ -96,17 +94,16 @@ fzf-marks:
 	fi
 
 private:
-	# private-dotfiles holds ssh keys + other secrets (separate repo)
+	# this uses a private repository where I store some other snippets
 	if [ ! -d "${FC}/private" ]; then \
-	    git clone https://github.com/marromlam/private-dotfiles.git "${FC}/private"; \
+	    git clone git@github.com:marromlam/.dotfiles.git "${FC}/private"; \
 	else \
-	    cd "${FC}/private" && git pull --ff-only; \
+	    cd  "${FC}/private"; \
+	    git pull; \
+	    cd "${FC}"; \
 	fi
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
 	chmod 600 ${HOME}/.ssh/*
-
-keys:
-	bash ${FC}/install/install_keys.sh
 
 zsh-plugins:
 	git clone https://github.com/djui/alias-tips.git ${HOMEBREW_PREFIX}/Cellar/alias-tips; \
@@ -126,4 +123,4 @@ commit: fmt
 	git add -u
 	git commit
 
-.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private keys zsh-plugins test fmt commit
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test fmt commit

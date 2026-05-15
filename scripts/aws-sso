@@ -1,4 +1,4 @@
-export BROWSER=browsh
-aws configure sso
+# export BROWSER=browsh
+aws sso login --profile marcos
 
 # vim: ft=sh
