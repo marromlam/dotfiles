@@ -100,3 +100,4 @@ fi
 # BEGIN_FZF_THEME: carbon-mist
 source ~/.config/fzf/themes/carbon-mist.sh
 # END_FZF_THEME: carbon-mist
+. "$HOME/.cargo/env"

@@ -120,6 +120,10 @@
       "rev": "08783ec022e7ddefe0f12a16f1ac4968f55478b0",
       "src": "https://github.com/HiPhish/rainbow-delimiters.nvim"
     },
+    "sailor.vim": {
+      "rev": "ddc66272c5603c082e48ce3816f872769d74f816",
+      "src": "https://github.com/marromlam/sailor.vim"
+    },
     "sidekick.nvim": {
       "rev": "208e1c5b8170c01fd1d07df0139322a76479b235",
       "src": "https://github.com/folke/sidekick.nvim"
