@@ -18,6 +18,7 @@
 
 
 
-# BEGIN_GHOSTTY_THEME: horizon
-theme = horizon
-# END_GHOSTTY_THEME: horizon
+
+# BEGIN_GHOSTTY_THEME
+theme = dracula-pro
+# END_GHOSTTY_THEME

@@ -202,20 +202,19 @@ git submodule update --init --recursive
 ### Installing New Homebrew Packages
 
 1. Add package to `homebrew/Brewfile` (or `homebrew/BrewfileLinux`)
-2. Run: `brew bundle --file=~/Projects/personal/dotfiles/homebrew/Brewfile`
+2. Run: `brew bundle --file=~/Workspaces/personal/dotfiles/homebrew/Brewfile`
 
 ### Working with Private Dotfiles
 
 The repository references a private dotfiles repo for sensitive configs (SSH keys, etc.):
 ```bash
-make private  # Clones ~/Projects/personal/private-dotfiles and symlinks files
+make private  # Clones ~/Workspaces/personal/private-dotfiles and symlinks files
 ```
 
 ## Important Paths
 
-- Dotfiles repo: `~/Projects/personal/dotfiles` (also stored in `vim.g.dotfiles`)
-- Projects: `~/Projects/personal/` and `~/Projects/work/`
-- Workspaces: `~/Workspaces/` (newer convention, see `init.lua:14`)
+- Dotfiles repo: `~/Workspaces/personal/dotfiles` (also stored in `vim.g.dotfiles`)
+- Workspaces: `~/Workspaces/personal/` and `~/Workspaces/work/`
 - Obsidian vault: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Marcos`
 - Scripts: Scripts in `scripts/` are available in PATH
 

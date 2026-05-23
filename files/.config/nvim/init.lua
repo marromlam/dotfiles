@@ -933,7 +933,7 @@ vim.pack.add({
   -- 'https://github.com/ruifm/gitlinker.nvim',
   -- 'https://github.com/akinsho/git-conflict.nvim',
   'https://github.com/tpope/vim-fugitive',
-  -- 'https://github.com/sindrets/diffview.nvim',
+  'https://github.com/sindrets/diffview.nvim',
   -- 'https://github.com/isakbm/gitgraph.nvim',
   -- 'https://github.com/ThePrimeagen/git-worktree.nvim',
 
@@ -943,7 +943,7 @@ vim.pack.add({
   'https://github.com/SmiteshP/nvim-navic',
   'https://github.com/nvim-tree/nvim-web-devicons',
   -- 'https://github.com/b0o/incline.nvim',
-  -- 'https://github.com/uga-rosa/ccc.nvim',
+  'https://github.com/uga-rosa/ccc.nvim',
   -- 'https://github.com/Wansmer/symbol-usage.nvim',
   'https://github.com/mbbill/undotree',
   -- 'https://github.com/nacro90/numb.nvim',
@@ -1872,6 +1872,40 @@ vim.keymap.set(
   ':Git push -u origin ',
   { desc = '[git] Set target branch' }
 )
+
+-- }}}
+
+-- Diffview {{{
+
+require('diffview').setup({
+  enhanced_diff_hl = true,
+  signs = {
+    fold_closed = '',
+    fold_open = '',
+    done = '✓',
+  },
+  view = {
+    merge_tool = { layout = 'diff3_mixed' },
+  },
+})
+
+-- }}}
+
+-- ccc.nvim {{{
+
+require('ccc').setup({
+  highlighter = {
+    auto_enable = true,
+    excludes = {
+      'dart',
+      'lazy',
+      'orgagenda',
+      'org',
+      'NeogitStatus',
+      'toggleterm',
+    },
+  },
+})
 
 -- }}}
 
