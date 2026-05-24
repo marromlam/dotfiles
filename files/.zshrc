@@ -27,8 +27,65 @@ alias '???'='noglob ???'
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# BEGIN_FZF_THEME: carbon-mist
-source ~/.config/fzf/themes/carbon-mist.sh
-# END_FZF_THEME: carbon-mist
 
 # vim: fdm=marker ft=zsh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# BEGIN_EZA_THEME
+export EZA_COLORS=$(tr '\n' ':' < ~/.config/eza/themes/amberglow.yaml)
+# END_EZA_THEME
+
+# Added by Antigravity
+export PATH="/Users/marcos/.antigravity/antigravity/bin:$PATH"

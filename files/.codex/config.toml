@@ -1,0 +1,103 @@
+personality = "pragmatic"
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
+approvals_reviewer = "user"
+[projects."/Users/marcos/Documents/MBA/M2/M2A2/entregable"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/marcos"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/gas-project"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/notes-scpt"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/notesutils"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/ish"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/awrit"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/pdfcat"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/tex-kitty"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/livetex.nvim"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Projects/personal/dracula_pro"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/pdfcat"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/nvim-docx"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/dracula_pro"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/ish"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/gas-project"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/mba/M3A1"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/ai-skills"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Library/Mobile Documents/iCloud~md~obsidian/Documents/Marcos"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/autograd"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/prompt-shell1"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/mba/M3A2"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/acelink"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/yubi-pass"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/finance-tracker"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/M3A0"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/mba/M4A1"]
+trust_level = "trusted"
+
+[projects."/Users/marcos/Workspaces/personal/hailaran-webapp"]
+trust_level = "trusted"
+
+[notice]
+hide_full_access_warning = true
+hide_rate_limit_model_nudge = true
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
