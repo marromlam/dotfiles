@@ -32,6 +32,7 @@ install:
 
 setup:
 	bash ${FC}/extra/setup.sh
+	chmod 600 ${HOME}/.ssh/github ${HOME}/.ssh/github_work ${HOME}/.ssh/id_rsa ${HOME}/.ssh/igfae_rsa 2>/dev/null || true
 
 projects:
 	mkdir -p "${HOME}/Projects/icloud"
