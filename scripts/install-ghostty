@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Install Ghostty terminal emulator on Debian (including WSL2)
+# Source: https://github.com/dariogriffo/ghostty-debian
+
+set -euo pipefail
+
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║  Ghostty Terminal Emulator - Debian Installation            ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+echo ""
+
+# Check if running on Debian
+if ! grep -q "ID=debian" /etc/os-release 2>/dev/null; then
+    echo "❌ Error: This script is for Debian systems only."
+    echo "   For Ubuntu, use: sudo add-apt-repository ppa:mkasberg/ghostty-ubuntu"
+    exit 1
+fi
+
+# Get Debian version codename
+CODENAME=$(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)
+echo "📋 Detected Debian version: $CODENAME"
+
+# Check if codename is supported
+case "$CODENAME" in
+    bookworm|trixie|sid)
+        echo "✓ $CODENAME is supported"
+        ;;
+    *)
+        echo "⚠️  Warning: $CODENAME may not be officially supported"
+        echo "   Supported versions: bookworm, trixie, sid"
+        echo ""
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+        ;;
+esac
+
+echo ""
+echo "📦 Setting up Ghostty repository..."
+
+# 1. Download and store the repository signing key
+echo "  → Downloading repository signing key..."
+sudo curl -fsSL https://debian.griffo.io/EA0F721D231FDD3A0A17B9AC7808B4DD62C41256.asc \
+  | sudo gpg --dearmor -o /usr/share/keyrings/debian.griffo.io.gpg
+
+if [ $? -eq 0 ]; then
+    echo "  ✓ Signing key installed"
+else
+    echo "  ❌ Failed to download signing key"
+    exit 1
+fi
+
+# 2. Add the repository
+echo "  → Adding Ghostty repository..."
+echo "deb [signed-by=/usr/share/keyrings/debian.griffo.io.gpg] https://debian.griffo.io/apt $CODENAME main" \
+  | sudo tee /etc/apt/sources.list.d/debian.griffo.io.list > /dev/null
+
+if [ $? -eq 0 ]; then
+    echo "  ✓ Repository added"
+else
+    echo "  ❌ Failed to add repository"
+    exit 1
+fi
+
+# 3. Update package lists
+echo ""
+echo "🔄 Updating package lists..."
+sudo apt update
+
+if [ $? -ne 0 ]; then
+    echo "  ❌ Failed to update package lists"
+    exit 1
+fi
+
+# 4. Install Ghostty
+echo ""
+echo "📥 Installing Ghostty..."
+sudo apt install -y ghostty
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ✓ Ghostty installed successfully!                          ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+
+    # Check installation
+    if command -v ghostty &> /dev/null; then
+        GHOSTTY_VERSION=$(ghostty --version 2>/dev/null || echo "unknown")
+        echo "Ghostty version: $GHOSTTY_VERSION"
+        echo ""
+        echo "To launch Ghostty:"
+        echo "  ghostty"
+        echo ""
+        echo "Configuration file location:"
+        echo "  ~/.config/ghostty/config"
+        echo ""
+        echo "For WSL2 users:"
+        echo "  - Ghostty runs as a Linux GUI app"
+        echo "  - Make sure X11/WSLg is configured"
+        echo "  - Or install Ghostty on Windows for better integration"
+        echo ""
+    else
+        echo "⚠️  Ghostty installed but 'ghostty' command not found in PATH"
+        echo "   You may need to restart your shell or add it to PATH"
+    fi
+
+    echo "To update Ghostty in the future:"
+    echo "  sudo apt update && sudo apt upgrade ghostty"
+    echo ""
+    echo "For bleeding-edge (tip) builds:"
+    echo "  sudo apt install ghostty-tip"
+else
+    echo ""
+    echo "❌ Failed to install Ghostty"
+    exit 1
+fi

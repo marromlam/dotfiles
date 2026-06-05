@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Launch Ghostty terminal with correct environment for WSL2 + X11
+
+# Force X11 backend (disable Wayland)
+export GDK_BACKEND=x11
+export KITTY_DISABLE_WAYLAND=1
+
+# OpenGL settings for WSL2
+export LIBGL_ALWAYS_SOFTWARE=1     # Use software rendering
+export LIBGL_ALWAYS_INDIRECT=1     # Indirect rendering for X11
+
+# Disable GTK accessibility warnings
+export GTK_A11Y=none
+
+# Get DISPLAY from current environment (auto-detected by windows.sh)
+# If not set, use the Wi-Fi IP detection
+if [[ -z "$DISPLAY" ]]; then
+    # Detect Windows host IP
+    if command -v powershell.exe &>/dev/null; then
+        WIFI_IP=$(powershell.exe -Command "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Wi-Fi 2>$null | Select-Object -ExpandProperty IPAddress" 2>/dev/null | tr -d '\r')
+        if [[ -n "$WIFI_IP" && "$WIFI_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            export DISPLAY="${WIFI_IP}:0"
+        else
+            export DISPLAY=":0"  # Fallback to WSLg
+        fi
+    else
+        export DISPLAY=":0"  # Fallback to WSLg
+    fi
+fi
+
+# Launch Ghostty
+exec ghostty "$@"
