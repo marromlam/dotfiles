@@ -406,14 +406,22 @@ local function _stl_hl()
   -- Build a named palette from the ANSI 16-color terminal slots.
   -- Index semantics are fixed by convention; every colorscheme that sets terminal_colors honors them.
   local palette = {
-    { 'black',         0  }, { 'red',           1  },
-    { 'green',         2  }, { 'yellow',        3  },
-    { 'blue',          4  }, { 'purple',        5  },
-    { 'cyan',          6  }, { 'white',         7  },
-    { 'bright_black',  8  }, { 'bright_red',    9  },
-    { 'bright_green',  10 }, { 'bright_yellow', 11 },
-    { 'bright_blue',   12 }, { 'bright_purple', 13 },
-    { 'bright_cyan',   14 }, { 'bright_white',  15 },
+    { 'black', 0 },
+    { 'red', 1 },
+    { 'green', 2 },
+    { 'yellow', 3 },
+    { 'blue', 4 },
+    { 'purple', 5 },
+    { 'cyan', 6 },
+    { 'white', 7 },
+    { 'bright_black', 8 },
+    { 'bright_red', 9 },
+    { 'bright_green', 10 },
+    { 'bright_yellow', 11 },
+    { 'bright_blue', 12 },
+    { 'bright_purple', 13 },
+    { 'bright_cyan', 14 },
+    { 'bright_white', 15 },
   }
   for _, p in ipairs(palette) do
     local fg = vim.g['terminal_color_' .. p[2]]
@@ -421,13 +429,13 @@ local function _stl_hl()
   end
   -- Rainbow delimiters pull from the palette by hue name.
   local rd_map = {
-    { 'RainbowDelimiterViolet', 'purple'       },
-    { 'RainbowDelimiterBlue',   'blue'         },
-    { 'RainbowDelimiterCyan',   'cyan'         },
-    { 'RainbowDelimiterGreen',  'green'        },
-    { 'RainbowDelimiterYellow', 'yellow'       },
-    { 'RainbowDelimiterOrange', 'bright_yellow'},
-    { 'RainbowDelimiterRed',    'red'          },
+    { 'RainbowDelimiterViolet', 'purple' },
+    { 'RainbowDelimiterBlue', 'blue' },
+    { 'RainbowDelimiterCyan', 'cyan' },
+    { 'RainbowDelimiterGreen', 'green' },
+    { 'RainbowDelimiterYellow', 'yellow' },
+    { 'RainbowDelimiterOrange', 'bright_yellow' },
+    { 'RainbowDelimiterRed', 'red' },
   }
   for _, pair in ipairs(rd_map) do
     api.nvim_set_hl(0, pair[1], { link = pair[2] })
@@ -498,7 +506,8 @@ do
     if lnum == cursor_lnum then return ' ' end
     -- Fold header: show fold icon in this cell instead of diagnostic sign.
     if fn.foldlevel(lnum) > fn.foldlevel(lnum - 1) then
-      local icon = fn.foldclosed(lnum) == -1 and (_fcs.foldopen or '▾') or (_fcs.foldclose or '▸')
+      local icon = fn.foldclosed(lnum) == -1 and (_fcs.foldopen or '▾')
+        or (_fcs.foldclose or '▸')
       return _hl('FoldColumn', icon)
     end
     local best_text, best_hl, best_sev = '', nil, 99
@@ -569,7 +578,7 @@ end
 
 -- Options {{{
 -- Suppress deprecation warnings from plugins (e.g. client.notify)
-vim.deprecate = function() end
+-- vim.deprecate = function() end
 
 -- Make all keymaps silent by default (Folke's pattern)
 local keymap_set = vim.keymap.set
@@ -696,7 +705,7 @@ vim.opt.linebreak = true -- lines wrap at words rather than random characters
 -- avoid duplicated icons.
 vim.opt.signcolumn = 'no' -- statuscolumn.lua manages signs
 vim.opt.ruler = false
-vim.opt.cmdheight = 0
+vim.opt.cmdheight = 1
 vim.opt.showbreak = [[↪ ]] -- Options include -> '…', '↳ ', '→','↪ '
 
 -- List chars
@@ -2033,6 +2042,12 @@ vim.lsp.config('ruff', {
   filetypes = { 'python' },
   root_dir = function(_, cb) cb(vim.fn.getcwd()) end,
   capabilities = _lsp_caps,
+  on_attach = function(client, _)
+    -- nvim-lightbulb uses buf_request_all for code actions and still sends
+    -- requests to ignored clients. Ruff currently errors on some incoming
+    -- codeAction payloads, so disable its code actions capability.
+    client.server_capabilities.codeActionProvider = false
+  end,
 })
 
 vim.lsp.config('ts_ls', {
@@ -2116,9 +2131,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('gr', vim.lsp.buf.references, 'references')
     map('gy', vim.lsp.buf.type_definition, 'type definition')
     map('gm', vim.lsp.buf.implementation, 'implementation')
-    vim.keymap.set('n', '<leader>rn', function()
-      return ':IncRename ' .. vim.fn.expand('<cword>')
-    end, { expr = true, silent = false, buffer = event.buf, desc = 'rename' })
+    vim.keymap.set(
+      'n',
+      '<leader>rn',
+      function() return ':IncRename ' .. vim.fn.expand('<cword>') end,
+      { expr = true, silent = false, buffer = event.buf, desc = 'rename' }
+    )
     map('<leader>ca', vim.lsp.buf.code_action, 'code action')
     map(
       '<leader>th',
@@ -2197,6 +2215,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
         text = _icons.misc.lightbulb,
         hl = 'DiagnosticWarn',
       },
+      ignore = {
+        clients = { 'ruff' },
+      },
     })
   end,
 })
@@ -2217,7 +2238,12 @@ require('inc_rename').setup({
 vim.g.undotree_TreeNodeShape = '◉'
 vim.g.undotree_SetFocusWhenToggle = 1
 
-vim.keymap.set('n', '<leader>u', '<Cmd>UndotreeToggle<CR>', { desc = 'undotree: toggle' })
+vim.keymap.set(
+  'n',
+  '<leader>u',
+  '<Cmd>UndotreeToggle<CR>',
+  { desc = 'undotree: toggle' }
+)
 
 -- }}}
 
@@ -2246,7 +2272,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
     if not ok then return end
     local rd = vim.g.rainbow_delimiters or {}
     rd.strategy = { [''] = rainbow_delimiters.strategy['global'] }
-    rd.query    = { [''] = 'rainbow-delimiters' }
+    rd.query = { [''] = 'rainbow-delimiters' }
     vim.g.rainbow_delimiters = rd
   end,
 })
@@ -2255,12 +2281,42 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
 
 -- Debug {{{
 
-vim.keymap.set('n', '<F5>',       function() require('dap').continue() end,          { desc = 'debug: continue' })
-vim.keymap.set('n', '<F1>',       function() require('dap').step_into() end,         { desc = 'debug: step into' })
-vim.keymap.set('n', '<F2>',       function() require('dap').step_over() end,         { desc = 'debug: step over' })
-vim.keymap.set('n', '<F3>',       function() require('dap').step_out() end,          { desc = 'debug: step out' })
-vim.keymap.set('n', '<leader>db', function() require('dap').toggle_breakpoint() end, { desc = 'debug: toggle breakpoint' })
-vim.keymap.set('n', '<F7>',       function() require('dapui').toggle() end,          { desc = 'debug: toggle UI' })
+vim.keymap.set(
+  'n',
+  '<F5>',
+  function() require('dap').continue() end,
+  { desc = 'debug: continue' }
+)
+vim.keymap.set(
+  'n',
+  '<F1>',
+  function() require('dap').step_into() end,
+  { desc = 'debug: step into' }
+)
+vim.keymap.set(
+  'n',
+  '<F2>',
+  function() require('dap').step_over() end,
+  { desc = 'debug: step over' }
+)
+vim.keymap.set(
+  'n',
+  '<F3>',
+  function() require('dap').step_out() end,
+  { desc = 'debug: step out' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>db',
+  function() require('dap').toggle_breakpoint() end,
+  { desc = 'debug: toggle breakpoint' }
+)
+vim.keymap.set(
+  'n',
+  '<F7>',
+  function() require('dapui').toggle() end,
+  { desc = 'debug: toggle UI' }
+)
 
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
@@ -2271,7 +2327,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
 
     dap.adapters.python = {
       type = 'executable',
-      command = vim.fn.stdpath('data') .. '/mason/packages/debugpy/venv/bin/python',
+      command = vim.fn.stdpath('data')
+        .. '/mason/packages/debugpy/venv/bin/python',
       args = { '-m', 'debugpy.adapter' },
     }
     dap.configurations.python = {
@@ -2292,9 +2349,14 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       controls = {
         icons = {
-          pause = '', play = '', step_into = '󱆭',
-          step_over = '', step_out = '󰙣', run_last = '󰙡',
-          terminate = '', disconnect = '',
+          pause = '',
+          play = '',
+          step_into = '󱆭',
+          step_over = '',
+          step_out = '󰙣',
+          run_last = '󰙡',
+          terminate = '',
+          disconnect = '',
         },
       },
     })
@@ -2310,13 +2372,48 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
 -- Testing {{{
 
 local function nt() return require('neotest') end
-vim.keymap.set('n', '<localleader>ts', function() nt().summary.toggle() end,                { desc = 'neotest: summary' })
-vim.keymap.set('n', '<localleader>to', function() nt().output.open({ enter = true }) end,   { desc = 'neotest: output' })
-vim.keymap.set('n', '<localleader>tn', function() nt().run.run() end,                       { desc = 'neotest: run nearest' })
-vim.keymap.set('n', '<localleader>tf', function() nt().run.run(vim.fn.expand('%')) end,     { desc = 'neotest: run file' })
-vim.keymap.set('n', '<localleader>tc', function() nt().run.stop() end,                      { desc = 'neotest: cancel' })
-vim.keymap.set('n', '[n',              function() nt().jump.prev({ status = 'failed' }) end, { desc = 'prev failed test' })
-vim.keymap.set('n', ']n',              function() nt().jump.next({ status = 'failed' }) end, { desc = 'next failed test' })
+vim.keymap.set(
+  'n',
+  '<localleader>ts',
+  function() nt().summary.toggle() end,
+  { desc = 'neotest: summary' }
+)
+vim.keymap.set(
+  'n',
+  '<localleader>to',
+  function() nt().output.open({ enter = true }) end,
+  { desc = 'neotest: output' }
+)
+vim.keymap.set(
+  'n',
+  '<localleader>tn',
+  function() nt().run.run() end,
+  { desc = 'neotest: run nearest' }
+)
+vim.keymap.set(
+  'n',
+  '<localleader>tf',
+  function() nt().run.run(vim.fn.expand('%')) end,
+  { desc = 'neotest: run file' }
+)
+vim.keymap.set(
+  'n',
+  '<localleader>tc',
+  function() nt().run.stop() end,
+  { desc = 'neotest: cancel' }
+)
+vim.keymap.set(
+  'n',
+  '[n',
+  function() nt().jump.prev({ status = 'failed' }) end,
+  { desc = 'prev failed test' }
+)
+vim.keymap.set(
+  'n',
+  ']n',
+  function() nt().jump.next({ status = 'failed' }) end,
+  { desc = 'next failed test' }
+)
 
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
@@ -3943,9 +4040,9 @@ do
     local icons = _icons.lsp
     local result = {
       error = { count = 0, icon = icons.error },
-      warn  = { count = 0, icon = icons.warn  },
-      info  = { count = 0, icon = icons.info  },
-      hint  = { count = 0, icon = icons.hint  },
+      warn = { count = 0, icon = icons.warn },
+      info = { count = 0, icon = icons.info },
+      hint = { count = 0, icon = icons.hint },
     }
     for _, item in ipairs(vim.diagnostic.get(buf)) do
       local s = sev[item.severity]:lower()
@@ -3955,13 +4052,13 @@ do
   end
 
   local _diag_zero = {
-    error = { count = 0 }, warn = { count = 0 },
-    info  = { count = 0 }, hint = { count = 0 },
+    error = { count = 0 },
+    warn = { count = 0 },
+    info = { count = 0 },
+    hint = { count = 0 },
   }
 
-  local function _diagnostics(buf)
-    return _diag_cache[buf] or _diag_zero
-  end
+  local function _diagnostics(buf) return _diag_cache[buf] or _diag_zero end
 
   -- ── Search count ──────────────────────────────────────────────────────
 
@@ -3990,7 +4087,10 @@ do
 
   local function _refresh_lsp(buf)
     local clients = vim.lsp.get_clients({ bufnr = buf }) or {}
-    if #clients == 0 then _lsp_cache[buf] = { false, {} }; return end
+    if #clients == 0 then
+      _lsp_cache[buf] = { false, {} }
+      return
+    end
     local has_copilot, names = false, {}
     for _, c in ipairs(clients) do
       local name = c.name or ''
@@ -4305,13 +4405,22 @@ do
     command = _git_updates,
   }, {
     event = 'DiagnosticChanged',
-    command = function(ev) _refresh_diag(ev.buf); vim.cmd('redrawstatus') end,
+    command = function(ev)
+      _refresh_diag(ev.buf)
+      vim.cmd('redrawstatus')
+    end,
   }, {
     event = { 'LspAttach', 'LspDetach' },
-    command = function(ev) _refresh_lsp(ev.buf); vim.cmd('redrawstatus') end,
+    command = function(ev)
+      _refresh_lsp(ev.buf)
+      vim.cmd('redrawstatus')
+    end,
   }, {
     event = 'BufDelete',
-    command = function(ev) _diag_cache[ev.buf] = nil; _lsp_cache[ev.buf] = nil end,
+    command = function(ev)
+      _diag_cache[ev.buf] = nil
+      _lsp_cache[ev.buf] = nil
+    end,
   }, {
     event = { 'WinEnter', 'WinLeave', 'BufWinEnter' },
     command = function() vim.cmd('redrawstatus') end,

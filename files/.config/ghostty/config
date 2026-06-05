@@ -19,6 +19,14 @@
 
 
 
+# Window decorations
+gtk-titlebar = false
+
+# Window management keybindings
+keybind = ctrl+shift+m=toggle_fullscreen
+# Use Alt+Left-click to drag window (standard X11 behavior)
+# Use Alt+Right-click to resize window
+
 # BEGIN_GHOSTTY_THEME
 theme = dracula-pro
 # END_GHOSTTY_THEME

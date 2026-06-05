@@ -10,36 +10,29 @@ REPO_URL="https://github.com/marromlam/dotfiles.git"
 step() { echo; echo "==> $*"; }
 
 # ------------------------------------------------------------------------------
-# Detect machine type and write ~/.machine
+# Validate machine type from ~/.machine
 # ------------------------------------------------------------------------------
-detect_machine() {
-	if [[ -f "$HOME/.machine" ]]; then
-		echo "$HOME/.machine already set: $(cat "$HOME/.machine")"
-		return
+ensure_machine_file() {
+	if [[ ! -f "$HOME/.machine" ]]; then
+		echo "Missing ~/.machine"
+		echo "Create it with one allowed identifier, for example:"
+		echo '  export MACHINE="x64-linux"'
+		exit 1
 	fi
 
-	local os arch
-	os="$(uname -s)"
-	arch="$(uname -m)"
+	# shellcheck disable=SC1090
+	source "$HOME/.machine"
 
-	local machine
-	case "$os" in
-		Darwin)
-			if [[ "$arch" == "arm64" ]]; then machine="arm64-darwin"
-			else machine="x64-darwin"
-			fi ;;
-		Linux)
-			if grep -qi microsoft /proc/version 2>/dev/null; then machine="x64-wsl"
-			elif [[ "$arch" == "x86_64" ]]; then machine="x64-linux"
-			elif [[ "$arch" == "aarch64" ]]; then machine="arm64-linux"
-			elif [[ "$arch" == "i686" ]]; then machine="x32-linux"
-			else machine="x64-linux"
-			fi ;;
-		*) machine="x64-linux" ;;
+	case "${MACHINE:-}" in
+		arm64-darwin|x64-darwin|x64-linux|x64-wsl|x64-nodos|x64-codespaces|arm64-linux|x32-linux)
+			echo "$HOME/.machine set: $MACHINE"
+			;;
+		*)
+			echo "Invalid MACHINE='${MACHINE:-}' in ~/.machine"
+			echo "Allowed: arm64-darwin, x64-darwin, x64-linux, x64-wsl, x64-nodos, x64-codespaces, arm64-linux, x32-linux"
+			exit 1
+			;;
 	esac
-
-	echo "$machine" > "$HOME/.machine"
-	echo "Detected machine: $machine"
 }
 
 # ------------------------------------------------------------------------------
@@ -95,7 +88,7 @@ clone_dotfiles() {
 # ------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------
-detect_machine
+ensure_machine_file
 apt_bootstrap
 install_dependencies
 clone_dotfiles

@@ -1,19 +1,6 @@
 # Eval Homebrew {{{
 
-# Detect Homebrew prefix using zsh builtins (no subprocesses)
-if [[ "$OSTYPE" == darwin* ]]; then
-  if [[ "$CPUTYPE" == x86_64 ]]; then
-    export HOMEBREW_PREFIX="/usr/local"
-  else
-    export HOMEBREW_PREFIX="/opt/homebrew"
-  fi
-else
-  export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-fi
-# WSL override
-[[ -f ~/.machine ]] && export MACHINE="$(<~/.machine)"
-[[ "$MACHINE" == "x64-wsl" ]] && export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+[[ -f "$HOME/.dotfiles/scripts/machine-env.sh" ]] && source "$HOME/.dotfiles/scripts/machine-env.sh"
 
 # Cache brew shellenv to avoid spawning brew subprocess every shell start
 _brew_shellenv_cache="$HOME/.cache/zsh/brew-shellenv.sh"

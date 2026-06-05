@@ -6,7 +6,7 @@ echo "--------------------------------------------------------------------------
 
 set -e
 
-export MACHINEOS=`$HOME/.dotfiles/scripts/machine.sh`
+[[ -f "$HOME/.dotfiles/scripts/machine-env.sh" ]] && source "$HOME/.dotfiles/scripts/machine-env.sh"
 
 if [[ "$MACHINEOS" == "Mac" ]]; then
   echo "Remap caps-lock to control for all Keyboards"

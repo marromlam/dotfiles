@@ -16,7 +16,10 @@ jobs:
           submodules: false
 
       - name: Set up machine identifier
-        run: echo "x64-linux" > "$HOME/.machine"
+        run: |
+          {
+            echo 'export MACHINE="x64-linux"'
+          } > "$HOME/.machine"
 
       - name: install_dependencies.sh (Homebrew + packages)
         run: bash install/install_dependencies.sh

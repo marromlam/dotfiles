@@ -7,23 +7,17 @@
 #
 #
 
-export MACHINEOS=$($HOME/.dotfiles/scripts/machine.sh)
 function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
-# Set OS-dependent stuff
-if [[ "$MACHINEOS" == "Mac" ]]; then
-	if [[ "$(uname -m)" == "x86_64" ]]; then
-		export HOMEBREW_PREFIX="/usr/local"
-	else
-		export HOMEBREW_PREFIX="/opt/homebrew"
-	fi
-else
-	export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-fi
+[[ -f "$HOME/.dotfiles/scripts/machine-env.sh" ]] && source "$HOME/.dotfiles/scripts/machine-env.sh"
 
-eval $($HOMEBREW_PREFIX/bin/brew shellenv)
-export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
+if [[ -x "$HOMEBREW_PREFIX/bin/brew" ]]; then
+	eval "$("$HOMEBREW_PREFIX/bin/brew" shellenv)"
+fi
+export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:${XDG_DATA_DIRS:-}"
 export PATH="$HOME/.local/bin:$PATH"
+
+[[ -f "$HOME/.bashrc_local" ]] && source $HOME/.bashrc_local
 
 # If not running interactively, don't do anything
 case $- in

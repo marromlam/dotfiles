@@ -16,7 +16,9 @@ fi
 
 machine_from_file() {
 	if [[ -f "$HOME/.machine" ]]; then
-		cat "$HOME/.machine"
+		# shellcheck disable=SC1090
+		source "$HOME/.machine"
+		echo "${MACHINE:-}"
 	else
 		echo ""
 	fi
@@ -24,9 +26,19 @@ machine_from_file() {
 
 MACHINE="${MACHINE_OVERRIDE:-$(machine_from_file)}"
 if [[ -z "$MACHINE" ]]; then
-	echo "No machine identifier found. Create ~/.machine or pass one as an argument."
+	echo "No machine identifier found. Create ~/.machine with export MACHINE=\"<machine>\" or pass one as an argument."
 	exit 1
 fi
+
+case "$MACHINE" in
+	arm64-darwin|x64-darwin|x64-linux|x64-wsl|x64-nodos|x64-codespaces|arm64-linux|x32-linux)
+		;;
+	*)
+		echo "Invalid MACHINE '$MACHINE'"
+		echo "Allowed: arm64-darwin, x64-darwin, x64-linux, x64-wsl, x64-nodos, x64-codespaces, arm64-linux, x32-linux"
+		exit 1
+		;;
+esac
 
 OS_NAME="$(uname -s)"
 ARCH_NAME="$(uname -m)"

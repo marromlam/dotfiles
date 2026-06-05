@@ -19,7 +19,7 @@ Most of my machine configuration lives here.
 <img width="1680" alt="Screenshot 2023-11-07 at 10 55 09" src="https://github.com/marromlam/dotfiles/assets/41004396/7686b940-8004-42b6-bb28-92c5173882b6">
 <img width="1680" alt="Screenshot 2023-11-07 at 11 01 43" src="https://github.com/marromlam/dotfiles/assets/41004396/feb8d9c7-2fbb-4a75-8b5c-a934fbb293ba">
 
-Each machine is identified by a string stored in `~/.machine`:
+Each machine is identified in `~/.machine`:
 
 | Identifier       | Machine                    |
 | ---------------- | -------------------------- |
@@ -32,7 +32,11 @@ Each machine is identified by a string stored in `~/.machine`:
 | `arm64-linux`    | Raspberry Pi 4             |
 | `x32-linux`      | iSH app                    |
 
-The install script creates this file automatically, or you can write it manually.
+Create it manually as a sourceable env file, for example:
+
+```bash
+export MACHINE="x64-linux"
+```
 
 ## Core tools
 

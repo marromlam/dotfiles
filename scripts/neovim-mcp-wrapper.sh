@@ -5,7 +5,7 @@ SOCKET_PATH="${NVIM_SOCKET:-/tmp/nvim-mcp-server.sock}"
 TIMEOUT=5
 
 # Ensure Homebrew nvim is discoverable in non-login shells
-export PATH="/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH}"
+export PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
 
 # Quick health check - if it fails, systemd will restart the service
 if [[ ! -S "$SOCKET_PATH" ]] || ! timeout $TIMEOUT nvim --server "$SOCKET_PATH" --remote-expr "1+1" &>/dev/null; then
@@ -20,19 +20,9 @@ if [[ ! -S "$SOCKET_PATH" ]] || ! timeout $TIMEOUT nvim --server "$SOCKET_PATH" 
     fi
 fi
 
-export MACHINEOS=$($HOME/.dotfiles/scripts/machine.sh)
+[[ -f "$HOME/.dotfiles/scripts/machine-env.sh" ]] && source "$HOME/.dotfiles/scripts/machine-env.sh"
 
-# Set OS-dependent stuff
-if [[ "$MACHINEOS" == "Mac" ]]; then
-    if [[ "$(uname -m)" == "x86_64" ]]; then
-        export HOMEBREW_PREFIX="/usr/local"
-    else
-        export HOMEBREW_PREFIX="/opt/homebrew"
-    fi
-else
-    export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
-fi
-export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 export NVIM_SOCKET_PATH="${NVIM_SOCKET:-/tmp/nvim-mcp-server.sock}"
 export ALLOW_SHELL_COMMANDS=true
 exec npx -y mcp-neovim-server

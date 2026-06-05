@@ -74,3 +74,5 @@ bin/
 .ccls-cache/
 .project
 # vim:filetype=conf
+
+**/.claude/settings.local.json
