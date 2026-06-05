@@ -125,4 +125,6 @@ files/.config/vivaldi/
 files/.config/litellm/github_copilot/access-token
 files/.config/litellm/github_copilot/api-key.json
 
-
+# files with secrets
+files/.config/rosetta-llm/rosetta.env
+files/.config/rosetta-llm/config.json

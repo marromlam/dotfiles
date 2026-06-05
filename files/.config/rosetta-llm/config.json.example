@@ -1,0 +1,53 @@
+{
+  "host": "0.0.0.0",
+  "port": 4000,
+  "proxy": {
+    "api_keys": [
+      "YOUR_API_KEY_HERE"
+    ]
+  },
+  "log_level": "info",
+  "providers": {
+    "anthropic": {
+      "format": "openai_chat",
+      "base_url": "https://api.enterprise.githubcopilot.com",
+      "api_key_env": "COPILOT_ACCESS_TOKEN",
+      "extra_headers": {
+        "Editor-Version": "vscode/1.85.1",
+        "Copilot-Integration-Id": "copilot-language-server"
+      },
+      "models": [
+        {
+          "id": "copilot-sonnet",
+          "upstream_name": "claude-sonnet-4.5"
+        },
+        {
+          "id": "claude-sonnet-4.5"
+        },
+        {
+          "id": "claude-sonnet-4",
+          "upstream_name": "claude-sonnet-4.5"
+        },
+        {
+          "id": "claude-sonnet-4-0",
+          "upstream_name": "claude-sonnet-4.5"
+        },
+        {
+          "id": "claude-opus-4.5"
+        },
+        {
+          "id": "claude-haiku-4.5"
+        },
+        {
+          "id": "copilot-opus",
+          "upstream_name": "claude-opus-4.5"
+        },
+        {
+          "id": "copilot-haiku",
+          "upstream_name": "claude-haiku-4.5"
+        }
+      ],
+      "models_ttl_seconds": 300
+    }
+  }
+}
