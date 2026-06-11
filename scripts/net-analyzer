@@ -123,6 +123,8 @@ OUI_FALLBACK = {
     "00:1a:11": "Google, Inc.",
 }
 
+BASELINE_PATH = CACHE_DIR / "baseline.json"
+
 SSDP_MX = 2
 SSDP_GROUP = ("239.255.255.250", 1900)
 SSDP_M_SEARCH = (
@@ -525,7 +527,24 @@ def _parse_os_from_xml(xml_text: str) -> Optional[str]:
 # ---------- output ------------------------------------------------------------
 
 
-def build_table(hosts: list[Host], *, wide: bool) -> Table:
+def build_table(
+    hosts: list[Host],
+    *,
+    wide: bool,
+    unknown: set[str] | None = None,
+    changed: set[str] | None = None,
+) -> Table:
+    unknown = unknown or set()
+    changed = changed or set()
+
+    def _row_style(h: Host) -> str:
+        key = _baseline_key(h)
+        if key in unknown:
+            return "bold red"
+        if key in changed:
+            return "yellow"
+        return ""
+
     if wide:
         table = Table(box=box.SIMPLE_HEAVY, show_lines=False, expand=False)
         for col in (
@@ -554,6 +573,7 @@ def build_table(hosts: list[Host], *, wide: bool) -> Table:
                 h.friendly_name or "-",
                 h.manufacturer or "-",
                 h.model or "-",
+                style=_row_style(h),
             )
         return table
 
@@ -573,6 +593,7 @@ def build_table(hosts: list[Host], *, wide: bool) -> Table:
             h.os_ or "-",
             services,
             h.friendly_name or "-",
+            style=_row_style(h),
         )
     return table
 
@@ -602,6 +623,60 @@ def to_json(hosts: list[Host], cidr: str) -> str:
         ],
     }
     return json.dumps(payload, indent=2)
+
+
+# ---------- baseline ----------------------------------------------------------
+
+
+def _load_baseline() -> dict:
+    if not BASELINE_PATH.exists():
+        return {}
+    try:
+        data = json.loads(BASELINE_PATH.read_text())
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _save_baseline(baseline: dict) -> None:
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        BASELINE_PATH.write_text(json.dumps(baseline, indent=2))
+    except OSError as exc:
+        console.print(f"[yellow][warn][/] could not save baseline: {exc}")
+
+
+def _baseline_key(h: Host) -> str:
+    return h.mac if h.mac else f"ip:{h.ip}"
+
+
+def _update_baseline(hosts: list[Host], baseline: dict) -> None:
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for h in hosts:
+        key = _baseline_key(h)
+        entry = baseline.get(key, {})
+        baseline[key] = {
+            "ip": h.ip,
+            "hostname": h.hostname,
+            "vendor": h.vendor,
+            "first_seen": entry.get("first_seen", now),
+        }
+
+
+def check_suspicious(
+    hosts: list[Host], baseline: dict
+) -> tuple[set[str], set[str]]:
+    """Return (unknown_keys, changed_ip_keys)."""
+    unknown: set[str] = set()
+    changed: set[str] = set()
+    for h in hosts:
+        key = _baseline_key(h)
+        entry = baseline.get(key)
+        if entry is None:
+            unknown.add(key)
+        elif h.mac and entry.get("ip") != h.ip:
+            changed.add(key)
+    return unknown, changed
 
 
 # ---------- helpers -----------------------------------------------------------
@@ -639,6 +714,9 @@ def main() -> int:
     parser.add_argument("--no-cache", action="store_true", help="ignore the on-disk vendor cache for this run")
     parser.add_argument("--clear-cache", action="store_true", help="wipe the vendor cache and exit")
     parser.add_argument("--quiet", action="store_true", help="suppress progress messages on stderr")
+    parser.add_argument("--learn", action="store_true", help="add all current hosts to the baseline, then continue")
+    parser.add_argument("--no-baseline", action="store_true", help="skip baseline comparison for this run")
+    parser.add_argument("--reset-baseline", action="store_true", help="wipe the baseline file and exit")
     args = parser.parse_args()
 
     if args.quiet:
@@ -650,6 +728,14 @@ def main() -> int:
             console.print(f"[green]cleared[/] {CACHE_PATH}")
         except FileNotFoundError:
             console.print(f"[dim]no cache at {CACHE_PATH}[/]")
+        return 0
+
+    if args.reset_baseline:
+        try:
+            BASELINE_PATH.unlink()
+            console.print(f"[green]cleared[/] {BASELINE_PATH}")
+        except FileNotFoundError:
+            console.print(f"[dim]no baseline at {BASELINE_PATH}[/]")
         return 0
 
     is_root = hasattr(os, "geteuid") and os.geteuid() == 0
@@ -749,11 +835,39 @@ def main() -> int:
 
     hosts_sorted = sorted(by_ip.values(), key=_sort_key)
 
+    # baseline comparison
+    unknown_keys: set[str] = set()
+    changed_ip_keys: set[str] = set()
+    if not args.no_baseline:
+        first_run = not BASELINE_PATH.exists()
+        baseline = _load_baseline()
+        if args.learn or first_run:
+            _update_baseline(hosts_sorted, baseline)
+            _save_baseline(baseline)
+            if first_run:
+                console.print(
+                    f"[green][baseline][/] first run — saved {len(hosts_sorted)} device(s) as known. "
+                    "Re-run with [bold]--learn[/] to add new devices."
+                )
+        else:
+            unknown_keys, changed_ip_keys = check_suspicious(hosts_sorted, baseline)
+
     if args.json:
         sys.stdout.write(to_json(hosts_sorted, cidr) + "\n")
     else:
         out_console = Console()
-        out_console.print(build_table(hosts_sorted, wide=args.wide))
+        out_console.print(
+            build_table(hosts_sorted, wide=args.wide, unknown=unknown_keys, changed=changed_ip_keys)
+        )
+        if unknown_keys or changed_ip_keys:
+            parts = []
+            if unknown_keys:
+                parts.append(f"[bold red]{len(unknown_keys)} unknown device(s)[/]")
+            if changed_ip_keys:
+                parts.append(f"[yellow]{len(changed_ip_keys)} device(s) with changed IP[/]")
+            out_console.print(
+                " · ".join(parts) + " — run with [bold]--learn[/] to trust them."
+            )
 
     if not args.no_cache:
         _save_vendor_cache(cache)
