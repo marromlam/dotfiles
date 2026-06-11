@@ -1,23 +1,4 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+font-family = JetBrainsMono Nerd Font Mono
 
 # Window decorations
 gtk-titlebar = false
@@ -28,5 +9,5 @@ keybind = ctrl+shift+m=toggle_fullscreen
 # Use Alt+Right-click to resize window
 
 # BEGIN_GHOSTTY_THEME
-theme = dracula-pro
+# theme = dracula-pro
 # END_GHOSTTY_THEME

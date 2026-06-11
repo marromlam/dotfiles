@@ -6,9 +6,13 @@ result = subprocess.run(
     ["gh", "api", "/copilot_internal/user"],
     capture_output=True, text=True
 )
+if result.returncode != 0:
+    print(result.stderr.strip() or "gh api failed")
+    raise SystemExit(1)
 d = json.loads(result.stdout)
 p = d["quota_snapshots"]["premium_interactions"]
 
-print(f"Plan:             {d['copilot_plan']} ({d['organization_login_list'][0]})")
+org = d["organization_login_list"][0] if d["organization_login_list"] else "individual"
+print(f"Plan:             {d['copilot_plan']} ({org})")
 print(f"Premium requests: {p['remaining']} / {p['entitlement']} remaining ({p['percent_remaining']}%)")
 print(f"Resets:           {d['quota_reset_date_utc']}")
