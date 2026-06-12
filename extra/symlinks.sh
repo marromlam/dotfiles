@@ -31,6 +31,7 @@ FORCE=0
 # ------------------------------------------------------------------------------
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
 mkdir -p ~/Projects/work ~/Projects/personal
+mkdir -p ~/Workspaces/work ~/Workspaces/personal
 
 # ------------------------------------------------------------------------------
 # On --force: remove any existing symlinks for files in the stow package

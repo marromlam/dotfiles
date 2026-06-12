@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-DOTFILES="${DOTFILES:-$HOME/Projects/personal/dotfiles}"
+DOTFILES="${DOTFILES:-$HOME/Workspaces/personal/dotfiles}"
 REPO_URL="https://github.com/marromlam/dotfiles.git"
 
 step() { echo; echo "==> $*"; }
@@ -60,7 +60,7 @@ install_dependencies() {
 	local tmp_script
 	tmp_script="$(mktemp /tmp/install_dependencies.XXXXXX.sh)"
 	step "Downloading install_dependencies.sh"
-	curl -fsSL "$raw_url" -o "$tmp_script"
+	curl -fsSL -H "Cache-Control: no-cache" -H "Pragma: no-cache" "$raw_url" -o "$tmp_script"
 	chmod +x "$tmp_script"
 	step "Running install_dependencies.sh"
 	bash "$tmp_script"
@@ -94,5 +94,13 @@ install_dependencies
 clone_dotfiles
 
 step "Running make install setup"
-cd "$DOTFILES"
-make install setup
+# Run in a subshell so the sourced Homebrew env is fully applied before make.
+DOTFILES="$DOTFILES" bash -c '
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+  cd "$DOTFILES"
+  exec make install setup
+'

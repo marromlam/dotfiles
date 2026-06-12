@@ -24,7 +24,7 @@ homebrew:
 	@command -v brew >/dev/null || /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 install:
-	bash ${FC}/extra/symlinks.sh
+	bash $(CURDIR)/extra/symlinks.sh
 	@if [[ "$$(uname)" == "Darwin" ]]; then \
 	  rm -rf ~/Downloads; \
 	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \
