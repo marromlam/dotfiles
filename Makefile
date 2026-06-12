@@ -26,8 +26,14 @@ homebrew:
 install:
 	bash $(CURDIR)/extra/symlinks.sh
 	@if [[ "$$(uname)" == "Darwin" ]]; then \
-	  rm -rf ~/Downloads; \
-	  ln -sf "${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads" ~/Downloads; \
+	  icloud_dl="${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads"; \
+	  if [[ -L ~/Downloads ]]; then \
+	    echo "  ~/Downloads already a symlink, skipping"; \
+	  elif rm -rf ~/Downloads 2>/dev/null; then \
+	    ln -sfn "$$icloud_dl" ~/Downloads && echo "  link  ~/Downloads -> $$icloud_dl"; \
+	  else \
+	    echo "  warning: could not replace ~/Downloads (permission denied), skipping"; \
+	  fi; \
 	fi
 
 setup:
