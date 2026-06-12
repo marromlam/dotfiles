@@ -13,9 +13,9 @@ test:
 	${HOME}/.dotfiles/tests/tmux/sanity.sh
 
 macos:
-	${FC}/extra/macos/macos_settings.sh
+	bash $(CURDIR)/extra/macos/macos_settings.sh
 	# now we change the keymaps
-	bash extra/keyboard.sh
+	bash $(CURDIR)/extra/keyboard.sh
 
 update:
 	brew update && brew upgrade && brew update && brew upgrade && brew cleanup
