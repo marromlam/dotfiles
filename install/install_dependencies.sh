@@ -415,7 +415,7 @@ fi
 
 install_pdfcat
 install_rust
-install_sonarqube
+# install_sonarqube
 brew_install_once "pixi"
 
 DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
