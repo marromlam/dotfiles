@@ -29,10 +29,10 @@ install:
 	  icloud_dl="${HOME}/Library/Mobile Documents/com~apple~CloudDocs/Downloads"; \
 	  if [[ -L ~/Downloads ]]; then \
 	    echo "  ~/Downloads already a symlink, skipping"; \
-	  elif rm -rf ~/Downloads 2>/dev/null; then \
+	  elif rm -rf ~/Downloads 2>/dev/null || sudo rm -rf ~/Downloads; then \
 	    ln -sfn "$$icloud_dl" ~/Downloads && echo "  link  ~/Downloads -> $$icloud_dl"; \
 	  else \
-	    echo "  warning: could not replace ~/Downloads (permission denied), skipping"; \
+	    echo "  error: could not replace ~/Downloads even with sudo"; \
 	  fi; \
 	fi
 
