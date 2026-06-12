@@ -94,13 +94,11 @@ install_dependencies
 clone_dotfiles
 
 step "Running make install setup"
-# Run in a subshell so the sourced Homebrew env is fully applied before make.
-DOTFILES="$DOTFILES" bash -c '
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  fi
-  cd "$DOTFILES"
-  exec make install setup
-'
+# Ensure Homebrew tools (stow, etc.) are on PATH before make runs.
+if [[ -x /opt/homebrew/bin/brew ]]; then
+	export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+elif [[ -x /usr/local/bin/brew ]]; then
+	export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+fi
+cd "$DOTFILES"
+make install setup
