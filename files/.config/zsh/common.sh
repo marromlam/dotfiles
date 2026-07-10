@@ -8,6 +8,11 @@ export PYTHONPATH="$HOME/.config/kitty/mplbackend":$PYTHONPATH
 # LaTeX inputs
 export TEXINPUTS=".:~/beamer-compostela:"
 
+# MCP Chrome defaults (WSL -> Windows Chrome)
+export MCP_CHROME_HEADLESS=true
+export MCP_CHROME_AUTOLAUNCH=true
+export CDP_PORT=9222
+
 # ==============================================================================
 # PATH Configuration
 # ==============================================================================
