@@ -5,7 +5,11 @@
       "args": ["mcp-server"]
     },
     "atlassian": {
-      "command": "/home/mromerol/.dotfiles/scripts/mcp-atlassian-wrapper.sh",
+      "command": "$HOME/.dotfiles/scripts/mcp-atlassian-wrapper.sh",
+      "args": []
+    },
+    "chrome-devtools": {
+      "command": "$HOME/.dotfiles/scripts/mcp-chrome-wrapper.sh",
       "args": []
     }
   }

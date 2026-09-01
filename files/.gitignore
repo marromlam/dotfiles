@@ -76,3 +76,4 @@ bin/
 # vim:filetype=conf
 
 **/.claude/settings.local.json
+.claude

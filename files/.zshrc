@@ -363,6 +363,11 @@ export BROWSER="$HOMEBREW_PREFIX/bin/browsh"
 export DISPLAY=:0
 command -v bat >/dev/null || export BAT_THEME="base16"
 
+# MCP Chrome defaults (WSL -> Windows Chrome)
+export MCP_CHROME_HEADLESS=true
+export MCP_CHROME_AUTOLAUNCH=true
+export CDP_PORT=9222
+
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_TMUX=0 # don't open a separate tmux split
