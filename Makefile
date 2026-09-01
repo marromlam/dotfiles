@@ -37,7 +37,7 @@ install:
 	fi
 
 setup:
-	bash ${FC}/extra/setup.sh
+	bash $(CURDIR)/extra/setup.sh
 	chmod 600 ${HOME}/.ssh/github ${HOME}/.ssh/github_work ${HOME}/.ssh/id_rsa ${HOME}/.ssh/igfae_rsa 2>/dev/null || true
 
 projects:
@@ -45,7 +45,7 @@ projects:
 	stow --ignore ".DS_Store" --target="${HOME}/Projects/icloud" --dir="${HOME}/Library/Mobile Documents/com~apple~CloudDocs/" Projects
 
 brew:
-	bash ${FC}/install/install_dependencies.sh
+	bash $(CURDIR)/install/install_dependencies.sh
 	python3 -m pip install pynvim neovim-remote mcphub[all] --upgrade
 	npm install -g mcp-hub@latest
 
@@ -112,12 +112,6 @@ private:
 	stow --ignore ".DS_Store" --target="${HOME}" --dir="${FC}/private" files
 	chmod 600 ${HOME}/.ssh/*
 
-zsh-plugins:
-	git clone https://github.com/djui/alias-tips.git ${HOMEBREW_PREFIX}/Cellar/alias-tips; \
-	mkdir -p ${HOMEBREW_PREFIX}/share/zsh-alias-tips; \
-	ln -sf ${HOMEBREW_PREFIX}/Cellar/alias-tips/alias-tips.plugin.zsh ${HOMEBREW_PREFIX}/share/zsh-alias-tips
-	
-
 MASON := $(HOME)/.local/share/nvim/mason/bin
 
 fmt:
@@ -130,4 +124,4 @@ commit: fmt
 	git add -u
 	git commit
 
-.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private zsh-plugins test fmt commit
+.PHONY: all homebrew install setup brew macos kitty nvim vim tmux fzf-marks private test fmt commit

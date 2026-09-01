@@ -1,12 +1,4 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = [
-#   "rich>=13",
-#   "zeroconf>=0.131",
-#   "requests>=2.31",
-# ]
-# ///
+#!/usr/bin/env python3
 """LAN device scanner inspired by the iOS Net Analyzer app.
 
 Lists hosts on the current network with hostname, MAC, vendor, advertised
@@ -15,14 +7,41 @@ Bonjour services, SSDP/UPnP identity, and (optionally) OS fingerprint.
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+
+# --- self-install bootstrap (plain pip, no uv) --------------------------------
+_DEPS = {
+    "requests": "requests",
+    "rich": "rich",
+    "zeroconf": "zeroconf",
+}
+
+
+def _bootstrap() -> None:
+    missing = []
+    for mod, pkg in _DEPS.items():
+        try:
+            __import__(mod)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        print(f"[net-analyzer] installing missing packages: {' '.join(missing)}", file=sys.stderr)
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "--quiet", "--user", *missing]
+        )
+        os.execv(sys.executable, [sys.executable, *sys.argv])
+
+
+_bootstrap()
+# ------------------------------------------------------------------------------
+
 import argparse
 import ipaddress
 import json
-import os
 import re
 import socket
-import subprocess
-import sys
 import time
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -32,16 +51,18 @@ from pathlib import Path
 from typing import Optional
 
 import requests
+from rich import box
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from rich import box
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 # ---------- constants ---------------------------------------------------------
 
 MACVENDORS_URL = "https://api.macvendors.com/{}"
-CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "net-analyzer"
+CACHE_DIR = (
+    Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "net-analyzer"
+)
 CACHE_PATH = CACHE_DIR / "vendors.json"
 CACHE_TTL_SECONDS = 30 * 24 * 3600
 
@@ -94,6 +115,30 @@ SERVICE_LABELS = {
     "_amzn-wplay._tcp.local.": "Amazon",
     "_nvstream._tcp.local.": "NVIDIA",
 }
+
+PORT_LABELS: dict[int, str] = {
+    21: "FTP",
+    22: "SSH",
+    23: "Telnet",
+    53: "DNS",
+    80: "HTTP",
+    443: "HTTPS",
+    445: "SMB",
+    548: "AFP",
+    554: "RTSP",
+    631: "IPP",
+    1883: "MQTT",
+    3389: "RDP",
+    5000: "UPnP",
+    5900: "VNC",
+    7000: "AirPlay",
+    8080: "HTTP-alt",
+    8443: "HTTPS-alt",
+    8888: "HTTP-dev",
+    9100: "Print",
+    32400: "Plex",
+}
+HOME_PORTS: list[int] = sorted(PORT_LABELS)
 
 # OUI fallback so cold-start (no network for macvendors) still gives useful output.
 OUI_FALLBACK = {
@@ -153,6 +198,11 @@ class Host:
     manufacturer: Optional[str] = None
     model: Optional[str] = None
     ssdp_location: Optional[str] = None
+    open_ports: list[int] = field(default_factory=list)
+    ttl: Optional[int] = None
+    latency_ms: Optional[float] = None
+    device_type: Optional[str] = None
+    mdns_txt: dict[str, str] = field(default_factory=dict)
 
 
 # ---------- default route / CIDR ---------------------------------------------
@@ -162,7 +212,9 @@ def detect_default_cidr() -> tuple[str, Optional[str]]:
     """Return (cidr, local_ip). Falls back to 192.168.1.0/24 with a warning."""
     try:
         if sys.platform == "darwin":
-            out = subprocess.check_output(["route", "-n", "get", "default"], text=True, timeout=3)
+            out = subprocess.check_output(
+                ["route", "-n", "get", "default"], text=True, timeout=3
+            )
             iface_m = re.search(r"interface:\s*(\S+)", out)
             if not iface_m:
                 raise RuntimeError("no default interface")
@@ -199,11 +251,56 @@ def detect_default_cidr() -> tuple[str, Optional[str]]:
 
 # ---------- nmap host discovery ----------------------------------------------
 
+_PING_TTL_RE = re.compile(r"\bttl=(\d+)\b", re.IGNORECASE)
+_PING_TIME_RE = re.compile(r"\btime=([\d.]+)\s*ms\b", re.IGNORECASE)
+
+
+def _ping_one(ip: str) -> tuple[Optional[str], Optional[int], Optional[float]]:
+    """Ping ip once. Returns (ip_if_alive, ttl, latency_ms) or (None, None, None)."""
+    if sys.platform == "darwin":
+        args = ["ping", "-c", "1", "-t", "1", ip]
+    else:
+        args = ["ping", "-c", "1", "-W", "1", ip]
+    try:
+        r = subprocess.run(args, capture_output=True, text=True, timeout=3)
+        if r.returncode != 0:
+            return None, None, None
+        ttl: Optional[int] = None
+        latency: Optional[float] = None
+        m = _PING_TTL_RE.search(r.stdout)
+        if m:
+            ttl = int(m.group(1))
+        m2 = _PING_TIME_RE.search(r.stdout)
+        if m2:
+            latency = float(m2.group(1))
+        return ip, ttl, latency
+    except (subprocess.TimeoutExpired, OSError):
+        return None, None, None
+
+
+def ping_sweep(cidr: str) -> list[Host]:
+    """Pure-Python fallback host discovery via parallel ICMP pings."""
+    try:
+        network = ipaddress.ip_network(cidr, strict=False)
+    except ValueError:
+        return []
+    host_ips = [str(ip) for ip in network.hosts()]
+    if len(host_ips) > 1024:
+        console.print("[yellow][warn][/] large network; ping sweep limited to first 1024 hosts")
+        host_ips = host_ips[:1024]
+    console.print(f"[dim]ping sweep of {len(host_ips)} addresses (nmap unavailable)[/]")
+    live: list[Host] = []
+    with ThreadPoolExecutor(max_workers=64) as pool:
+        for ip, ttl, latency in pool.map(_ping_one, host_ips):
+            if ip is not None:
+                live.append(Host(ip=ip, ttl=ttl, latency_ms=latency))
+    return live
+
 
 def nmap_ping_scan(cidr: str, *, unprivileged: bool) -> list[Host]:
     if not _have("nmap"):
-        console.print("[yellow][warn][/] nmap not found; skipping active host discovery")
-        return []
+        console.print("[yellow][warn][/] nmap not found; falling back to ping sweep")
+        return ping_sweep(cidr)
     args = ["nmap", "-sn", "-oX", "-"]
     if unprivileged:
         args.append("--unprivileged")
@@ -349,9 +446,12 @@ def lookup_vendor(mac: str, cache: dict, *, use_cache: bool = True) -> Optional[
 
 
 class _MDNSCollector(ServiceListener):
-    def __init__(self, zc: Zeroconf, sink: dict[str, set[str]]) -> None:
+    def __init__(
+        self, zc: Zeroconf, sink: dict[str, set[str]], meta: dict[str, dict]
+    ) -> None:
         self.zc = zc
         self.sink = sink
+        self.meta = meta  # ip -> {"instance": str, "hostname": str, "txt": dict}
 
     def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:  # noqa: D401
         try:
@@ -368,6 +468,24 @@ class _MDNSCollector(ServiceListener):
             if ":" in addr:  # skip IPv6 for now
                 continue
             self.sink.setdefault(addr, set()).add(type_)
+            m = self.meta.setdefault(addr, {})
+            if "instance" not in m and "._" in name:
+                m["instance"] = name.split("._")[0]
+            if "hostname" not in m and info.server:
+                raw = info.server.rstrip(".")
+                if raw.lower().endswith(".local"):
+                    raw = raw[:-6]
+                if raw:
+                    m["hostname"] = raw
+            if "txt" not in m and info.properties:
+                m["txt"] = {
+                    (k.decode("utf-8", errors="ignore") if isinstance(k, bytes) else k): (
+                        v.decode("utf-8", errors="ignore")
+                        if isinstance(v, bytes)
+                        else str(v) if v is not None else ""
+                    )
+                    for k, v in info.properties.items()
+                }
 
     def update_service(self, *args, **kwargs) -> None:
         return
@@ -376,15 +494,16 @@ class _MDNSCollector(ServiceListener):
         return
 
 
-def discover_mdns(timeout: float) -> dict[str, set[str]]:
+def discover_mdns(timeout: float) -> tuple[dict[str, set[str]], dict[str, dict]]:
     sink: dict[str, set[str]] = {}
+    meta: dict[str, dict] = {}
     try:
         zc = Zeroconf()
     except OSError as exc:
         console.print(f"[yellow][warn][/] zeroconf init failed ({exc}); skipping mDNS")
-        return sink
+        return sink, meta
     try:
-        listener = _MDNSCollector(zc, sink)
+        listener = _MDNSCollector(zc, sink, meta)
         browsers = [ServiceBrowser(zc, t, listener) for t in MDNS_SERVICE_TYPES]
         time.sleep(timeout)
         for b in browsers:
@@ -397,7 +516,7 @@ def discover_mdns(timeout: float) -> dict[str, set[str]]:
             zc.close()
         except Exception:
             pass
-    return sink
+    return sink, meta
 
 
 # ---------- SSDP --------------------------------------------------------------
@@ -446,7 +565,9 @@ def discover_ssdp(timeout: float, local_ip: Optional[str]) -> dict[str, dict]:
 
 
 def _http_header(text: str, name: str) -> Optional[str]:
-    pat = re.compile(rf"^{re.escape(name)}\s*:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE)
+    pat = re.compile(
+        rf"^{re.escape(name)}\s*:\s*(.+?)\s*$", re.IGNORECASE | re.MULTILINE
+    )
     m = pat.search(text)
     return m.group(1) if m else None
 
@@ -469,6 +590,114 @@ def fetch_upnp_descriptor(location: str) -> dict[str, Optional[str]]:
         "manufacturer": grab("manufacturer"),
         "model": grab("modelName"),
     }
+
+
+# ---------- network probes ----------------------------------------------------
+
+
+def _os_from_ttl(ttl: int) -> str:
+    if ttl <= 64:
+        return "Linux/macOS"
+    if ttl <= 128:
+        return "Windows"
+    return "Router/Embedded"
+
+
+def _infer_device_type(h: Host) -> Optional[str]:
+    svc = h.mdns_services
+    ports = set(h.open_ports)
+    vendor = (h.vendor or "").lower()
+    txt_md = (h.mdns_txt.get("md") or h.mdns_txt.get("model") or "").lower()
+
+    if "_amzn-wplay._tcp.local." in svc:
+        return "Fire TV"
+    if "_googlecast._tcp.local." in svc:
+        return "Chromecast" if "chromecast" in txt_md else "Cast"
+    if "_airplay._tcp.local." in svc:
+        if "appletv" in txt_md or "apple tv" in txt_md:
+            return "Apple TV"
+        return "HomePod" if "homepod" in txt_md else "AirPlay"
+    if "_sonos._tcp.local." in svc:
+        return "Sonos"
+    if "_printer._tcp.local." in svc or "_ipp._tcp.local." in svc or 9100 in ports:
+        return "Printer"
+    if "_homekit._tcp.local." in svc or "_hap._tcp.local." in svc:
+        return "HomeKit"
+    if 53 in ports and (80 in ports or 443 in ports) and 22 not in ports:
+        return "Router"
+    if "raspberry" in vendor:
+        return "Raspberry Pi"
+    if "apple" in vendor:
+        return "iPhone/iPad" if "_companion-link._tcp.local." in svc else "Apple"
+    if 445 in ports and 548 in ports:
+        return "NAS"
+    if 445 in ports or 22 in ports:
+        return "Server"
+    if 1883 in ports:
+        return "IoT"
+    return None
+
+
+def reverse_dns(ip: str) -> Optional[str]:
+    socket.setdefaulttimeout(1.0)
+    try:
+        name, _, _ = socket.gethostbyaddr(ip)
+        return name if name != ip else None
+    except (socket.herror, socket.gaierror, OSError):
+        return None
+
+
+def tcp_scan(ip: str, ports: list[int], timeout: float = 0.5) -> list[int]:
+    """Non-root TCP connect scan. Returns list of open port numbers."""
+    open_ports: list[int] = []
+    for port in ports:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(timeout)
+                if s.connect_ex((ip, port)) == 0:
+                    open_ports.append(port)
+        except OSError:
+            pass
+    return open_ports
+
+
+# RFC 1002 Node Status Request for the wildcard name "*"
+_NETBIOS_REQUEST = (
+    b"\x82\x28\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00"
+    b"\x20"
+    b"CKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    b"\x00"
+    b"\x00\x21\x00\x01"
+)
+
+
+def netbios_name(ip: str) -> Optional[str]:
+    """Query NetBIOS Name Service (UDP 137) for the workstation name."""
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(1.0)
+        try:
+            sock.sendto(_NETBIOS_REQUEST, (ip, 137))
+            data, _ = sock.recvfrom(1024)
+        finally:
+            sock.close()
+    except OSError:
+        return None
+    try:
+        if len(data) < 57:
+            return None
+        num_names = data[56]
+        for i in range(num_names):
+            offset = 57 + i * 18
+            if offset + 16 > len(data):
+                break
+            raw = data[offset: offset + 15].decode("ascii", errors="ignore").rstrip()
+            name_type = data[offset + 15]
+            if name_type == 0x00 and raw:
+                return raw
+        return None
+    except (IndexError, UnicodeDecodeError):
+        return None
 
 
 # ---------- deep scan ---------------------------------------------------------
@@ -527,6 +756,22 @@ def _parse_os_from_xml(xml_text: str) -> Optional[str]:
 # ---------- output ------------------------------------------------------------
 
 
+def _fmt_ip(h: Host) -> str:
+    if h.latency_ms is not None:
+        return f"{h.ip} [dim]({h.latency_ms:.1f}ms)[/dim]"
+    return h.ip
+
+
+def _fmt_ports(h: Host) -> str:
+    if not h.open_ports:
+        return "-"
+    return ", ".join(PORT_LABELS.get(p, str(p)) for p in sorted(h.open_ports))
+
+
+def _best_name(h: Host) -> str:
+    return h.friendly_name or h.hostname or "-"
+
+
 def build_table(
     hosts: list[Host],
     *,
@@ -548,37 +793,39 @@ def build_table(
     if wide:
         table = Table(box=box.SIMPLE_HEAVY, show_lines=False, expand=False)
         for col in (
-            "IP",
-            "Hostname",
+            "IP / Latency",
+            "Name",
+            "Type",
             "MAC",
             "Vendor",
             "OS",
             "mDNS",
             "SSDP",
-            "Friendly",
             "Manufacturer",
             "Model",
+            "Ports",
         ):
             table.add_column(col, overflow="fold")
         for h in hosts:
             mdns = ", ".join(sorted(_label(s) for s in h.mdns_services)) or "-"
             table.add_row(
-                h.ip,
-                h.hostname or "-",
+                _fmt_ip(h),
+                _best_name(h),
+                h.device_type or "-",
                 h.mac or "-",
                 h.vendor or "-",
                 h.os_ or "-",
                 mdns,
                 "yes" if h.ssdp else "-",
-                h.friendly_name or "-",
                 h.manufacturer or "-",
                 h.model or "-",
+                _fmt_ports(h),
                 style=_row_style(h),
             )
         return table
 
     table = Table(box=box.SIMPLE_HEAVY, show_lines=False, expand=False)
-    for col in ("IP", "Hostname", "MAC", "Vendor", "OS", "Services", "Friendly Name"):
+    for col in ("IP / Latency", "Name", "Type", "MAC", "Vendor", "OS", "Services", "Ports"):
         table.add_column(col, overflow="fold")
     for h in hosts:
         labels = sorted({_label(s) for s in h.mdns_services})
@@ -586,20 +833,23 @@ def build_table(
             labels.append("+UPnP")
         services = ", ".join(labels) or "-"
         table.add_row(
-            h.ip,
-            h.hostname or "-",
+            _fmt_ip(h),
+            _best_name(h),
+            h.device_type or "-",
             h.mac or "-",
             h.vendor or "-",
             h.os_ or "-",
             services,
-            h.friendly_name or "-",
+            _fmt_ports(h),
             style=_row_style(h),
         )
     return table
 
 
 def _label(service_type: str) -> str:
-    return SERVICE_LABELS.get(service_type, service_type.rstrip(".").split(".")[0].lstrip("_"))
+    return SERVICE_LABELS.get(
+        service_type, service_type.rstrip(".").split(".")[0].lstrip("_")
+    )
 
 
 def to_json(hosts: list[Host], cidr: str) -> str:
@@ -618,6 +868,11 @@ def to_json(hosts: list[Host], cidr: str) -> str:
                 "friendly_name": h.friendly_name,
                 "manufacturer": h.manufacturer,
                 "model": h.model,
+                "open_ports": h.open_ports,
+                "ttl": h.ttl,
+                "latency_ms": h.latency_ms,
+                "device_type": h.device_type,
+                "mdns_txt": h.mdns_txt,
             }
             for h in hosts
         ],
@@ -663,9 +918,7 @@ def _update_baseline(hosts: list[Host], baseline: dict) -> None:
         }
 
 
-def check_suspicious(
-    hosts: list[Host], baseline: dict
-) -> tuple[set[str], set[str]]:
+def check_suspicious(hosts: list[Host], baseline: dict) -> tuple[set[str], set[str]]:
     """Return (unknown_keys, changed_ip_keys)."""
     unknown: set[str] = set()
     changed: set[str] = set()
@@ -703,20 +956,85 @@ def main() -> int:
         description="Scan the local network and list devices, services, and identity (iOS Net Analyzer-style)."
     )
     parser.add_argument("cidr", nargs="?", help="CIDR to scan (default: auto-detect)")
-    parser.add_argument("--json", action="store_true", help="emit JSON instead of a table")
-    parser.add_argument("--wide", action="store_true", help="show all 10 columns (parity with old bash version)")
-    parser.add_argument("--no-vendor", action="store_true", help="skip MAC vendor lookup")
-    parser.add_argument("--identify", dest="identify", action="store_true", default=True, help="run mDNS + SSDP discovery (default)")
-    parser.add_argument("--no-identify", dest="identify", action="store_false", help="skip mDNS + SSDP discovery")
-    parser.add_argument("--deep", action="store_true", help="run nmap OS fingerprint (requires sudo)")
-    parser.add_argument("--timeout-mdns", type=float, default=8.0, help="mDNS browse duration in seconds (default: 8)")
-    parser.add_argument("--timeout-ssdp", type=float, default=5.0, help="SSDP listen duration in seconds (default: 5)")
-    parser.add_argument("--no-cache", action="store_true", help="ignore the on-disk vendor cache for this run")
-    parser.add_argument("--clear-cache", action="store_true", help="wipe the vendor cache and exit")
-    parser.add_argument("--quiet", action="store_true", help="suppress progress messages on stderr")
-    parser.add_argument("--learn", action="store_true", help="add all current hosts to the baseline, then continue")
-    parser.add_argument("--no-baseline", action="store_true", help="skip baseline comparison for this run")
-    parser.add_argument("--reset-baseline", action="store_true", help="wipe the baseline file and exit")
+    parser.add_argument(
+        "--json", action="store_true", help="emit JSON instead of a table"
+    )
+    parser.add_argument(
+        "--wide",
+        action="store_true",
+        help="show all 10 columns (parity with old bash version)",
+    )
+    parser.add_argument(
+        "--no-vendor", action="store_true", help="skip MAC vendor lookup"
+    )
+    parser.add_argument(
+        "--identify",
+        dest="identify",
+        action="store_true",
+        default=True,
+        help="run mDNS + SSDP discovery (default)",
+    )
+    parser.add_argument(
+        "--no-identify",
+        dest="identify",
+        action="store_false",
+        help="skip mDNS + SSDP discovery",
+    )
+    parser.add_argument(
+        "--deep", action="store_true", help="run nmap OS fingerprint (requires sudo)"
+    )
+    parser.add_argument(
+        "--timeout-mdns",
+        type=float,
+        default=8.0,
+        help="mDNS browse duration in seconds (default: 8)",
+    )
+    parser.add_argument(
+        "--timeout-ssdp",
+        type=float,
+        default=5.0,
+        help="SSDP listen duration in seconds (default: 5)",
+    )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="ignore the on-disk vendor cache for this run",
+    )
+    parser.add_argument(
+        "--clear-cache", action="store_true", help="wipe the vendor cache and exit"
+    )
+    parser.add_argument(
+        "--quiet", action="store_true", help="suppress progress messages on stderr"
+    )
+    parser.add_argument(
+        "--learn",
+        action="store_true",
+        help="add all current hosts to the baseline, then continue",
+    )
+    parser.add_argument(
+        "--no-baseline",
+        action="store_true",
+        help="skip baseline comparison for this run",
+    )
+    parser.add_argument(
+        "--reset-baseline", action="store_true", help="wipe the baseline file and exit"
+    )
+    parser.add_argument(
+        "--no-rdns",
+        action="store_true",
+        help="skip reverse DNS and NetBIOS hostname resolution",
+    )
+    parser.add_argument(
+        "--no-ports",
+        action="store_true",
+        help="skip TCP port scan",
+    )
+    parser.add_argument(
+        "--port-timeout",
+        type=float,
+        default=0.5,
+        help="TCP connect timeout per port in seconds (default: 0.5)",
+    )
     args = parser.parse_args()
 
     if args.quiet:
@@ -740,7 +1058,9 @@ def main() -> int:
 
     is_root = hasattr(os, "geteuid") and os.geteuid() == 0
     if args.deep and not is_root:
-        console.print("[yellow][warn][/] --deep requires root; ignoring. Re-run with sudo.")
+        console.print(
+            "[yellow][warn][/] --deep requires root; ignoring. Re-run with sudo."
+        )
         args.deep = False
 
     cidr = args.cidr
@@ -750,6 +1070,10 @@ def main() -> int:
     console.print(f"[bold]Scanning[/] {cidr} …")
 
     hosts = nmap_ping_scan(cidr, unprivileged=not is_root)
+
+    for h in hosts:
+        if h.ttl is not None and h.os_ is None:
+            h.os_ = _os_from_ttl(h.ttl)
 
     arp = read_arp_table()
     by_ip: dict[str, Host] = {h.ip: h for h in hosts}
@@ -764,25 +1088,58 @@ def main() -> int:
             except ValueError:
                 continue
 
-    # parallel: vendor + SSDP
+    # parallel: vendor + rDNS + TCP scan + SSDP
     cache = {} if args.no_cache else _load_vendor_cache()
 
     ssdp_results: dict[str, dict] = {}
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        vendor_futures = {}
+    with ThreadPoolExecutor(max_workers=32) as pool:
+        vendor_futures: dict = {}
+        rdns_futures: dict = {}
+        tcp_futures: dict = {}
+
         if not args.no_vendor:
             for h in by_ip.values():
                 if h.mac:
-                    vendor_futures[pool.submit(lookup_vendor, h.mac, cache, use_cache=not args.no_cache)] = h
+                    vendor_futures[
+                        pool.submit(lookup_vendor, h.mac, cache, use_cache=not args.no_cache)
+                    ] = h
+
+        if not args.no_rdns:
+            for h in by_ip.values():
+                if not h.hostname:
+                    rdns_futures[pool.submit(reverse_dns, h.ip)] = h
+
+        if not args.no_ports:
+            for h in by_ip.values():
+                tcp_futures[pool.submit(tcp_scan, h.ip, HOME_PORTS, args.port_timeout)] = h
+
         ssdp_future = None
         if args.identify:
             ssdp_future = pool.submit(discover_ssdp, args.timeout_ssdp, local_ip)
+
         for fut in as_completed(vendor_futures):
             host = vendor_futures[fut]
             try:
                 host.vendor = fut.result()
             except Exception:
                 pass
+
+        for fut in as_completed(rdns_futures):
+            host = rdns_futures[fut]
+            try:
+                name = fut.result()
+                if name and not host.hostname:
+                    host.hostname = name
+            except Exception:
+                pass
+
+        for fut in as_completed(tcp_futures):
+            host = tcp_futures[fut]
+            try:
+                host.open_ports = fut.result() or []
+            except Exception:
+                pass
+
         if ssdp_future:
             ssdp_results = ssdp_future.result()
 
@@ -811,13 +1168,13 @@ def main() -> int:
                     desc = fut.result()
                 except Exception:
                     desc = {}
-                host.friendly_name = desc.get("friendly_name")
-                host.manufacturer = desc.get("manufacturer")
-                host.model = desc.get("model")
+                host.friendly_name = desc.get("friendly_name") or host.friendly_name
+                host.manufacturer = desc.get("manufacturer") or host.manufacturer
+                host.model = desc.get("model") or host.model
 
     # mDNS pass (zeroconf runs its own threads)
     if args.identify:
-        mdns_results = discover_mdns(args.timeout_mdns)
+        mdns_results, mdns_meta = discover_mdns(args.timeout_mdns)
         for ip, types in mdns_results.items():
             host = by_ip.get(ip)
             if host is None:
@@ -829,9 +1186,52 @@ def main() -> int:
                 host = Host(ip=ip)
                 by_ip[ip] = host
             host.mdns_services |= types
+            m = mdns_meta.get(ip, {})
+            if not host.hostname and m.get("hostname"):
+                host.hostname = m["hostname"]
+            if not host.friendly_name and m.get("instance"):
+                host.friendly_name = m["instance"]
+            if not host.mdns_txt and m.get("txt"):
+                host.mdns_txt = m["txt"]
+            if not host.model and m.get("txt"):
+                host.model = m["txt"].get("md") or m["txt"].get("model") or host.model
+
+    # rDNS for any hosts added after the main parallel block (SSDP/mDNS discoveries)
+    if not args.no_rdns:
+        late = [h for h in by_ip.values() if not h.hostname]
+        if late:
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                late_futs = {pool.submit(reverse_dns, h.ip): h for h in late}
+                for fut in as_completed(late_futs):
+                    host = late_futs[fut]
+                    try:
+                        name = fut.result()
+                        if name and not host.hostname:
+                            host.hostname = name
+                    except Exception:
+                        pass
+
+    # NetBIOS fallback for hosts still missing a hostname
+    if not args.no_rdns:
+        nb_targets = [h for h in by_ip.values() if not h.hostname]
+        if nb_targets:
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                nb_futures = {pool.submit(netbios_name, h.ip): h for h in nb_targets}
+                for fut in as_completed(nb_futures):
+                    host = nb_futures[fut]
+                    try:
+                        name = fut.result()
+                        if name and not host.hostname:
+                            host.hostname = name
+                    except Exception:
+                        pass
 
     if args.deep and is_root:
         nmap_deep_scan(list(by_ip.values()))
+
+    for h in by_ip.values():
+        if h.device_type is None:
+            h.device_type = _infer_device_type(h)
 
     hosts_sorted = sorted(by_ip.values(), key=_sort_key)
 
@@ -857,14 +1257,21 @@ def main() -> int:
     else:
         out_console = Console()
         out_console.print(
-            build_table(hosts_sorted, wide=args.wide, unknown=unknown_keys, changed=changed_ip_keys)
+            build_table(
+                hosts_sorted,
+                wide=args.wide,
+                unknown=unknown_keys,
+                changed=changed_ip_keys,
+            )
         )
         if unknown_keys or changed_ip_keys:
             parts = []
             if unknown_keys:
                 parts.append(f"[bold red]{len(unknown_keys)} unknown device(s)[/]")
             if changed_ip_keys:
-                parts.append(f"[yellow]{len(changed_ip_keys)} device(s) with changed IP[/]")
+                parts.append(
+                    f"[yellow]{len(changed_ip_keys)} device(s) with changed IP[/]"
+                )
             out_console.print(
                 " · ".join(parts) + " — run with [bold]--learn[/] to trust them."
             )

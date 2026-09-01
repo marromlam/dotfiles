@@ -3,11 +3,22 @@ font-family = JetBrainsMono Nerd Font Mono
 # Window decorations
 gtk-titlebar = false
 
-# Window management keybindings
+# Keybindings
+# `clear` wipes every keybind defined before it, including ALL of Ghostty's
+# built-in defaults (copy/paste, new tab/window, font size, tab switching,
+# quit, etc.) — nothing but what's listed below this line will work. It must
+# stay first: anything placed above it would be wiped too.
+keybind = clear
+
 keybind = ctrl+shift+m=toggle_fullscreen
 # Use Alt+Left-click to drag window (standard X11 behavior)
 # Use Alt+Right-click to resize window
 
+keybind = super+c=copy_to_clipboard:mixed
+keybind = super+v=paste_from_clipboard
+
+
+
 # BEGIN_GHOSTTY_THEME
-# theme = dracula-pro
+theme = dracula-pro
 # END_GHOSTTY_THEME

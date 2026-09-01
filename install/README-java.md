@@ -25,7 +25,7 @@ If you prefer to install manually:
 # Install OpenJDK
 brew install openjdk
 
-# The PATH is automatically configured in files/.config/zsh/macos.sh
+# The PATH is automatically configured in files/.zshrc (macOS section)
 # Just restart your terminal or source your .zshrc
 source ~/.zshrc
 

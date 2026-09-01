@@ -15,3 +15,6 @@ unset _brew_shellenv_cache
 export XDG_DATA_DIRS="$HOMEBREW_PREFIX/share:$XDG_DATA_DIRS"
 
 # }}}
+
+# Manual pages
+export MANPATH="/usr/local/man:$MANPATH"

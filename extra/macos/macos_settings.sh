@@ -5,8 +5,8 @@
 # change name the machine's name
 sudo scutil --set HostName mb
 
-# enable install from untrusted developers
-sudo spctl --master-disable
+# enable install from untrusted developers (requires manual confirmation in System Settings on macOS 13+)
+sudo spctl --master-disable 2>/dev/null || true
 
 # Stop System Preferences from overriding stuff
 osascript -e 'tell application "System Preferences" to quit'
@@ -27,7 +27,7 @@ done 2>/dev/null &
 defaults write -g ApplePressAndHoldEnabled -bool false
 
 # hide menu bar
-defaults write NSGlobalDomain _HIHideMenuBar -bool true
+defaults write NSGlobalDomain _HIHideMenuBar -bool false
 
 # show battery percentage in menu bar
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
@@ -49,8 +49,8 @@ defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 # Disable the “Are you sure you want to open this application?” dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
-# Disable Resume system-wide
-defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+# Disable Resume system-wide (sandboxed on macOS 14+, ignore failure)
+defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false 2>/dev/null || true
 
 # Disable the crash reporter
 defaults write com.apple.CrashReporter DialogType -string "none"

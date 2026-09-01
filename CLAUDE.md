@@ -157,16 +157,17 @@ make tmux
 
 ## ZSH Configuration
 
-ZSH config is split across multiple files in `files/.config/zsh/`:
-- `common.sh` - Common shell settings
-- `aliases.sh` - Alias definitions
-- `ufunctions.sh` - Utility functions
-- `prompt.sh` - Custom prompt configuration
-- `tmux_aliases.sh` - tmux-specific aliases
-- `conda.sh` - Conda environment setup
-- `macos.sh`, `linux.sh`, `windows.sh` - OS-specific settings
-- `plugins/` - ZSH plugin git submodules
-- `funcs/` - Additional function definitions
+Just 3 files, no `ZDOTDIR`, no `rc.d/`:
+- `files/.zshenv` - sourced by every zsh invocation (history, locale, editor, conda vars, dir shortcuts)
+- `files/.zprofile` - login shells only (cached Homebrew env, `MANPATH`, `XDG_DATA_DIRS`)
+- `files/.zshrc` - everything else: completions, plugins, history options, OS-specific
+  config + prompt, fzf, PATH assembly, all aliases/functions (git, nav, misc, tmux/zellij,
+  fzf helpers, docker helpers, AI quick-answer `?`/`??`/`???`), local/private override
+  hooks. Organized top-to-bottom with `# ---` section comments; read it directly rather
+  than looking for a file split.
+
+ZSH plugins are installed to `~/.local/share/zsh/plugins/` by
+`install/install_zsh.sh` (not git submodules).
 
 ## Common Development Tasks
 
@@ -221,8 +222,11 @@ make private  # Clones ~/Projects/personal/private-dotfiles and symlinks files
 
 ## Python/Conda Setup
 
-The repo includes conda management in `.config/zsh/conda.sh`:
-- `CONDA_AUTO_ACTIVATE_BASE=false` - Doesn't auto-activate base
+Conda is installed once via `install/install_conda.sh` (to `/opt/conda`, run manually
+or from `install/install_dependencies.sh`) and lazily activated by a `conda()` shell
+function in `files/.zshrc` — the real conda hook only loads on first actual `conda`
+invocation, not on every shell startup.
+- `CONDA_AUTO_ACTIVATE_BASE=false` (set in `files/.zshenv`) - Doesn't auto-activate base
 - Python packages listed in `requirements.txt` include:
   - `pynvim`, `neovim-remote` - For Neovim integration
   - `mcphub[all]` - MCP hub

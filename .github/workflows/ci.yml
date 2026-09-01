@@ -83,16 +83,8 @@ jobs:
             echo "OK: $1"
           }
           assert_path "$HOME/.config/nvim"
-          assert_path "$HOME/.config/zsh"
           assert_path "$HOME/.config/tmux"
           assert_path "$HOME/.config/git"
-
-      - name: Assert zshenv sets ZDOTDIR
-        run: |
-          result=$(bash -c 'source "$HOME/.zshenv" 2>/dev/null; echo "$ZDOTDIR"')
-          [[ "$result" == "$HOME/.config/zsh" ]] \
-            && echo "OK: ZDOTDIR=$result" \
-            || { echo "FAIL: ZDOTDIR='$result'"; exit 1; }
 
   lint:
     name: Lint
