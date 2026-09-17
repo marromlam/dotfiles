@@ -3,7 +3,26 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find ~/Workspaces/ ~/Workspaces/work ~/Workspaces/personal -mindepth 1 -maxdepth 1 -type d | fzf --height 100% --layout=reverse --prompt="Tmux Sessions> ")
+    # Prefix each folder with a sort key so existing tmux sessions are shown
+    # before folders that do not have a session yet.  Keep the path hidden from
+    # the picker, then remove the key after selection.
+    candidates=$(find ~/Workspaces/ ~/Workspaces/work ~/Workspaces/personal \
+        -mindepth 1 -maxdepth 1 -type d |
+        while IFS= read -r folder; do
+            session_name=$(basename "$folder" | tr . _)
+            if tmux has-session -t="$session_name" 2>/dev/null; then
+                sort_key=0
+            else
+                sort_key=1
+            fi
+            printf '%s\t%s\n' "$sort_key" "$folder"
+        done |
+        sort -t $'\t' -k1,1n -k2,2)
+
+    selected=$(printf '%s\n' "$candidates" |
+        fzf --no-sort --delimiter=$'\t' --with-nth=2.. \
+            --height 100% --layout=reverse --prompt="Tmux Sessions> ")
+    selected=${selected#*$'\t'}
 fi
 
 if [[ -z $selected ]]; then

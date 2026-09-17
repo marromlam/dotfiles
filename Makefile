@@ -54,9 +54,11 @@ tmux:
 	    git clone https://github.com/tmux-plugins/tpm "${TMUX_SHARE}/plugins/tpm"; \
 	fi
 	tmux start-server
-	tmux new-session -d
-	${TMUX_SHARE}/plugins/tpm/scripts/install_plugins.sh
-	tmux kill-server
+	if ! tmux has-session -t __dotfiles_plugin_install 2>/dev/null; then \
+	    tmux new-session -d -s __dotfiles_plugin_install; \
+	fi
+	${TMUX_SHARE}/plugins/tpm/bin/install_plugins
+	tmux kill-session -t __dotfiles_plugin_install 2>/dev/null || true
 
 nvim:
 	if [ ! -d "${FC}/files/.config/nvim" ]; then \

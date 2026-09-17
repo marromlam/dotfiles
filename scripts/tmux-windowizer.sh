@@ -1,35 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-TMUX_BINARY=`which tmux`
-# TMUX_BINARY="$TMUX_BINARY -S /home3/marcos.romero/tmux.socket"
-if [ $SSH_TTY ] && ! [ -n "$TMUX" ]; then
-  echo "within tmux"
-fi
+# Pick from every window in every session.  The final hidden field is the tmux
+# window ID, which keeps the selection unambiguous when names contain spaces.
+selection=$(tmux list-windows -a -F '#{session_name}\t#{window_index}\t#{window_name}\t#{window_id}' |
+  fzf --delimiter=$'\t' --with-nth=1,2,3 --prompt='tmux window> ' --height=100% --reverse) || exit 0
 
-# customizable
-LIST_DATA="#{session-name} #{window_name} #{pane_title} #{pane_current_path} #{pane_current_command}"
-FZF_COMMAND="fzf-tmux -p --delimiter=: --with-nth 4"
-FZF_COMMAND="fzf"
-
-# do not change
-TARGET_SPEC="#{session_name}:#{window_id}:#{pane_id}:"
-TARGET_SPEC="#{session_name}:#{window_name}:#{pane_id}:"
-
-# select pane
-# LINE=$(ssh nodo051 -- "${TMUX_BINARY} list-windows -a -F '#{session_name}§#{window_name}§#{window_id}'"  | $FZF_COMMAND) || exit 0
-LINE=$(tmux list-windows -a -F '#{session_name}§#{window_name}§#{window_id}'  | $FZF_COMMAND ) || exit 0
-
-echo $LINE
-# split the result
-COMPLETE_INFO=(${LINE//§/ })
-# WINDOW_AND_PANE=${COMPLETE_INFO[1]}
-# WINDOW_AND_PANE=(${WINDOW_AND_PANE//./ })
-echo ${COMPLETE_INFO[0]}
-echo ${COMPLETE_INFO[1]}
-echo ${COMPLETE_INFO[2]}
-
-# activate session/window/pane
-# ssh nodo051 -- "${TMUX_BINARY} select-window -t '${COMPLETE_INFO[2]}' && ${TMUX_BINARY} switch-client -t '${COMPLETE_INFO[0]}'"
-tmux select-window -t '${COMPLETE_INFO[0]}' && ${TMUX_BINARY} switch-client -t '${COMPLETE_INFO[1]}'
+window_id=${selection##*$'\t'}
+tmux switch-client -t "$window_id"
 
 # vim:fdm=marker

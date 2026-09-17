@@ -901,7 +901,7 @@ vim.g.rainbow_delimiters = {
 -- General plugins {{{
 vim.pack.add({
   -- Colorschemes
-  'https://github.com/folke/tokyonight.nvim',
+'https://github.com/vague-theme/vague.nvim',
 
   -- LSP
   -- 'https://github.com/neovim/nvim-lspconfig',
@@ -1031,20 +1031,20 @@ vim.pack.add({
 
 -- Colorscheme {{{
 
-require('tokyonight').setup({
-  style = 'night', -- 'storm', 'moon', 'night', 'day'
-  transparent = false,
-  terminal_colors = true,
-  styles = {
-    comments = { italic = true },
-    keywords = { italic = true },
-    functions = {},
-    variables = {},
-  },
-  sidebars = { 'qf', 'help', 'terminal' },
-  day_brightness = 0.3,
-})
-vim.cmd('colorscheme tokyonight')
+-- require('tokyonight').setup({
+--   style = 'night', -- 'storm', 'moon', 'night', 'day'
+--   transparent = false,
+--   terminal_colors = true,
+--   styles = {
+--     comments = { italic = true },
+--     keywords = { italic = true },
+--     functions = {},
+--     variables = {},
+--   },
+--   sidebars = { 'qf', 'help', 'terminal' },
+--   day_brightness = 0.3,
+-- })
+vim.cmd('colorscheme vague')
 
 -- }}}
 
@@ -1980,6 +1980,8 @@ do
   end
 end
 
+-- Neovim's replacement for the old vim.lsp.with pattern: add borders to LSP
+-- handler popups while preserving the handler's original arguments.
 local function _with_border(handler)
   return function(err, result, ctx, config)
     config = vim.tbl_extend('force', config or {}, { border = 'rounded' })
