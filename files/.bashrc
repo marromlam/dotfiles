@@ -119,4 +119,5 @@ if ! shopt -oq posix; then
 		. /etc/bash_completion
 	fi
 fi
+eval "$(direnv hook bash)"
 . "$HOME/.cargo/env"

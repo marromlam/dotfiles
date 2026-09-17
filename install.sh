@@ -20,7 +20,7 @@ ensure_machine_file() {
 		exit 1
 	fi
 
-	# shellcheck disable=SC1090
+	# shellcheck disable=SC1090,SC1091
 	source "$HOME/.machine"
 
 	case "${MACHINE:-}" in

@@ -990,6 +990,8 @@ vim.pack.add({
   -- Copilot / AI {{{
   'https://github.com/zbirenbaum/copilot.lua',
   'https://github.com/folke/sidekick.nvim',
+  'https://github.com/folke/snacks.nvim',
+  'https://github.com/coder/claudecode.nvim',
   -- }}}
 
   -- Database
@@ -1441,6 +1443,53 @@ vim.keymap.set(
   '<leader>ac',
   function() require('sidekick.cli').toggle({ name = 'claude', focus = true }) end,
   { desc = 'Sidekick Toggle Claude' }
+)
+
+require('claudecode').setup({
+  terminal_cmd = vim.fn.exepath('claude'),
+})
+
+vim.keymap.set(
+  'n',
+  '<leader>aC',
+  '<cmd>ClaudeCode<cr>',
+  { desc = 'Claude Code toggle' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>aF',
+  '<cmd>ClaudeCodeFocus<cr>',
+  { desc = 'Claude Code focus' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>aR',
+  '<cmd>ClaudeCode --resume<cr>',
+  { desc = 'Claude Code resume' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>aB',
+  '<cmd>ClaudeCodeAdd %<cr>',
+  { desc = 'Claude Code add buffer' }
+)
+vim.keymap.set(
+  'v',
+  '<leader>aS',
+  '<cmd>ClaudeCodeSend<cr>',
+  { desc = 'Claude Code send selection' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>aA',
+  '<cmd>ClaudeCodeDiffAccept<cr>',
+  { desc = 'Claude Code accept diff' }
+)
+vim.keymap.set(
+  'n',
+  '<leader>aD',
+  '<cmd>ClaudeCodeDiffDeny<cr>',
+  { desc = 'Claude Code deny diff' }
 )
 
 vim.api.nvim_create_autocmd('VimEnter', {

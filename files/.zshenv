@@ -1,6 +1,6 @@
 # Sourced by every zsh invocation (login, interactive, script)
 
-. "$HOME/.cargo/env"
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 # Directory paths
 export DOTFILES=$HOME/.dotfiles

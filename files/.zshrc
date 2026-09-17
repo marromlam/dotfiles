@@ -222,7 +222,8 @@ if [[ -f ~/.wsl ]]; then
     fi
   }
 
-  [[ -f $HOME/.vcxsrv ]] && export DISPLAY="$(cat $HOME/.vcxsrv)"
+  # Legacy VcXsrv DISPLAY override — disabled in favor of WSLg (:0).
+  # [[ -f $HOME/.vcxsrv ]] && export DISPLAY="$(cat $HOME/.vcxsrv)"
   get-vcxsrv-display() {
     IP4_ADDRESS=$(powershell.exe Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Wi-Fi | grep IPAddress | awk '{print $3}')
     rm -rf $HOME/.vcxsrv

@@ -16,7 +16,7 @@ fi
 
 machine_from_file() {
 	if [[ -f "$HOME/.machine" ]]; then
-		# shellcheck disable=SC1090
+		# shellcheck disable=SC1090,SC1091
 		source "$HOME/.machine"
 		echo "${MACHINE:-}"
 	else
