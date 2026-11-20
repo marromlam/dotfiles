@@ -222,7 +222,7 @@ make private  # Clones ~/Projects/personal/private-dotfiles and symlinks files
 
 ## Python/Conda Setup
 
-Conda is installed once via `install/install_conda.sh` (to `/opt/conda`, run manually
+Conda (Miniforge, conda-forge only) is installed once via `install/install_conda.sh` (to `~/miniforge3`, run manually
 or from `install/install_dependencies.sh`) and lazily activated by a `conda()` shell
 function in `files/.zshrc` — the real conda hook only loads on first actual `conda`
 invocation, not on every shell startup.

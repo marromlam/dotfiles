@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-CONDA_INSTALL_DIR="/opt/conda"
+# Miniforge (conda-forge only): Anaconda's defaults channel is not needed
+CONDA_INSTALL_DIR="${HOME}/miniforge3"
 
 if [[ -x "${CONDA_INSTALL_DIR}/bin/conda" ]]; then
 	echo "conda already installed at ${CONDA_INSTALL_DIR}. Skipping."
@@ -35,24 +36,19 @@ case "$(uname -m)" in
 		;;
 esac
 
-conda_url="https://repo.anaconda.com/miniconda/Miniconda3-latest-${conda_os}-${conda_arch}.sh"
-conda_installer="${HOME}/miniconda.sh"
+conda_url="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-${conda_os}-${conda_arch}.sh"
+conda_installer="${HOME}/miniforge.sh"
 
 if command -v wget >/dev/null 2>&1; then
 	wget "${conda_url}" -O "${conda_installer}"
 elif command -v curl >/dev/null 2>&1; then
 	curl -fsSL "${conda_url}" -o "${conda_installer}"
 else
-	echo "Neither wget nor curl is available to download Miniconda." >&2
+	echo "Neither wget nor curl is available to download Miniforge." >&2
 	exit 1
 fi
 
-sudo mkdir -p /opt
-sudo chown -R "$(whoami)" /opt
-
 bash "${conda_installer}" -b -p "${CONDA_INSTALL_DIR}"
 rm -f "${conda_installer}"
-
-"${CONDA_INSTALL_DIR}/bin/conda" config --append channels conda-forge
 
 echo "conda installed at ${CONDA_INSTALL_DIR}. Open a new shell and run 'conda' to activate it."

@@ -14,7 +14,7 @@
 # --- conda (activate) --- {{{
 # Install happens once, out-of-band, via install/install_conda.sh — this is
 # just the lazy activation shim so a plain shell startup never touches conda.
-CONDA_INSTALL_DIR="/opt/conda"
+CONDA_INSTALL_DIR="$HOME/miniforge3"
 conda() {
   if [[ ! -x "${CONDA_INSTALL_DIR}/bin/conda" ]]; then
     echo "conda not installed — run install/install_conda.sh" >&2
